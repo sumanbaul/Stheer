@@ -61,7 +61,10 @@ class _NotificationsLogState extends State<NotificationsLog> {
       // }
 
       if (event.packageName.contains("skydrive") ||
-          (event.packageName.contains("service"))) {
+          (event.packageName.contains("service")) ||
+          (event.packageName.contains("notifoo")) ||
+          (event.packageName.contains("screenshot")) ||
+          (event.packageName.contains("gallery"))) {
         print(event.packageName);
       } else {
         _log.add(event);
@@ -130,49 +133,65 @@ class _NotificationsLogState extends State<NotificationsLog> {
               reverse: true,
               itemBuilder: (BuildContext context, int idx) {
                 final entry = _log[idx];
-                return Container(
-                  margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(10),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        offset: const Offset(
-                          2.0,
-                          2.0,
-                        ),
-                        blurRadius: 5.0,
-                        spreadRadius: 2.0,
-                      ), //BoxShadow
-                      BoxShadow(
-                        color: Colors.white,
-                        offset: const Offset(0.0, 0.0),
-                        blurRadius: 0.0,
-                        spreadRadius: 0.0,
-                      ), //BoxShadow
-                    ],
-                  ),
-                  padding: EdgeInsets.all(5.0),
-                  child: ListTile(
-                    trailing:
-                        Text(entry.packageName.toString().split('.').last),
-                    //Text(entry.packageName.toString()),
-                    title: Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(entry.title ?? "<<no title>>"),
-                          // Text(entry.text.toString()),
-                          //Text(entry.message.toString() ?? ""),
-                          //Text(entry.timestamp.toString())
-                        ],
+                return InkWell(
+                  child: Container(
+                    margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(10),
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          offset: const Offset(
+                            2.0,
+                            2.0,
+                          ),
+                          blurRadius: 5.0,
+                          spreadRadius: 2.0,
+                        ), //BoxShadow
+                        BoxShadow(
+                          color: Colors.white,
+                          offset: const Offset(0.0, 0.0),
+                          blurRadius: 0.0,
+                          spreadRadius: 0.0,
+                        ), //BoxShadow
+                      ],
                     ),
-                    //subtitle: Text(entry.createAt.toString().substring(0, 11)),
-                    subtitle: Text(entry.text.toString()),
+                    padding: EdgeInsets.all(5.0),
+                    child: ListTile(
+                      //Text(entry.packageName.toString()),
+                      title: Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(entry.title ?? "<<no title>>"),
+                            // Text(entry.text.toString()),
+                            //Text(entry.message.toString() ?? ""),
+                            //Text(entry.timestamp.toString())
+                            Text(entry.packageName
+                                .toString()
+                                .split('.')
+                                .last), //use this somewhere else, this use is for checking package name on view
+                          ],
+                        ),
+                      ),
+                      //subtitle: Text(entry.createAt.toString().substring(0, 11)),
+                      subtitle: Text(entry.text.toString()),
+                      trailing:
+                          //  Text(entry.packageName.toString().split('.').last),
+                          Icon(Icons.keyboard_arrow_right),
+                      onTap: () {
+                        final _packageName = SnackBar(
+                            content: Text(
+                                entry.packageName.toString().split('.').last));
+
+                        print(entry.packageName.toString().split('.').last);
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(_packageName);
+                      },
+                    ),
                   ),
                 );
               })),
