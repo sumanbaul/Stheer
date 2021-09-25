@@ -17,6 +17,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
   List<NotificationEvent> _log = [];
   bool started = false;
   bool _loading = false;
+  String packageName = "";
 
   ReceivePort port = ReceivePort();
 
@@ -63,8 +64,11 @@ class _NotificationsLogState extends State<NotificationsLog> {
       //   _log.add(event);
       // }
 
+      packageName =
+          event.packageName.toString().split('.').last.capitalizeFirstofEach;
       if (event.packageName.contains("skydrive") ||
           (event.packageName.contains("service")) ||
+          (event.packageName.contains("android")) ||
           (event.packageName.contains("notifoo")) ||
           (event.packageName.contains("screenshot")) ||
           (event.packageName.contains("gallery"))) {
@@ -175,16 +179,14 @@ class _NotificationsLogState extends State<NotificationsLog> {
                 contentPadding:
                     EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
                 leading: Icon(Icons.notifications),
-                title: Text(element.title ?? "<<no title>>"),
+                title: Text(element.title ?? packageName),
                 subtitle: Text(element.text.toString()),
                 //trailing: Text(element.text.toString()),
                 trailing:
                     //  Text(entry.packageName.toString().split('.').last),
                     Icon(Icons.keyboard_arrow_right),
                 onTap: () {
-                  final _packageName = SnackBar(
-                      content:
-                          Text(element.packageName.toString().split('.').last));
+                  final _packageName = SnackBar(content: Text(packageName));
 
                   print(element.packageName.toString().split('.').last);
                   ScaffoldMessenger.of(context).showSnackBar(_packageName);
