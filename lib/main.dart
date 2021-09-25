@@ -21,6 +21,9 @@ class _MyAppState extends State<MyApp> {
     return new MaterialApp(
       debugShowCheckedModeBanner: false,
       home: NotificationsLog(),
+      //  theme: ThemeData(
+      //   primarySwatch: Colors.blue,
+      // ),
     );
   }
 }
