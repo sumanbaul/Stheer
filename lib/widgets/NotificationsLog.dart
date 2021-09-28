@@ -151,75 +151,78 @@ class _NotificationsLogState extends State<NotificationsLog> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             print(snapshot.data);
-        return StickyGroupedListView<NotificationEvent, String>(
-          elements: _log,
-          order: StickyGroupedListOrder.DESC,
-          groupBy: (NotificationEvent element) => element.packageName.toString(),
-          groupComparator: (String value1, String value2) =>
-              value2.compareTo(value1),
-          itemComparator:
-              (NotificationEvent element1, NotificationEvent element2) =>
-                  element1.packageName.compareTo(element2.packageName),
-          floatingHeader: true,
-          groupSeparatorBuilder: (NotificationEvent element) => Container(
-            height: 50,
-            child: Align(
-              alignment: Alignment.center,
-              child: Container(
-                width: 120,
-                decoration: BoxDecoration(
-                  color: Colors.blue[300],
-                  border: Border.all(
-                    color: Colors.blue[300],
-                  ),
-                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    '${element.packageName.toString().split('.').last.capitalizeFirstofEach}',
-                    textAlign: TextAlign.center,
+            return StickyGroupedListView<NotificationEvent, String>(
+              elements: _log,
+              order: StickyGroupedListOrder.DESC,
+              groupBy: (NotificationEvent element) =>
+                  element.packageName.toString(),
+              groupComparator: (String value1, String value2) =>
+                  value2.compareTo(value1),
+              itemComparator:
+                  (NotificationEvent element1, NotificationEvent element2) =>
+                      element1.packageName.compareTo(element2.packageName),
+              floatingHeader: true,
+              groupSeparatorBuilder: (NotificationEvent element) => Container(
+                height: 50,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Container(
+                    width: 120,
+                    decoration: BoxDecoration(
+                      color: Colors.blue[300],
+                      border: Border.all(
+                        color: Colors.blue[300],
+                      ),
+                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        '${element.packageName.toString().split('.').last.capitalizeFirstofEach}',
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-          itemBuilder: (_, NotificationEvent element) {
-            return Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6.0),
-              ),
-              elevation: 8.0,
-              margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
-              child: Container(
-                child: ListTile(
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                  leading: Icon(Icons.notifications),
-                  title: Text(element.title ?? packageName),
-                  subtitle: Text(element.text.toString()),
-                  //trailing: Text(element.text.toString()),
-                  trailing:
-                      //  Text(entry.packageName.toString().split('.').last),
-                      Icon(Icons.keyboard_arrow_right),
-                  onTap: () {
-                    final _packageName = SnackBar(content: Text(packageName));
+              itemBuilder: (_, NotificationEvent element) {
+                return Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6.0),
+                  ),
+                  elevation: 8.0,
+                  margin:
+                      new EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+                  child: Container(
+                    child: ListTile(
+                      contentPadding: EdgeInsets.symmetric(
+                          horizontal: 20.0, vertical: 10.0),
+                      leading: Icon(Icons.notifications),
+                      title: Text(element.title ?? packageName),
+                      subtitle: Text(element.text.toString()),
+                      //trailing: Text(element.text.toString()),
+                      trailing:
+                          //  Text(entry.packageName.toString().split('.').last),
+                          Icon(Icons.keyboard_arrow_right),
+                      onTap: () {
+                        final _packageName =
+                            SnackBar(content: Text(packageName));
 
-                    print(element.packageName.toString().split('.').last);
-                    ScaffoldMessenger.of(context).showSnackBar(_packageName);
-                  },
-                ),
-              ),
+                        print(element.packageName.toString().split('.').last);
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(_packageName);
+                      },
+                    ),
+                  ),
+                );
+              },
             );
-          }
-        );
-      
-
-} else if (snapshot.hasError) {
+          } else if (snapshot.hasError) {
             return Text("Oops!");
           }
           return Center(child: CircularProgressIndicator());
-
+        },
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: started ? stopListening : startListening,
         tooltip: 'Start/Stop sensing',
