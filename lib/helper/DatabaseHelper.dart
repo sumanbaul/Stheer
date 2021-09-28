@@ -22,7 +22,7 @@ class DatabaseHelper {
     return await openDatabase(join(await getDatabasesPath(), databaseName),
         version: 1, onCreate: (Database db, int version) async {
       await db.execute(
-          "CREATE TABLE notifications (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, textLines TEXT, summaryText TEXT, showWhen INTEGER, package_name TEXT, text TEXT, title TEXT, subText TEXT, timestamp TEXT)");
+          "CREATE TABLE notifications (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, infoText TEXT, summaryText TEXT, showWhen INTEGER, package_name TEXT, text TEXT,  subText TEXT, timestamp TEXT)");
     });
   }
 

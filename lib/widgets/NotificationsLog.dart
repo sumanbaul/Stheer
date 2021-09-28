@@ -81,9 +81,9 @@ class _NotificationsLogState extends State<NotificationsLog> {
         DatabaseHelper.instance.insertNotification(Notifications(
             title: event.title,
             infoText: event.text,
-            showWhen: true,
+            showWhen: 1,
             subText: event.text,
-            timestamp: event.timestamp,
+            timestamp: event.timestamp.toString(),
             package_name: event.packageName,
             text: event.text,
             summaryText: event.text));
