@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'Pages/NotificationsLog.dart';
+import 'widgets/NotificationsLog.dart';
 
 void main() {
   runApp(MyApp());
