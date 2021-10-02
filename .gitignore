@@ -44,3 +44,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+
+.DS_Store 
+key.properties
+upload-keystore.jks
