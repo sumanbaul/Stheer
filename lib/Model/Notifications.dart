@@ -39,4 +39,8 @@ class Notifications {
       'timestamp': timestamp
     };
   }
+
+  // Notifications.FromJson(Map json) {
+  //   this.package_name = json["package_name"];
+  // }
 }

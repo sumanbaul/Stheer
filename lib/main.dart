@@ -20,10 +20,11 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return new MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData.dark().copyWith(
+        primaryColor: Color(0xff0A0E21),
+        scaffoldBackgroundColor: Color(0xFF0A0E21),
+      ),
       home: NotificationsLog(),
-      //  theme: ThemeData(
-      //   primarySwatch: Colors.blue,
-      // ),
     );
   }
 }

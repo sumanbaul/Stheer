@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:isolate';
 import 'dart:ui';
 import 'dart:async';
@@ -6,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:sticky_grouped_list/sticky_grouped_list.dart';
-import 'package:device_apps/device_apps.dart';
+//import 'package:device_apps/device_apps.dart';
 import 'package:notifoo/extensions/textFormat.dart';
 import 'package:notifoo/model/Notifications.dart';
 
@@ -17,6 +18,7 @@ class NotificationsLog extends StatefulWidget {
 
 class _NotificationsLogState extends State<NotificationsLog> {
   List<NotificationEvent> _log = [];
+  List<Notifications> _logNotification = [];
   bool started = false;
   bool _loading = false;
   String packageName = "";
@@ -31,7 +33,9 @@ class _NotificationsLogState extends State<NotificationsLog> {
 
   // we must use static method, to handle in background
   static void _callback(NotificationEvent evt) {
-    print("send evt to ui: $evt");
+    print(
+      "send evt to ui: $evt",
+    );
     final SendPort send = IsolateNameServer.lookupPortByName("_listener_");
     if (send == null) print("can't find the sender");
     send?.send(evt);
@@ -52,7 +56,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
 
     var isR = await NotificationsListener.isRunning;
     print("""Service is ${!isR ? "not " : ""}aleary running""");
-    GetListOfApps();
+    //GetListOfApps();
     setState(() {
       started = isR;
     });
@@ -74,19 +78,42 @@ class _NotificationsLogState extends State<NotificationsLog> {
           (event.packageName.contains("notifoo")) ||
           (event.packageName.contains("screenshot")) ||
           (event.packageName.contains("gallery"))) {
-        print(event.packageName);
+        //print(event.packageName);
       } else {
-        _log.add(event);
+        var jsonData = json.decoder.convert(event.toString());
 
-        DatabaseHelper.instance.insertNotification(Notifications(
-            title: event.title,
-            infoText: event.text,
-            showWhen: 1,
-            subText: event.text,
-            timestamp: event.timestamp.toString(),
-            package_name: event.packageName,
-            text: event.text,
-            summaryText: event.text));
+        _log.add(event);
+        // _logNotification.add(jsonData);
+        print("something");
+
+        // DatabaseHelper.instance.insertNotification(_logNotification.last);
+
+        //Map<String, dynamic> datas = jsonDecode(jsonData);
+        // print("jsonData['summaryText']:" + jsonData["summaryText"]);
+        //print("jsonData['package_name']:" + jsonData["package_name"]);
+        //print("jsonData['textLines']:" + jsonData["textLines"]);
+        //print("jsonData['summaryText']:" + jsonData["summaryText"]);
+
+        // DatabaseHelper.instance.insertNotification(Notifications(
+        //     title: jsonData["title"],
+        //     infoText: jsonData["textLines"],
+        //     showWhen: int.parse(jsonData["showWhen"]),
+        //     subText: jsonData["subtext"],
+        //     timestamp: jsonData["timestamp"].toString(),
+        //     package_name: jsonData["package_name"],
+        //     text: jsonData["text"],
+        //     summaryText: jsonData["summaryText"]));
+        DatabaseHelper.instance.insertNotification(
+          Notifications(
+              title: jsonData["title"],
+              infoText: jsonData["text"],
+              showWhen: 1,
+              subText: jsonData["text"],
+              timestamp: event.timestamp.toString(),
+              package_name: jsonData["package_name"],
+              text: jsonData["text"],
+              summaryText: jsonData["summaryText"] ?? ""),
+        );
       }
     });
     // if (!event.packageName.contains("example") ||
@@ -96,7 +123,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
     //   // TODO: fix bug
     //   // NotificationsListener.promoteToForeground("");
     // }
-    print(event.toString());
+    print("Print Notification: $event");
   }
 
   void startListening() async {
@@ -150,19 +177,18 @@ class _NotificationsLogState extends State<NotificationsLog> {
         future: DatabaseHelper.instance.getNotifications(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            print(snapshot.data);
-            return StickyGroupedListView<NotificationEvent, String>(
-              elements: _log,
+            // print("Snapshot data: $snapshot.data");
+            return StickyGroupedListView<Notifications, String>(
+              elements: snapshot.data,
               order: StickyGroupedListOrder.DESC,
-              groupBy: (NotificationEvent element) =>
-                  element.packageName.toString(),
+              groupBy: (Notifications element) => element.package_name,
               groupComparator: (String value1, String value2) =>
                   value2.compareTo(value1),
               itemComparator:
-                  (NotificationEvent element1, NotificationEvent element2) =>
-                      element1.packageName.compareTo(element2.packageName),
+                  (Notifications element1, Notifications element2) =>
+                      element1.package_name.compareTo(element2.package_name),
               floatingHeader: true,
-              groupSeparatorBuilder: (NotificationEvent element) => Container(
+              groupSeparatorBuilder: (Notifications element) => Container(
                 height: 50,
                 child: Align(
                   alignment: Alignment.center,
@@ -178,14 +204,14 @@ class _NotificationsLogState extends State<NotificationsLog> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        '${element.packageName.toString().split('.').last.capitalizeFirstofEach}',
+                        '${element.package_name.toString().split('.').last.capitalizeFirstofEach}',
                         textAlign: TextAlign.center,
                       ),
                     ),
                   ),
                 ),
               ),
-              itemBuilder: (_, NotificationEvent element) {
+              itemBuilder: (_, Notifications element) {
                 return Card(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6.0),
@@ -208,7 +234,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
                         final _packageName =
                             SnackBar(content: Text(packageName));
 
-                        print(element.packageName.toString().split('.').last);
+                        //print(element.packageName.toString().split('.').last);
                         ScaffoldMessenger.of(context)
                             .showSnackBar(_packageName);
                       },
@@ -235,10 +261,10 @@ class _NotificationsLogState extends State<NotificationsLog> {
 }
 
 Future<String> GetListOfApps() async {
-  List _apps = await DeviceApps.getInstalledApplications(
-      onlyAppsWithLaunchIntent: true,
-      includeAppIcons: true,
-      includeSystemApps: true);
+  // List _apps = await DeviceApps.getInstalledApplications(
+  //     onlyAppsWithLaunchIntent: true,
+  //     includeAppIcons: true,
+  //     includeSystemApps: true);
 
-  print(_apps);
+  //print(_apps);
 }
