@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:sticky_grouped_list/sticky_grouped_list.dart';
-//import 'package:device_apps/device_apps.dart';
+import 'package:device_apps/device_apps.dart';
 import 'package:notifoo/extensions/textFormat.dart';
 import 'package:notifoo/model/Notifications.dart';
 
@@ -18,7 +18,9 @@ class NotificationsLog extends StatefulWidget {
 
 class _NotificationsLogState extends State<NotificationsLog> {
   List<NotificationEvent> _log = [];
-  List<Notifications> _logNotification = [];
+  //List<Notifications> _logNotification = [];
+  List<Application> _apps;
+  ApplicationWithIcon _currentApp;
   bool started = false;
   bool _loading = false;
   String packageName = "";
@@ -56,10 +58,12 @@ class _NotificationsLogState extends State<NotificationsLog> {
 
     var isR = await NotificationsListener.isRunning;
     print("""Service is ${!isR ? "not " : ""}aleary running""");
-    //GetListOfApps();
+    GetListOfApps();
     setState(() {
       started = isR;
     });
+
+    //var getData = DatabaseHelper.instance.getNotifications();
   }
 
   void onData(NotificationEvent event) {
@@ -80,11 +84,32 @@ class _NotificationsLogState extends State<NotificationsLog> {
           (event.packageName.contains("gallery"))) {
         //print(event.packageName);
       } else {
-        var jsonData = json.decoder.convert(event.toString());
+        for (var app in _apps) {
+          //print(app);
+          // print(app.packageName);
+          //var x = app;
+          if (app.packageName == event.packageName) {
+            _currentApp = app;
+            print("Success Package Found: " + app.packageName);
 
-        _log.add(event);
+            var jsonData = json.decoder.convert(event.toString());
+            _log.add(event);
+            DatabaseHelper.instance.insertNotification(
+              Notifications(
+                  title: jsonData["title"],
+                  infoText: jsonData["text"],
+                  showWhen: 1,
+                  subText: jsonData["text"],
+                  timestamp: event.timestamp.toString(),
+                  package_name: jsonData["package_name"],
+                  text: jsonData["text"],
+                  summaryText: jsonData["summaryText"] ?? ""),
+            );
+          }
+        }
+
         // _logNotification.add(jsonData);
-        print("something");
+        //print("something");
 
         // DatabaseHelper.instance.insertNotification(_logNotification.last);
 
@@ -103,17 +128,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
         //     package_name: jsonData["package_name"],
         //     text: jsonData["text"],
         //     summaryText: jsonData["summaryText"]));
-        DatabaseHelper.instance.insertNotification(
-          Notifications(
-              title: jsonData["title"],
-              infoText: jsonData["text"],
-              showWhen: 1,
-              subText: jsonData["text"],
-              timestamp: event.timestamp.toString(),
-              package_name: jsonData["package_name"],
-              text: jsonData["text"],
-              summaryText: jsonData["summaryText"] ?? ""),
-        );
+
       }
     });
     // if (!event.packageName.contains("example") ||
@@ -167,6 +182,15 @@ class _NotificationsLogState extends State<NotificationsLog> {
     });
   }
 
+//getting list of apps
+  Future<String> GetListOfApps() async {
+    _apps = await DeviceApps.getInstalledApplications(
+        onlyAppsWithLaunchIntent: true,
+        includeAppIcons: true,
+        includeSystemApps: true);
+    //print(_apps);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -218,26 +242,21 @@ class _NotificationsLogState extends State<NotificationsLog> {
                   ),
                   elevation: 8.0,
                   margin:
-                      new EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+                      new EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
                   child: Container(
                     child: ListTile(
-                      contentPadding: EdgeInsets.symmetric(
-                          horizontal: 20.0, vertical: 10.0),
-                      leading: Icon(Icons.notifications),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 10.0, vertical: 2.0),
+                      leading: _currentApp is ApplicationWithIcon
+                          ? Image.memory(_currentApp.icon)
+                          : null,
                       title: Text(element.title ?? packageName),
                       subtitle: Text(element.text.toString()),
                       //trailing: Text(element.text.toString()),
                       trailing:
                           //  Text(entry.packageName.toString().split('.').last),
                           Icon(Icons.keyboard_arrow_right),
-                      onTap: () {
-                        final _packageName =
-                            SnackBar(content: Text(packageName));
-
-                        //print(element.packageName.toString().split('.').last);
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(_packageName);
-                      },
+                      onTap: () => onAppClicked(context, _currentApp),
                     ),
                   ),
                 );
@@ -258,13 +277,45 @@ class _NotificationsLogState extends State<NotificationsLog> {
       ),
     );
   }
+
+  onAppClicked(BuildContext context, Application app) {
+    final appName = SnackBar(content: Text(app.appName));
+    ScaffoldMessenger.of(context).showSnackBar(appName);
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(app.appName),
+            actions: <Widget>[
+              _AppButtonAction(
+                label: 'Open app',
+                onPressed: () => app.openApp(),
+              ),
+              _AppButtonAction(
+                label: 'Open app settings',
+                onPressed: () => app.openSettingsScreen(),
+              ),
+            ],
+          );
+        });
+  }
 }
 
-Future<String> GetListOfApps() async {
-  // List _apps = await DeviceApps.getInstalledApplications(
-  //     onlyAppsWithLaunchIntent: true,
-  //     includeAppIcons: true,
-  //     includeSystemApps: true);
+class _AppButtonAction extends StatelessWidget {
+  final String label;
+  final VoidCallback onPressed;
 
-  //print(_apps);
+  _AppButtonAction({this.label, this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: () {
+        onPressed?.call();
+        Navigator.of(context).maybePop();
+      },
+      child: Text(label),
+    );
+  }
 }
