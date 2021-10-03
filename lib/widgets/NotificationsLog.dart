@@ -21,6 +21,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
   //List<Notifications> _logNotification = [];
   List<Application> _apps;
   ApplicationWithIcon _currentApp;
+
   bool started = false;
   bool _loading = false;
   String packageName = "";
@@ -191,6 +192,15 @@ class _NotificationsLogState extends State<NotificationsLog> {
     //print(_apps);
   }
 
+  Application GetCurrentApp(String packageName) {
+    for (var app in _apps) {
+      if (app.packageName == packageName) {
+        _currentApp = app;
+        return _currentApp;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -201,6 +211,8 @@ class _NotificationsLogState extends State<NotificationsLog> {
         future: DatabaseHelper.instance.getNotifications(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            var packageName = (Notifications element) => element.package_name;
+            GetCurrentApp(packageName.toString());
             // print("Snapshot data: $snapshot.data");
             return StickyGroupedListView<Notifications, String>(
               elements: snapshot.data,
