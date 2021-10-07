@@ -59,7 +59,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
 
     var isR = await NotificationsListener.isRunning;
     print("""Service is ${!isR ? "not " : ""}aleary running""");
-    GetListOfApps();
+    getListOfApps();
     setState(() {
       started = isR;
     });
@@ -184,7 +184,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
   }
 
 //getting list of apps
-  Future<String> GetListOfApps() async {
+  Future<String> getListOfApps() async {
     _apps = await DeviceApps.getInstalledApplications(
         onlyAppsWithLaunchIntent: true,
         includeAppIcons: true,
@@ -192,13 +192,14 @@ class _NotificationsLogState extends State<NotificationsLog> {
     //print(_apps);
   }
 
-  Application GetCurrentApp(String packageName) {
+  Application getCurrentApp(String packageName) {
+    getListOfApps();
     for (var app in _apps) {
       if (app.packageName == packageName) {
         _currentApp = app;
-        return _currentApp;
       }
     }
+    return _currentApp;
   }
 
   @override
@@ -211,8 +212,8 @@ class _NotificationsLogState extends State<NotificationsLog> {
         future: DatabaseHelper.instance.getNotifications(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            var packageName = (Notifications element) => element.package_name;
-            GetCurrentApp(packageName.toString());
+            //var packageName = (Notifications element) => element.package_name;
+            //getCurrentApp(packageName.toString());
             // print("Snapshot data: $snapshot.data");
             return StickyGroupedListView<Notifications, String>(
               elements: snapshot.data,
@@ -248,6 +249,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
                 ),
               ),
               itemBuilder: (_, Notifications element) {
+                getCurrentApp(element.package_name);
                 return Card(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6.0),
