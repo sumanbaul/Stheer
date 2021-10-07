@@ -4,6 +4,8 @@ import 'dart:ui';
 import 'dart:async';
 import 'package:flutter/material.dart';
 
+import 'package:android_notification_listener2/android_notification_listener2.dart';
+
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:sticky_grouped_list/sticky_grouped_list.dart';
@@ -17,6 +19,12 @@ class NotificationsLog extends StatefulWidget {
 }
 
 class _NotificationsLogState extends State<NotificationsLog> {
+//new library implementation(testing purpose)
+  AndroidNotificationListener _notifications;
+  StreamSubscription<NotificationEventV2> _subscription;
+
+//////////////////
+
   List<NotificationEvent> _log = [];
   //List<Notifications> _logNotification = [];
   List<Application> _apps;
@@ -30,9 +38,20 @@ class _NotificationsLogState extends State<NotificationsLog> {
 
   @override
   void initState() {
-    initPlatformState();
     super.initState();
+    initPlatformState();
   }
+
+/////
+  ///
+  ///new code new library test
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
 
   // we must use static method, to handle in background
   static void _callback(NotificationEvent evt) {
@@ -46,6 +65,8 @@ class _NotificationsLogState extends State<NotificationsLog> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
+    startListening2();
+
     NotificationsListener.initialize(callbackHandle: _callback);
 
     // this can fix restart<debug> can't handle error
@@ -65,6 +86,22 @@ class _NotificationsLogState extends State<NotificationsLog> {
     });
 
     //var getData = DatabaseHelper.instance.getNotifications();
+  }
+
+  void onData2(NotificationEventV2 event) {
+    print(event);
+    print('converting package extra to json');
+    var jsonDatax = json.decode(event.packageExtra);
+    print(jsonDatax);
+  }
+
+  void startListening2() {
+    _notifications = new AndroidNotificationListener();
+    try {
+      _subscription = _notifications.notificationStream.listen(onData2);
+    } on NotificationExceptionV2 catch (exception) {
+      print(exception);
+    }
   }
 
   void onData(NotificationEvent event) {
