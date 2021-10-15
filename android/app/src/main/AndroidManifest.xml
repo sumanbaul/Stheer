@@ -38,19 +38,20 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-       <receiver android:name="im.zoe.labs.flutter_notification_listener.RebootBroadcastReceiver"
-           android:enabled="true">
-           <intent-filter>
-               <action android:name="android.intent.action.BOOT_COMPLETED" />
-           </intent-filter>
-       </receiver>
+       
         <service android:name="im.zoe.labs.flutter_notification_listener.NotificationsHandlerService"
-            android:label="Flutter Notifications Handler"
+            android:label="Notifoo Notifications Handler"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>
                <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
+        <receiver android:name="im.zoe.labs.flutter_notification_listener.RebootBroadcastReceiver"
+           android:enabled="true">
+           <intent-filter>
+               <action android:name="android.intent.action.BOOT_COMPLETED" />
+           </intent-filter>
+       </receiver>
     </application>
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
 </manifest>

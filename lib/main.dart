@@ -24,7 +24,8 @@ class _MyAppState extends State<MyApp> {
         primaryColor: Color(0xff0A0E21),
         scaffoldBackgroundColor: Color(0xFF0A0E21),
       ),
-      home: NotificationsLog(),
+      title: "Notifoo",
+      home: new NotificationsLog(title: "Notifoo"),
     );
   }
 }

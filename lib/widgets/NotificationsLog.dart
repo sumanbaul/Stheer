@@ -8,15 +8,23 @@ import 'package:flutter_notification_listener/flutter_notification_listener.dart
 import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 import 'package:device_apps/device_apps.dart';
-import 'package:notifoo/extensions/textFormat.dart';
+//import 'package:notifoo/extensions/textFormat.dart';
 import 'package:notifoo/model/Notifications.dart';
+import 'package:notifoo/widgets/Topbar.dart';
+import 'package:notifoo/widgets/BottomBar.dart';
+
+//import 'Notifications/NotificationsList.dart';
 
 class NotificationsLog extends StatefulWidget {
+  NotificationsLog({Key key, this.title}) : super(key: key);
+
+  final String title;
   @override
   _NotificationsLogState createState() => _NotificationsLogState();
 }
 
 class _NotificationsLogState extends State<NotificationsLog> {
+  // getCurrentApp();
   List<NotificationEvent> _log = [];
   //List<Notifications> _logNotification = [];
   List<Application> _apps;
@@ -69,14 +77,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
 
   void onData(NotificationEvent event) {
     setState(() {
-      // if (!event.packageName.contains("example") ||
-      //     !event.packageName.contains("discover") ||
-      //     !event.packageName.contains("service")) {
-      //   _log.add(event);
-      // }
-
-      packageName =
-          event.packageName.toString().split('.').last.capitalizeFirstofEach;
+      //packageName = event.packageName.toString().split('.').last.capitalizeFirstofEach;
       if (event.packageName.contains("skydrive") ||
           (event.packageName.contains("service")) ||
           (event.packageName.contains("android")) ||
@@ -91,7 +92,8 @@ class _NotificationsLogState extends State<NotificationsLog> {
           //var x = app;
           if (app.packageName == event.packageName) {
             _currentApp = app;
-            print("Success Package Found: " + app.packageName);
+            packageName = event.packageName;
+            // print("Success Package Found: " + app.packageName);
 
             var jsonData = json.decoder.convert(event.toString());
             _log.add(event);
@@ -108,28 +110,6 @@ class _NotificationsLogState extends State<NotificationsLog> {
             );
           }
         }
-
-        // _logNotification.add(jsonData);
-        //print("something");
-
-        // DatabaseHelper.instance.insertNotification(_logNotification.last);
-
-        //Map<String, dynamic> datas = jsonDecode(jsonData);
-        // print("jsonData['summaryText']:" + jsonData["summaryText"]);
-        //print("jsonData['package_name']:" + jsonData["package_name"]);
-        //print("jsonData['textLines']:" + jsonData["textLines"]);
-        //print("jsonData['summaryText']:" + jsonData["summaryText"]);
-
-        // DatabaseHelper.instance.insertNotification(Notifications(
-        //     title: jsonData["title"],
-        //     infoText: jsonData["textLines"],
-        //     showWhen: int.parse(jsonData["showWhen"]),
-        //     subText: jsonData["subtext"],
-        //     timestamp: jsonData["timestamp"].toString(),
-        //     package_name: jsonData["package_name"],
-        //     text: jsonData["text"],
-        //     summaryText: jsonData["summaryText"]));
-
       }
     });
     // if (!event.packageName.contains("example") ||
@@ -205,9 +185,9 @@ class _NotificationsLogState extends State<NotificationsLog> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Notifoo'),
-      ),
+      backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
+      appBar: Topbar.getTopbar(widget.title),
+      bottomNavigationBar: BottomBar.getBottomBar(),
       body: FutureBuilder<List<Notifications>>(
         future: DatabaseHelper.instance.getNotifications(),
         builder: (context, snapshot) {
@@ -232,16 +212,16 @@ class _NotificationsLogState extends State<NotificationsLog> {
                   child: Container(
                     width: 120,
                     decoration: BoxDecoration(
-                      color: Colors.blue[300],
+                      color: Colors.black87,
                       border: Border.all(
-                        color: Colors.blue[300],
+                        color: Colors.teal,
                       ),
                       borderRadius: BorderRadius.all(Radius.circular(20.0)),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        '${element.package_name.toString().split('.').last.capitalizeFirstofEach}',
+                        '${getCurrentApp(element.package_name).appName}',
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -249,7 +229,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
                 ),
               ),
               itemBuilder: (_, Notifications element) {
-                getCurrentApp(element.package_name);
+                // getCurrentApp(element.package_name);
                 return Card(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6.0),
@@ -260,7 +240,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
                   child: Container(
                     child: ListTile(
                       contentPadding:
-                          EdgeInsets.symmetric(horizontal: 10.0, vertical: 2.0),
+                          EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
                       leading: _currentApp is ApplicationWithIcon
                           ? Image.memory(_currentApp.icon)
                           : null,
@@ -270,7 +250,8 @@ class _NotificationsLogState extends State<NotificationsLog> {
                       trailing:
                           //  Text(entry.packageName.toString().split('.').last),
                           Icon(Icons.keyboard_arrow_right),
-                      onTap: () => onAppClicked(context, _currentApp),
+                      onTap: () => onAppClicked(
+                          context, getCurrentApp(element.package_name)),
                     ),
                   ),
                 );
