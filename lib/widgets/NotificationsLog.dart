@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
+import 'package:notifoo/helper/AppsList.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 import 'package:device_apps/device_apps.dart';
@@ -14,6 +15,8 @@ import 'package:notifoo/widgets/Topbar.dart';
 import 'package:notifoo/widgets/BottomBar.dart';
 
 //import 'Notifications/NotificationsList.dart';
+
+final AppsList appsList = new AppsList();
 
 class NotificationsLog extends StatefulWidget {
   NotificationsLog({Key key, this.title}) : super(key: key);
@@ -27,8 +30,10 @@ class _NotificationsLogState extends State<NotificationsLog> {
   // getCurrentApp();
   List<NotificationEvent> _log = [];
   //List<Notifications> _logNotification = [];
-  List<Application> _apps;
+  List<Application> _apps = appsList.appListData;
   ApplicationWithIcon _currentApp;
+
+  bool appsLoaded = false;
 
   bool started = false;
   bool _loading = false;
@@ -40,6 +45,10 @@ class _NotificationsLogState extends State<NotificationsLog> {
   void initState() {
     initPlatformState();
     super.initState();
+    DatabaseHelper.instance.initializeDatabase();
+    //getListOfApps();
+
+    //_apps = AppsList.getListOfApps();
   }
 
   // we must use static method, to handle in background
@@ -67,7 +76,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
 
     var isR = await NotificationsListener.isRunning;
     print("""Service is ${!isR ? "not " : ""}aleary running""");
-    getListOfApps();
+
     setState(() {
       started = isR;
     });
@@ -164,16 +173,19 @@ class _NotificationsLogState extends State<NotificationsLog> {
   }
 
 //getting list of apps
-  Future<String> getListOfApps() async {
+  Future<void> getListOfApps() async {
     _apps = await DeviceApps.getInstalledApplications(
         onlyAppsWithLaunchIntent: true,
         includeAppIcons: true,
         includeSystemApps: true);
+
+    //return _apps;
     //print(_apps);
+    // return _apps;
   }
 
   Application getCurrentApp(String packageName) {
-    getListOfApps();
+    // getListOfApps().whenComplete(() => _apps);
     for (var app in _apps) {
       if (app.packageName == packageName) {
         _currentApp = app;
@@ -187,7 +199,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
     return Scaffold(
       backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
       appBar: Topbar.getTopbar(widget.title),
-      bottomNavigationBar: BottomBar.getBottomBar(),
+      bottomNavigationBar: BottomBar.getBottomBar(context),
       body: FutureBuilder<List<Notifications>>(
         future: DatabaseHelper.instance.getNotifications(),
         builder: (context, snapshot) {
@@ -222,6 +234,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
                         '${getCurrentApp(element.package_name).appName}',
+                        // '${element.package_name}',
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -229,36 +242,46 @@ class _NotificationsLogState extends State<NotificationsLog> {
                 ),
               ),
               itemBuilder: (_, Notifications element) {
-                // getCurrentApp(element.package_name);
-                return Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6.0),
-                  ),
-                  elevation: 8.0,
-                  margin:
-                      new EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                  child: Container(
-                    child: ListTile(
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                      leading: _currentApp is ApplicationWithIcon
-                          ? Image.memory(_currentApp.icon)
-                          : null,
-                      title: Text(element.title ?? packageName),
-                      subtitle: Text(element.text.toString()),
-                      //trailing: Text(element.text.toString()),
-                      trailing:
-                          //  Text(entry.packageName.toString().split('.').last),
-                          Icon(Icons.keyboard_arrow_right),
-                      onTap: () => onAppClicked(
-                          context, getCurrentApp(element.package_name)),
+                if (element != null) {
+                  getCurrentApp(element.package_name);
+                  //print('Current App: ' +
+                  // getCurrentApp(element.package_name).appName);
+
+                  return Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6.0),
                     ),
-                  ),
-                );
+                    elevation: 8.0,
+                    margin: new EdgeInsets.symmetric(
+                        horizontal: 10.0, vertical: 5.0),
+                    child: Container(
+                      child: ListTile(
+                        contentPadding: EdgeInsets.symmetric(
+                            horizontal: 10.0, vertical: 5.0),
+
+                        leading: _currentApp is ApplicationWithIcon
+                            ? Image.memory(_currentApp.icon)
+                            : null,
+                        title: Text(element.title ?? packageName),
+                        subtitle: Text(element.text.toString()),
+                        //trailing: Text(element.text.toString()),
+                        trailing:
+                            //  Text(entry.packageName.toString().split('.').last),
+                            Icon(Icons.keyboard_arrow_right),
+                        onTap: () => onAppClicked(
+                            context, getCurrentApp(element.package_name)),
+                      ),
+                    ),
+                  );
+                } else {
+                  return Center(child: Text('Nothing to Display!'));
+                }
+                // getCurrentApp(element.package_name);
               },
             );
           } else if (snapshot.hasError) {
-            return Text("Oops!");
+            //return Center(child: Text("Oops!"));
+            return Center(child: CircularProgressIndicator());
           }
           return Center(child: CircularProgressIndicator());
         },
@@ -268,7 +291,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
         tooltip: 'Start/Stop sensing',
         child: _loading
             ? Icon(Icons.close)
-            : (started ? Icon(Icons.stop) : Icon(Icons.play_arrow)),
+            : (started ? Icon(Icons.close) : Icon(Icons.play_arrow)),
       ),
     );
   }

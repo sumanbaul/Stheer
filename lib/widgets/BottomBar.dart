@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:notifoo/pages/TestPage.dart';
+
+import 'NotificationsLog.dart';
 
 class BottomBar {
-  static getBottomBar() {
+  static getBottomBar(BuildContext context) {
     final makeBottom = Container(
       height: 55.0,
       child: BottomAppBar(
@@ -11,11 +14,20 @@ class BottomBar {
           children: <Widget>[
             IconButton(
               icon: Icon(Icons.home, color: Colors.white),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.popAndPushNamed(context, '/'
+                    //NotificationsLog(title: "Notifoo"),
+                    );
+              },
             ),
             IconButton(
               icon: Icon(Icons.blur_on, color: Colors.white),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.popAndPushNamed(context, '/second'
+                    //   MaterialPageRoute(
+                    //       builder: (context) => TestPage(title: "Test Page")),
+                    );
+              },
             ),
             IconButton(
               icon: Icon(Icons.hotel, color: Colors.white),
