@@ -30,7 +30,7 @@ class BottomBar {
               },
             ),
             IconButton(
-              icon: Icon(Icons.hotel, color: Colors.white),
+              icon: Icon(Icons.inventory, color: Colors.white),
               onPressed: () {
                 Navigator.popAndPushNamed(context, '/signin');
               },

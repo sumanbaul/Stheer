@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "176666661643-6n2kpe0bd31mtav9e2qv6rfo9o8jcker.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.devxstudio.notifoo",
+            "certificate_hash": "53d60e557884fce85b1ce2760a8854972a8dd22b"
+          }
+        },
+        {
           "client_id": "176666661643-3d28mf37hbm074kig62fdgtn0k9o1jl8.apps.googleusercontent.com",
           "client_type": 3
         }
