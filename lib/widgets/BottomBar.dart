@@ -31,7 +31,9 @@ class BottomBar {
             ),
             IconButton(
               icon: Icon(Icons.hotel, color: Colors.white),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.popAndPushNamed(context, '/signin');
+              },
             ),
             IconButton(
               icon: Icon(Icons.account_box, color: Colors.white),
