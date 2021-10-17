@@ -9,13 +9,11 @@ import 'package:notifoo/helper/AppsList.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 import 'package:device_apps/device_apps.dart';
-//import 'package:notifoo/extensions/textFormat.dart';
 import 'package:notifoo/model/Notifications.dart';
 import 'package:notifoo/widgets/Topbar.dart';
 import 'package:notifoo/widgets/BottomBar.dart';
 
-//import 'Notifications/NotificationsList.dart';
-
+//Initialize singleton
 final AppsList appsList = new AppsList();
 
 class NotificationsLog extends StatefulWidget {
@@ -27,13 +25,13 @@ class NotificationsLog extends StatefulWidget {
 }
 
 class _NotificationsLogState extends State<NotificationsLog> {
-  // getCurrentApp();
   List<NotificationEvent> _log = [];
-  //List<Notifications> _logNotification = [];
   List<Application> _apps = appsList.appListData;
   ApplicationWithIcon _currentApp;
 
   bool appsLoaded = false;
+
+  String flagEntry;
 
   bool started = false;
   bool _loading = false;
@@ -44,18 +42,16 @@ class _NotificationsLogState extends State<NotificationsLog> {
   @override
   void initState() {
     initPlatformState();
-    super.initState();
     DatabaseHelper.instance.initializeDatabase();
-    //getListOfApps();
 
-    //_apps = AppsList.getListOfApps();
+    super.initState();
   }
 
   // we must use static method, to handle in background
   static void _callback(NotificationEvent evt) {
-    print(
-      "send evt to ui: $evt",
-    );
+    // print(
+    //   "send evt to ui: $evt",
+    // );
     final SendPort send = IsolateNameServer.lookupPortByName("_listener_");
     if (send == null) print("can't find the sender");
     send?.send(evt);
@@ -85,38 +81,78 @@ class _NotificationsLogState extends State<NotificationsLog> {
   }
 
   void onData(NotificationEvent event) {
+    print(event);
     setState(() {
       //packageName = event.packageName.toString().split('.').last.capitalizeFirstofEach;
       if (event.packageName.contains("skydrive") ||
           (event.packageName.contains("service")) ||
-          (event.packageName.contains("android")) ||
+          // (event.packageName.contains("android")) ||
           (event.packageName.contains("notifoo")) ||
           (event.packageName.contains("screenshot")) ||
+          (event.title.contains("WhatsApp")) ||
           (event.packageName.contains("gallery"))) {
         //print(event.packageName);
       } else {
         for (var app in _apps) {
           //print(app);
-          // print(app.packageName);
-          //var x = app;
           if (app.packageName == event.packageName) {
             _currentApp = app;
             packageName = event.packageName;
             // print("Success Package Found: " + app.packageName);
+            //var jsondata2 = json.decode(event.toString());
+            Map<String, dynamic> jsonresponse = json.decode(event.toString());
 
-            var jsonData = json.decoder.convert(event.toString());
+            //var jsonData = json.decoder.convert(event.toString());
             _log.add(event);
-            DatabaseHelper.instance.insertNotification(
-              Notifications(
-                  title: jsonData["title"],
-                  infoText: jsonData["text"],
-                  showWhen: 1,
-                  subText: jsonData["text"],
-                  timestamp: event.timestamp.toString(),
-                  package_name: jsonData["package_name"],
-                  text: jsonData["text"],
-                  summaryText: jsonData["summaryText"] ?? ""),
-            );
+
+            //var xx = jsonresponse.containsKey('summaryText');
+            if (!jsonresponse.containsKey('summaryText')) {
+              if ((event.title != flagEntry)) {
+                DatabaseHelper.instance.insertNotification(
+                  Notifications(
+                      title: event.title,
+                      text: event.text,
+                      message: event.message,
+                      packageName: event.packageName,
+                      timestamp: event.timestamp,
+                      createAt: event.createAt.toString(),
+                      eventJson: event.toString()
+                      // infoText: jsonData["text"],
+                      // showWhen: 1,
+                      // subText: jsonData["text"],
+                      // timestamp: event.timestamp.toString(),
+                      // packageName: jsonData["packageName"],
+                      // text: jsonData["text"],
+                      // summaryText: jsonData["summaryText"] ?? ""
+                      ),
+                );
+              }
+              flagEntry = event.title;
+            } else {
+              // # TODO fix here
+              Map<String, dynamic> jsonTitle =
+                  json.decode(jsonresponse["textLines"]);
+              var titleLength = jsonTitle.length;
+
+              DatabaseHelper.instance.insertNotification(
+                Notifications(
+                    title: jsonresponse["textLines"][titleLength],
+                    text: event.text,
+                    message: event.message,
+                    packageName: event.packageName,
+                    timestamp: event.timestamp,
+                    createAt: event.createAt.toString(),
+                    eventJson: event.toString()
+                    // infoText: jsonData["text"],
+                    // showWhen: 1,
+                    // subText: jsonData["text"],
+                    // timestamp: event.timestamp.toString(),
+                    // packageName: jsonData["packageName"],
+                    // text: jsonData["text"],
+                    // summaryText: jsonData["summaryText"] ?? ""
+                    ),
+              );
+            }
           }
         }
       }
@@ -128,7 +164,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
     //   // TODO: fix bug
     //   // NotificationsListener.promoteToForeground("");
     // }
-    print("Print Notification: $event");
+    // print("Print Notification: $event");
   }
 
   void startListening() async {
@@ -172,18 +208,6 @@ class _NotificationsLogState extends State<NotificationsLog> {
     });
   }
 
-//getting list of apps
-  Future<void> getListOfApps() async {
-    _apps = await DeviceApps.getInstalledApplications(
-        onlyAppsWithLaunchIntent: true,
-        includeAppIcons: true,
-        includeSystemApps: true);
-
-    //return _apps;
-    //print(_apps);
-    // return _apps;
-  }
-
   Application getCurrentApp(String packageName) {
     // getListOfApps().whenComplete(() => _apps);
     for (var app in _apps) {
@@ -200,92 +224,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
       backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
       appBar: Topbar.getTopbar(widget.title),
       bottomNavigationBar: BottomBar.getBottomBar(context),
-      body: FutureBuilder<List<Notifications>>(
-        future: DatabaseHelper.instance.getNotifications(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            //var packageName = (Notifications element) => element.package_name;
-            //getCurrentApp(packageName.toString());
-            // print("Snapshot data: $snapshot.data");
-            return StickyGroupedListView<Notifications, String>(
-              elements: snapshot.data,
-              order: StickyGroupedListOrder.DESC,
-              groupBy: (Notifications element) => element.package_name,
-              groupComparator: (String value1, String value2) =>
-                  value2.compareTo(value1),
-              itemComparator:
-                  (Notifications element1, Notifications element2) =>
-                      element1.package_name.compareTo(element2.package_name),
-              floatingHeader: true,
-              groupSeparatorBuilder: (Notifications element) => Container(
-                height: 50,
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Container(
-                    width: 120,
-                    decoration: BoxDecoration(
-                      color: Colors.black87,
-                      border: Border.all(
-                        color: Colors.teal,
-                      ),
-                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        '${getCurrentApp(element.package_name).appName}',
-                        // '${element.package_name}',
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              itemBuilder: (_, Notifications element) {
-                if (element != null) {
-                  getCurrentApp(element.package_name);
-                  //print('Current App: ' +
-                  // getCurrentApp(element.package_name).appName);
-
-                  return Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6.0),
-                    ),
-                    elevation: 8.0,
-                    margin: new EdgeInsets.symmetric(
-                        horizontal: 10.0, vertical: 5.0),
-                    child: Container(
-                      child: ListTile(
-                        contentPadding: EdgeInsets.symmetric(
-                            horizontal: 10.0, vertical: 5.0),
-
-                        leading: _currentApp is ApplicationWithIcon
-                            ? Image.memory(_currentApp.icon)
-                            : null,
-                        title: Text(element.title ?? packageName),
-                        subtitle: Text(element.text.toString()),
-                        //trailing: Text(element.text.toString()),
-                        trailing:
-                            //  Text(entry.packageName.toString().split('.').last),
-                            Icon(Icons.keyboard_arrow_right),
-                        onTap: () => onAppClicked(
-                            context, getCurrentApp(element.package_name)),
-                      ),
-                    ),
-                  );
-                } else {
-                  return Center(child: Text('Nothing to Display!'));
-                }
-                // getCurrentApp(element.package_name);
-              },
-            );
-          } else if (snapshot.hasError) {
-            //return Center(child: Text("Oops!"));
-            return Center(child: CircularProgressIndicator());
-          }
-          return Center(child: CircularProgressIndicator());
-        },
-      ),
+      body: getNotificationListBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: started ? stopListening : startListening,
         tooltip: 'Start/Stop sensing',
@@ -293,6 +232,96 @@ class _NotificationsLogState extends State<NotificationsLog> {
             ? Icon(Icons.close)
             : (started ? Icon(Icons.close) : Icon(Icons.play_arrow)),
       ),
+    );
+  }
+
+  getNotificationListBody() {
+    return FutureBuilder<List<Notifications>>(
+      future: DatabaseHelper.instance.getNotifications(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          //var packageName = (Notifications element) => element.packageName;
+
+          // print("Snapshot data: $snapshot.data");
+          return StickyGroupedListView<Notifications, String>(
+            elements: snapshot.data,
+            order: StickyGroupedListOrder.DESC,
+            groupBy: (Notifications element) => element.packageName,
+            groupComparator: (String value1, String value2) =>
+                value2.compareTo(value1),
+            itemComparator: (Notifications element1, Notifications element2) =>
+                element1.packageName.compareTo(element2.packageName),
+            floatingHeader: true,
+            groupSeparatorBuilder: (Notifications element) => Container(
+              height: 50,
+              child: Align(
+                alignment: Alignment.center,
+                child: Container(
+                  width: 120,
+                  decoration: BoxDecoration(
+                    color: Colors.black87,
+                    border: Border.all(
+                      color: Colors.teal,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      '${getCurrentApp(element.packageName).appName}',
+                      // '${element.packageName}',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            itemBuilder: (_, Notifications element) {
+              if (element != null) {
+                getCurrentApp(element.packageName);
+                //print('Current App: ' +
+                // getCurrentApp(element.packageName).appName);
+
+                return Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6.0),
+                  ),
+                  elevation: 8.0,
+                  margin:
+                      new EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                  child: Container(
+                    child: ListTile(
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+
+                      leading: _currentApp is ApplicationWithIcon
+                          ? Image.memory(_currentApp.icon)
+                          : null,
+                      title: Text(element.title ?? packageName),
+                      subtitle: Text(element.text.toString()),
+
+                      //isThreeLine: true,
+                      //trailing: Text(element.text.toString()),
+                      trailing:
+                          //  Text(entry.packageName.toString().split('.').last),
+                          Icon(Icons.keyboard_arrow_right),
+                      onTap: () => onAppClicked(
+                          context, getCurrentApp(element.packageName)),
+                    ),
+                  ),
+                );
+              } else {
+                return Center(child: Text('Nothing to Display!'));
+              }
+              // getCurrentApp(element.packageName);
+            },
+          );
+        } else if (snapshot.hasError) {
+          //return Center(child: Text("Oops!"));
+          return Center(child: CircularProgressIndicator());
+        }
+        return Center(child: CircularProgressIndicator());
+      },
     );
   }
 
@@ -306,11 +335,11 @@ class _NotificationsLogState extends State<NotificationsLog> {
           return AlertDialog(
             title: Text(app.appName),
             actions: <Widget>[
-              _AppButtonAction(
+              AppButtonAction(
                 label: 'Open app',
                 onPressed: () => app.openApp(),
               ),
-              _AppButtonAction(
+              AppButtonAction(
                 label: 'Open app settings',
                 onPressed: () => app.openSettingsScreen(),
               ),
@@ -320,11 +349,11 @@ class _NotificationsLogState extends State<NotificationsLog> {
   }
 }
 
-class _AppButtonAction extends StatelessWidget {
+class AppButtonAction extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
 
-  _AppButtonAction({this.label, this.onPressed});
+  AppButtonAction({this.label, this.onPressed});
 
   @override
   Widget build(BuildContext context) {

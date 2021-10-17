@@ -13,17 +13,17 @@ class NotificationsList {
       future: DatabaseHelper.instance.getNotifications(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          //var packageName = (Notifications element) => element.package_name;
+          //var packageName = (Notifications element) => element.packageName;
           //getCurrentApp(packageName.toString());
           // print("Snapshot data: $snapshot.data");
           return StickyGroupedListView<Notifications, String>(
             elements: snapshot.data,
             order: StickyGroupedListOrder.DESC,
-            groupBy: (Notifications element) => element.package_name,
+            groupBy: (Notifications element) => element.packageName,
             groupComparator: (String value1, String value2) =>
                 value2.compareTo(value1),
             itemComparator: (Notifications element1, Notifications element2) =>
-                element1.package_name.compareTo(element2.package_name),
+                element1.packageName.compareTo(element2.packageName),
             floatingHeader: true,
             groupSeparatorBuilder: (Notifications element) => Container(
               height: 50,
@@ -41,7 +41,7 @@ class NotificationsList {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      '${InstalledAppsHelper.getCurrentApp(element.package_name).appName}',
+                      '${InstalledAppsHelper.getCurrentApp(element.packageName).appName}',
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -49,7 +49,7 @@ class NotificationsList {
               ),
             ),
             itemBuilder: (_, Notifications element) {
-              // getCurrentApp(element.package_name);
+              // getCurrentApp(element.packageName);
               return Card(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6.0),
@@ -59,28 +59,28 @@ class NotificationsList {
                     new EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
                 child: Container(
                   child: ListTile(
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                    leading:
-                        InstalledAppsHelper.getCurrentApp(element.package_name)
-                                is ApplicationWithIcon
-                            ? Image.memory(
-                                InstalledAppsHelper.getCurrentAppWithIcon(
-                                        element.package_name)
-                                    .icon)
-                            : null,
-                    title: Text(
-                        element.title ?? element.package_name.toUpperCase()),
-                    subtitle: Text(element.text.toString()),
-                    //trailing: Text(element.text.toString()),
-                    trailing:
-                        //  Text(entry.packageName.toString().split('.').last),
-                        Icon(Icons.keyboard_arrow_right),
-                    onTap: () => onAppClicked(
-                        context,
-                        InstalledAppsHelper.getCurrentApp(
-                            element.package_name)),
-                  ),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                      leading:
+                          InstalledAppsHelper.getCurrentApp(element.packageName)
+                                  is ApplicationWithIcon
+                              ? Image.memory(
+                                  InstalledAppsHelper.getCurrentAppWithIcon(
+                                          element.packageName)
+                                      .icon)
+                              : null,
+                      title: Text(
+                          element.title ?? element.packageName.toUpperCase()),
+                      subtitle: Text(element.text.toString()),
+                      //trailing: Text(element.text.toString()),
+                      trailing:
+                          //  Text(entry.packageName.toString().split('.').last),
+                          Icon(Icons.keyboard_arrow_right),
+                      onTap: () => ''
+                      // onAppClicked(context,
+                      //     InstalledAppsHelper.getCurrentApp(element.packageName)
+                      //     ),
+                      ),
                 ),
               );
             },

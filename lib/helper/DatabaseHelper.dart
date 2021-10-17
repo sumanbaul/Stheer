@@ -22,7 +22,8 @@ class DatabaseHelper {
     return await openDatabase(join(await getDatabasesPath(), databaseName),
         version: 1, onCreate: (Database db, int version) async {
       await db.execute(
-          "CREATE TABLE notifications (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, infoText TEXT, summaryText TEXT, showWhen INTEGER, package_name TEXT, text TEXT,  subText TEXT, timestamp TEXT)");
+          // "CREATE TABLE notifications (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, infoText TEXT, summaryText TEXT, showWhen INTEGER, package_name TEXT, text TEXT,  subText TEXT, timestamp TEXT)");
+          "CREATE TABLE notifications (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, text TEXT, message TEXT, packageName TEXT, timestamp INTEGER, createAt TEXT, eventJson TEXT)");
     });
   }
 
@@ -43,13 +44,20 @@ class DatabaseHelper {
       return Notifications(
         id: maps[i]['id'],
         title: maps[i]['title'],
-        infoText: maps[i]['infoText'],
-        summaryText: maps[i]['summaryText'],
-        showWhen: maps[i]['showWhen'],
-        package_name: maps[i]['package_name'],
         text: maps[i]['text'],
-        subText: maps[i]['subText'],
+        message: maps[i]['message'],
+        packageName: maps[i]['packageName'],
         timestamp: maps[i]['timestamp'],
+        createAt: maps[i]['createAt'],
+        eventJson: maps[i]['eventJson'],
+
+        // infoText: maps[i]['infoText'],
+        // summaryText: maps[i]['summaryText'],
+        // showWhen: maps[i]['showWhen'],
+        // package_name: maps[i]['package_name'],
+        // text: maps[i]['text'],
+        // subText: maps[i]['subText'],
+        // timestamp: maps[i]['timestamp'],
       );
     });
   }
