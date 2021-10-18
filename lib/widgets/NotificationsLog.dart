@@ -107,7 +107,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
 
             //var xx = jsonresponse.containsKey('summaryText');
             if (!jsonresponse.containsKey('summaryText')) {
-              if ((event.title != flagEntry)) {
+              if ((event.text != flagEntry)) {
                 DatabaseHelper.instance.insertNotification(
                   Notifications(
                       title: event.title,
@@ -127,12 +127,11 @@ class _NotificationsLogState extends State<NotificationsLog> {
                       ),
                 );
               }
-              flagEntry = event.title;
+              flagEntry = event.text;
             } else {
               // # TODO fix here
-              Map<String, dynamic> jsonTitle =
-                  json.decode(jsonresponse["textLines"]);
-              var titleLength = jsonTitle.length;
+
+              var titleLength = jsonresponse["textLines"].length;
 
               DatabaseHelper.instance.insertNotification(
                 Notifications(
@@ -241,6 +240,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           //var packageName = (Notifications element) => element.packageName;
+          // DateTime expiryAsDateTime = DateTime.parse(snapshot.data[]);
 
           // print("Snapshot data: $snapshot.data");
           return StickyGroupedListView<Notifications, String>(

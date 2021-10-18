@@ -38,7 +38,7 @@ class DatabaseHelper {
     final db = await database;
 
     final List<Map<String, dynamic>> maps =
-        await db.query(Notifications.TABLENAME);
+        await db.query(Notifications.TABLENAME, orderBy: 'createAt ASC');
 
     return List.generate(maps.length, (i) {
       return Notifications(
