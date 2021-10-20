@@ -52,6 +52,7 @@ class Notifications {
   final String eventJson;
   final String summaryText;
   final List<String> textLines;
+  //final String signature;
 
   static const String TABLENAME = "notifications";
 
@@ -65,7 +66,9 @@ class Notifications {
       this.createAt,
       this.eventJson,
       this.summaryText,
-      this.textLines});
+      this.textLines
+      //this.signature
+      });
 
   Map<String, dynamic> toMap() {
     return {
@@ -76,7 +79,8 @@ class Notifications {
       'packageName': packageName,
       'timestamp': timestamp,
       'createAt': createAt,
-      'eventJson': eventJson
+      'eventJson': eventJson,
+      //'signature': signature
     };
   }
 }

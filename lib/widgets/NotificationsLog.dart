@@ -104,9 +104,13 @@ class _NotificationsLogState extends State<NotificationsLog> {
 
             //var jsonData = json.decoder.convert(event.toString());
             _log.add(event);
-
+            var createatday = event.createAt.day;
+            print("Create AT Day: $createatday");
+            var today = new DateTime.now().day;
+            print('today: $today');
             //var xx = jsonresponse.containsKey('summaryText');
-            if (!jsonresponse.containsKey('summaryText')) {
+            if (!jsonresponse.containsKey('summaryText') &&
+                event.createAt.day >= today) {
               if ((event.text != flagEntry)) {
                 DatabaseHelper.instance.insertNotification(
                   Notifications(
@@ -115,7 +119,8 @@ class _NotificationsLogState extends State<NotificationsLog> {
                       message: event.message,
                       packageName: event.packageName,
                       timestamp: event.timestamp,
-                      createAt: event.createAt.toString(),
+                      createAt:
+                          event.createAt.millisecondsSinceEpoch.toString(),
                       eventJson: event.toString()
                       // infoText: jsonData["text"],
                       // showWhen: 1,
@@ -244,6 +249,10 @@ class _NotificationsLogState extends State<NotificationsLog> {
 
           // print("Snapshot data: $snapshot.data");
           return StickyGroupedListView<Notifications, String>(
+            //itemScrollController: x ,
+            physics: BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
             elements: snapshot.data,
             order: StickyGroupedListOrder.DESC,
             groupBy: (Notifications element) => element.packageName,

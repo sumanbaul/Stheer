@@ -37,19 +37,29 @@ class DatabaseHelper {
   Future<List<Notifications>> getNotifications() async {
     final db = await database;
 
-    final List<Map<String, dynamic>> maps =
-        await db.query(Notifications.TABLENAME, orderBy: 'createAt ASC');
+    var today = new DateTime.now().millisecondsSinceEpoch;
+    print('Date from Db: $today');
+
+    String whereString = 'createAt <= ?';
+    List<dynamic> whereArguments = [today];
+
+    final List<Map<String, dynamic>> maps = await db.query(
+        Notifications.TABLENAME,
+        orderBy: 'createAt ASC',
+        where: whereString,
+        whereArgs: whereArguments);
 
     return List.generate(maps.length, (i) {
       return Notifications(
-        id: maps[i]['id'],
+        //  id: maps[i]['id'],
         title: maps[i]['title'],
         text: maps[i]['text'],
         message: maps[i]['message'],
         packageName: maps[i]['packageName'],
         timestamp: maps[i]['timestamp'],
         createAt: maps[i]['createAt'],
-        eventJson: maps[i]['eventJson'],
+        // eventJson: maps[i]['eventJson'],
+        // signature: maps[i]['signature'],
 
         // infoText: maps[i]['infoText'],
         // summaryText: maps[i]['summaryText'],
