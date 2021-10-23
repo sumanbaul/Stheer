@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:notifoo/pages/Profile.dart';
 import 'package:notifoo/pages/SignIn.dart';
 import 'package:notifoo/pages/SplashScreen.dart';
 import 'package:notifoo/provider/google_sign_in.dart';
@@ -44,6 +45,7 @@ class _MyAppState extends State<MyApp> {
             '/second': (context) => TestPage(title: "Test Page"),
             '/splash': (context) => SplashScreen(),
             '/signin': (context) => SignIn(),
+            '/profile': (context) => Profile(),
           },
         ),
 

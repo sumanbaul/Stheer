@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:notifoo/pages/SignIn.dart';
 import 'package:notifoo/widgets/LoggedInWidget.dart';
 
 class Profile extends StatelessWidget {
@@ -20,7 +22,7 @@ class Profile extends StatelessWidget {
           } else if (snapshot.hasData) {
             return LoggedInWidget();
           } else {
-            return null;
+            return SignIn();
           }
         },
       ),
