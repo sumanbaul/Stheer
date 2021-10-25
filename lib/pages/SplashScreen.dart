@@ -2,7 +2,6 @@ import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
 import 'package:notifoo/helper/AppsList.dart';
 import 'dart:async';
-import 'package:notifoo/widgets/NotificationsLog.dart';
 
 final AppsList appsList = new AppsList();
 Future<List<Application>> apps;
@@ -32,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen> {
           if (snapshot.hasData) {
             appsList.setStateAuthUrl(snapshot.data);
             Timer(
-                Duration(seconds: 7),
+                Duration(seconds: 0),
                 () => Navigator.of(context).pushNamedAndRemoveUntil(
                     '/', (Route<dynamic> route) => false));
             // Navigator.pushReplacement(

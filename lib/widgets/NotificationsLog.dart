@@ -14,6 +14,7 @@ import 'package:notifoo/widgets/Topbar.dart';
 import 'package:notifoo/widgets/BottomBar.dart';
 
 //Initialize singleton
+//#todo
 final AppsList appsList = new AppsList();
 
 class NotificationsLog extends StatefulWidget {
@@ -26,7 +27,7 @@ class NotificationsLog extends StatefulWidget {
 
 class _NotificationsLogState extends State<NotificationsLog> {
   List<NotificationEvent> _log = [];
-  List<Application> _apps = appsList.appListData;
+  final List<Application> _apps = AppsList().appListData;
   ApplicationWithIcon _currentApp;
 
   bool appsLoaded = false;
@@ -246,7 +247,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
         if (snapshot.hasData) {
           //var packageName = (Notifications element) => element.packageName;
           // DateTime expiryAsDateTime = DateTime.parse(snapshot.data[]);
-
+          // var snapshotelement = snapshot.data;
           // print("Snapshot data: $snapshot.data");
           return StickyGroupedListView<Notifications, String>(
             //itemScrollController: x ,
@@ -277,8 +278,8 @@ class _NotificationsLogState extends State<NotificationsLog> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      '${getCurrentApp(element.packageName).appName}',
-                      // '${element.packageName}',
+                      //'${getCurrentApp(element.packageName).appName}',
+                      '${element.packageName}',
                       textAlign: TextAlign.center,
                     ),
                   ),

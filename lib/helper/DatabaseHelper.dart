@@ -37,11 +37,14 @@ class DatabaseHelper {
   Future<List<Notifications>> getNotifications() async {
     final db = await database;
 
-    var today = new DateTime.now().millisecondsSinceEpoch;
-    print('Date from Db: $today');
+    var now = DateTime.now();
+    var lastMidnight =
+        DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+    //var today = new DateTime.now().millisecondsSinceEpoch;
+    //print('Date from Db: $lastMidnight');
 
-    String whereString = 'createAt <= ?';
-    List<dynamic> whereArguments = [today];
+    String whereString = 'timestamp >= ?';
+    List<dynamic> whereArguments = [lastMidnight];
 
     final List<Map<String, dynamic>> maps = await db.query(
         Notifications.TABLENAME,
