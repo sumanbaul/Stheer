@@ -15,18 +15,22 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-
-    apps = appsList.appsData;
+    getAppsList();
+    //apps = appsList.appsData;
     // Timer(
     //     Duration(seconds: 3),
     //     () => Navigator.pushReplacement(context,
     //         MaterialPageRoute(builder: (context) => NotificationsLog())));
   }
 
+  void getAppsList() async {
+    await appsList.appsData;
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Application>>(
-        future: apps,
+        future: appsList.appsData,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             appsList.setStateAuthUrl(snapshot.data);

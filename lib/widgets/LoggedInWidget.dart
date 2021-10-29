@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:notifoo/provider/google_sign_in.dart';
+import 'package:notifoo/widgets/BottomBar.dart';
 import 'package:provider/provider.dart';
 
 class LoggedInWidget extends StatelessWidget {
@@ -26,6 +27,7 @@ class LoggedInWidget extends StatelessWidget {
               child: Text('Logout'))
         ],
       ),
+      bottomNavigationBar: BottomBar.getBottomBar(context),
       body: Container(
         alignment: Alignment.center,
         child: Column(

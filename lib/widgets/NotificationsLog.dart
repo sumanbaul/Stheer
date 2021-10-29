@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:isolate';
 import 'dart:ui';
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
@@ -27,7 +28,7 @@ class NotificationsLog extends StatefulWidget {
 
 class _NotificationsLogState extends State<NotificationsLog> {
   List<NotificationEvent> _log = [];
-  final List<Application> _apps = AppsList().appListData;
+  List<Application> _apps;
   ApplicationWithIcon _currentApp;
 
   bool appsLoaded = false;
@@ -44,8 +45,38 @@ class _NotificationsLogState extends State<NotificationsLog> {
   void initState() {
     initPlatformState();
     DatabaseHelper.instance.initializeDatabase();
+    getAppsList();
 
     super.initState();
+  }
+
+  Future<void> getAppsList() async {
+    _apps = await appsList.appsData;
+  }
+
+  Future<Application> getCurrentApp(String packageName) async {
+    //getAppsList();
+    // getListOfApps().whenComplete(() => _apps);
+    var xxxx = await appsList.appsData;
+    for (var app in xxxx) {
+      if (app.packageName == packageName) {
+        _currentApp = app;
+      }
+    }
+    return _currentApp;
+  }
+
+  Future<ApplicationWithIcon> getCurrentAppIcon(String packageName) async {
+    //getAppsList();
+    // getListOfApps().whenComplete(() => _apps);
+    ApplicationWithIcon icon;
+    var xxxx = await appsList.appsData;
+    for (var app in xxxx) {
+      if (app.packageName == packageName) {
+        icon = app;
+      }
+    }
+    return icon;
   }
 
   // we must use static method, to handle in background
@@ -213,16 +244,6 @@ class _NotificationsLogState extends State<NotificationsLog> {
     });
   }
 
-  Application getCurrentApp(String packageName) {
-    // getListOfApps().whenComplete(() => _apps);
-    for (var app in _apps) {
-      if (app.packageName == packageName) {
-        _currentApp = app;
-      }
-    }
-    return _currentApp;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -277,11 +298,29 @@ class _NotificationsLogState extends State<NotificationsLog> {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      //'${getCurrentApp(element.packageName).appName}',
-                      '${element.packageName}',
-                      textAlign: TextAlign.center,
+                    child: FutureBuilder(
+                      future: getCurrentApp(element.packageName),
+                      //initialData: InitialData,
+                      builder: (BuildContext context, AsyncSnapshot snapshot) {
+                        if (snapshot.hasData) {
+                          Application data = snapshot.data;
+
+                          return Text(
+                            data.appName,
+                            textAlign: TextAlign.center,
+                          );
+                        } else if (snapshot.hasError) {
+                          return Center();
+                        } else {
+                          return Center(child: CupertinoActivityIndicator());
+                        }
+                      },
                     ),
+                    //  Text(
+                    //   '${getCurrentApp(element.packageName).then((value) => value.appName)}',
+                    //   //'${element.packageName}',
+                    //   textAlign: TextAlign.center,
+                    // ),
                   ),
                 ),
               ),
@@ -289,6 +328,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
             itemBuilder: (_, Notifications element) {
               if (element != null) {
                 getCurrentApp(element.packageName);
+
                 //print('Current App: ' +
                 // getCurrentApp(element.packageName).appName);
 
@@ -304,9 +344,26 @@ class _NotificationsLogState extends State<NotificationsLog> {
                       contentPadding:
                           EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
 
-                      leading: _currentApp is ApplicationWithIcon
-                          ? Image.memory(_currentApp.icon)
-                          : null,
+                      leading: FutureBuilder(
+                        future: getCurrentAppIcon(element.packageName),
+                        //initialData: InitialData,
+                        builder:
+                            (BuildContext context, AsyncSnapshot snapshot) {
+                          if (snapshot.hasData) {
+                            ApplicationWithIcon data = snapshot.data;
+
+                            return Image.memory(
+                              data.icon,
+                              width: 50,
+                            );
+                          } else if (snapshot.hasError) {
+                            return Center();
+                          } else {
+                            return Center(child: CupertinoActivityIndicator());
+                          }
+                        },
+                      ),
+
                       title: Text(element.title ?? packageName),
                       subtitle: Text(element.text.toString()),
 
@@ -315,8 +372,7 @@ class _NotificationsLogState extends State<NotificationsLog> {
                       trailing:
                           //  Text(entry.packageName.toString().split('.').last),
                           Icon(Icons.keyboard_arrow_right),
-                      onTap: () => onAppClicked(
-                          context, getCurrentApp(element.packageName)),
+                      //onTap: () => onAppClicked(context, getCurrentApp(element.packageName)),
                     ),
                   ),
                 );

@@ -40,10 +40,18 @@ class AppsList extends AppsListBase {
   }
 
   static Future<List<Application>> getListOfApps() async {
-    return await DeviceApps.getInstalledApplications(
-        onlyAppsWithLaunchIntent: true,
-        includeAppIcons: true,
-        includeSystemApps: true);
+    //List<Application> list;
+    dynamic app;
+    try {
+      app = await DeviceApps.getInstalledApplications(
+          onlyAppsWithLaunchIntent: true,
+          includeAppIcons: true,
+          includeSystemApps: true);
+    } catch (e) {
+      print(e.toString());
+    }
+    //return list;
+    return app;
   }
 
   // Future<List<Application>> toList() {
