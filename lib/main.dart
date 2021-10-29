@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:notifoo/helper/provider/google_sign_in.dart';
 import 'package:notifoo/pages/Profile.dart';
 import 'package:notifoo/pages/SignIn.dart';
 import 'package:notifoo/pages/SplashScreen.dart';
 import 'package:notifoo/pages/TestPage.dart';
-import 'package:notifoo/provider/google_sign_in.dart';
 import 'pages/NotificationsLister.dart';
 import 'package:provider/provider.dart';
 

@@ -1,7 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:notifoo/provider/google_sign_in.dart';
-import 'package:provider/provider.dart';
 
 class LoggedInWidget extends StatelessWidget {
   //const LoggedInWidget({Key? key}) : super(key: key);
@@ -12,20 +10,6 @@ class LoggedInWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Logged In'),
-        centerTitle: true,
-        actions: [
-          TextButton(
-              onPressed: () {
-                //final provi = Provider.of<GoogleSignInProvider>(context, listen: GoogleSignInProvider.googleLogout());
-                final provider =
-                    Provider.of<GoogleSignInProvider>(context, listen: false);
-                provider.googleLogout();
-              },
-              child: Text('Logout'))
-        ],
-      ),
       body: Container(
         alignment: Alignment.center,
         child: Column(
