@@ -5,7 +5,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
-import 'package:notifoo/helper/AppsList.dart';
+import 'package:notifoo/helper/AppListHelper.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 import 'package:device_apps/device_apps.dart';
@@ -15,19 +15,19 @@ import 'package:notifoo/widgets/BottomBar.dart';
 
 //Initialize singleton
 //#todo
-final AppsList appsList = new AppsList();
+final AppListHelper appsListHelper = new AppListHelper();
 
-class NotificationsLog extends StatefulWidget {
-  NotificationsLog({Key key, this.title}) : super(key: key);
+class NotificationsLister extends StatefulWidget {
+  NotificationsLister({Key key, this.title}) : super(key: key);
 
   final String title;
   @override
-  _NotificationsLogState createState() => _NotificationsLogState();
+  _NotificationsListerState createState() => _NotificationsListerState();
 }
 
-class _NotificationsLogState extends State<NotificationsLog> {
+class _NotificationsListerState extends State<NotificationsLister> {
   List<NotificationEvent> _log = [];
-  final List<Application> _apps = AppsList().appListData;
+  final List<Application> _apps = AppListHelper().appListData;
   ApplicationWithIcon _currentApp;
 
   bool appsLoaded = false;

@@ -28,13 +28,13 @@ abstract class AppsListBase {
   }
 }
 
-class AppsList extends AppsListBase {
-  static final AppsList _instance = AppsList._internal();
-  factory AppsList() {
+class AppListHelper extends AppsListBase {
+  static final AppListHelper _instance = AppListHelper._internal();
+  factory AppListHelper() {
     return _instance;
   }
 
-  AppsList._internal() {
+  AppListHelper._internal() {
     //default fallback
     _apps = getListOfApps();
   }

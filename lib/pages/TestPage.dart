@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 import 'package:notifoo/helper/NotificationsHelper.dart';
 import 'package:notifoo/widgets/BottomBar.dart';
 import 'package:notifoo/widgets/Notifications/ListUIBody.dart';

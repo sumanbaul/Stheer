@@ -1,9 +1,9 @@
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
-import 'package:notifoo/helper/AppsList.dart';
+import 'package:notifoo/helper/AppListHelper.dart';
 import 'dart:async';
 
-final AppsList appsList = new AppsList();
+final AppListHelper appListHelper = new AppListHelper();
 Future<List<Application>> apps;
 
 class SplashScreen extends StatefulWidget {
@@ -16,7 +16,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    apps = appsList.appsData;
+    apps = appListHelper.appsData;
     // Timer(
     //     Duration(seconds: 3),
     //     () => Navigator.pushReplacement(context,
@@ -29,7 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
         future: apps,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            appsList.setStateAuthUrl(snapshot.data);
+            appListHelper.setStateAuthUrl(snapshot.data);
             Timer(
                 Duration(seconds: 0),
                 () => Navigator.of(context).pushNamedAndRemoveUntil(

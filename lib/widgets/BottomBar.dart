@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:notifoo/pages/TestPage.dart';
-
-import 'NotificationsLog.dart';
 
 class BottomBar {
   static getBottomBar(BuildContext context) {

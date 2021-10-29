@@ -2,14 +2,29 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:notifoo/pages/SignIn.dart';
+import 'package:notifoo/widgets/BottomBar.dart';
 import 'package:notifoo/widgets/LoggedInWidget.dart';
+import 'package:notifoo/widgets/Topbar.dart';
 
-class Profile extends StatelessWidget {
-  //const Profile({Key key}) : super(key: key);
+// class Profile extends StatefulWidget {
+//   Profile({Key key, this.title}) : super(key: key);
+//   //const Profile({Key key}) : super(key: key);
+// final String title;
 
+// }
+
+class Profile extends StatefulWidget {
+  Profile({Key key, this.title}) : super(key: key);
+  final String title;
+  @override
+  _ProfileState createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: Topbar.getTopbar(widget.title),
       body: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
@@ -26,6 +41,7 @@ class Profile extends StatelessWidget {
           }
         },
       ),
+      bottomNavigationBar: BottomBar.getBottomBar(context),
     );
   }
 }
