@@ -116,6 +116,10 @@ class _NotificationsListerState extends State<NotificationsLister> {
                 DatabaseHelper.instance.insertNotification(
                   Notifications(
                       title: event.title,
+                      appTitle: _currentApp.appName,
+                      // appIcon: _currentApp is ApplicationWithIcon
+                      //     ? Image.memory(_currentApp.icon)
+                      //     : null,
                       text: event.text,
                       message: event.message,
                       packageName: event.packageName,
@@ -279,7 +283,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
                       //'${getCurrentApp(element.packageName).appName}',
-                      '${element.packageName}',
+                      '${element.appTitle}',
                       textAlign: TextAlign.center,
                     ),
                   ),

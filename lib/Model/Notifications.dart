@@ -43,6 +43,8 @@
 
 class Notifications {
   final int id;
+  final String appTitle;
+  // final Image appIcon;
   final String title;
   final String text;
   final String message;
@@ -59,6 +61,8 @@ class Notifications {
   Notifications(
       {this.id,
       this.title,
+      this.appTitle,
+      //    this.appIcon,
       this.text,
       this.message,
       this.packageName,
@@ -74,6 +78,8 @@ class Notifications {
     return {
       'id': id,
       'title': title,
+      'appTitle': appTitle,
+      //   'appIcon': appIcon,
       'text': text,
       'message': message,
       'packageName': packageName,

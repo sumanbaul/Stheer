@@ -34,9 +34,9 @@ class _MyAppState extends State<MyApp> {
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           theme: ThemeData.dark().copyWith(
-            primaryColor: Color(0xff0A0E21),
-            scaffoldBackgroundColor: Color(0xFF0A0E21),
-          ),
+              primaryColor: Color(0xff0A0E21),
+              scaffoldBackgroundColor: Color(0xFF0A0E21),
+              brightness: Brightness.dark),
           initialRoute: '/splash',
           routes: {
             // When navigating to the "/" route, build the FirstScreen widget.
