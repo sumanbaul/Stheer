@@ -112,7 +112,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
             //var xx = jsonresponse.containsKey('summaryText');
             if (!jsonresponse.containsKey('summaryText') &&
                 event.createAt.day >= today) {
-              if ((event.text != flagEntry)) {
+              if ((event.text != flagEntry) && event.text != null) {
                 DatabaseHelper.instance.insertNotification(
                   Notifications(
                       title: event.title,
@@ -311,10 +311,38 @@ class _NotificationsListerState extends State<NotificationsLister> {
                       leading: _currentApp is ApplicationWithIcon
                           ? Image.memory(_currentApp.icon)
                           : null,
-                      title: Text(element.title ?? packageName),
-                      subtitle: Text(element.text.toString()),
+                      title: Container(
+                        alignment: Alignment.topLeft,
+                        //padding: EdgeInsets.a,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
+                              child: Text(
+                                element.title ?? packageName,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 2),
+                              child: Text(element.text.toString()),
+                            )
+                          ],
+                        ),
+                      ),
+                      subtitle: Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 7, 0, 0),
+                        child: Text(
+                          DateTime.fromMillisecondsSinceEpoch(
+                                  int.parse(element.createAt))
+                              .toString()
+                              .substring(0, 16),
+                          style: TextStyle(color: Colors.white54, fontSize: 12),
+                        ),
+                      ),
 
-                      //isThreeLine: true,
+                      isThreeLine: true,
                       //trailing: Text(element.text.toString()),
                       trailing:
                           //  Text(entry.packageName.toString().split('.').last),
