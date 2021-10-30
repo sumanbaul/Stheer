@@ -10,24 +10,24 @@ class BottomBar {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             IconButton(
-              icon: Icon(Icons.home, color: Colors.white),
+              icon: Icon(Icons.notification_add, color: Colors.white),
               onPressed: () {
                 Navigator.popAndPushNamed(context, '/'
                     //NotificationsLog(title: "Notifoo"),
                     );
               },
             ),
+            // IconButton(
+            //   icon: Icon(Icons.blur_on, color: Colors.white),
+            //   onPressed: () {
+            //     Navigator.popAndPushNamed(context, '/second'
+            //         //   MaterialPageRoute(
+            //         //       builder: (context) => TestPage(title: "Test Page")),
+            //         );
+            //   },
+            // ),
             IconButton(
-              icon: Icon(Icons.blur_on, color: Colors.white),
-              onPressed: () {
-                Navigator.popAndPushNamed(context, '/second'
-                    //   MaterialPageRoute(
-                    //       builder: (context) => TestPage(title: "Test Page")),
-                    );
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.inventory, color: Colors.white),
+              icon: Icon(Icons.person, color: Colors.white),
               onPressed: () {
                 Navigator.popAndPushNamed(context, '/profile');
               },
