@@ -41,7 +41,7 @@ class _ProfileState extends State<Profile> {
           }
         },
       ),
-      bottomNavigationBar: BottomBar.getBottomBar(context),
+      //  bottomNavigationBar: BottomBar.getBottomBar(context),
     );
   }
 }

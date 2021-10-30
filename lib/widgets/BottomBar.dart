@@ -3,11 +3,16 @@ import 'package:flutter/material.dart';
 class BottomBar {
   static getBottomBar(BuildContext context) {
     final makeBottom = Container(
-      height: 55.0,
+      height: 60.0,
       child: BottomAppBar(
-        color: Color(0xff0A0E21), //Color.fromRGBO(58, 66, 86, 1.0),
+        shape: CircularNotchedRectangle(),
+        notchMargin: 8,
+
+        color: Colors
+            .blueGrey, //Color(0xff0A0E21), //Color.fromRGBO(58, 66, 86, 1.0),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             IconButton(
               icon: Icon(Icons.notification_add, color: Colors.white),

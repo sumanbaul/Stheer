@@ -141,11 +141,11 @@ class _NotificationsListerState extends State<NotificationsLister> {
             } else {
               // # TODO fix here
 
-              var titleLength = jsonresponse["textLines"].length;
+              // var titleLength = jsonresponse["textLines"].length;
 
               DatabaseHelper.instance.insertNotification(
                 Notifications(
-                    title: jsonresponse["textLines"][titleLength],
+                    title: jsonresponse["textLines"],
                     text: event.text,
                     message: event.message,
                     packageName: event.packageName,
@@ -231,8 +231,8 @@ class _NotificationsListerState extends State<NotificationsLister> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-      appBar: Topbar.getTopbar(widget.title),
-      bottomNavigationBar: BottomBar.getBottomBar(context),
+      //appBar: Topbar.getTopbar(widget.title),
+      //bottomNavigationBar: BottomBar.getBottomBar(context),
       body: getNotificationListBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: started ? stopListening : startListening,
@@ -254,6 +254,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
           // var snapshotelement = snapshot.data;
           // print("Snapshot data: $snapshot.data");
           return StickyGroupedListView<Notifications, String>(
+            //padding: EdgeInsets.only(bottom: 80),
             //itemScrollController: x ,
             physics: BouncingScrollPhysics(
               parent: AlwaysScrollableScrollPhysics(),
@@ -297,6 +298,8 @@ class _NotificationsListerState extends State<NotificationsLister> {
                 // getCurrentApp(element.packageName).appName);
 
                 return Card(
+                  // key: ObjectKey(
+                  //     _apps), // this is a new change, might break the app!!!!!
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6.0),
                   ),

@@ -33,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
             Timer(
                 Duration(seconds: 0),
                 () => Navigator.of(context).pushNamedAndRemoveUntil(
-                    '/', (Route<dynamic> route) => false));
+                    '/app', (Route<dynamic> route) => false));
             // Navigator.pushReplacement(
             //   context,
             //   MaterialPageRoute(

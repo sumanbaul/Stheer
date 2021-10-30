@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:notifoo/helper/NotificationsHelper.dart';
-import 'package:notifoo/widgets/BottomBar.dart';
 import 'package:notifoo/widgets/Notifications/ListUIBody.dart';
 import 'package:notifoo/widgets/Topbar.dart';
 
@@ -18,7 +16,7 @@ class _ListPageState extends State<TestPage> {
 
   @override
   void initState() {
-    NotificationsHelper.initPlatformState();
+    //NotificationsHelper.initPlatformState();
     super.initState();
   }
 
@@ -28,10 +26,10 @@ class _ListPageState extends State<TestPage> {
       backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
       appBar: Topbar.getTopbar(widget.title),
       body: ListUIBody.getListUI(),
-      bottomNavigationBar: BottomBar.getBottomBar(context),
+      //bottomNavigationBar: BottomBar.getBottomBar(context),
     );
   }
-}
+} 
 
 // class NotifyService extends NotificationListener {
 

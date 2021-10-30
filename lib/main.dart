@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:notifoo/helper/provider/google_sign_in.dart';
+import 'package:notifoo/pages/Homepage.dart';
 import 'package:notifoo/pages/Profile.dart';
 import 'package:notifoo/pages/SignIn.dart';
 import 'package:notifoo/pages/SplashScreen.dart';
 import 'package:notifoo/pages/TestPage.dart';
+import 'package:notifoo/widgets/CustomBottomBar/navigator.dart';
 import 'pages/NotificationsLister.dart';
 import 'package:provider/provider.dart';
 
@@ -42,10 +44,12 @@ class _MyAppState extends State<MyApp> {
             // When navigating to the "/" route, build the FirstScreen widget.
             '/': (context) => NotificationsLister(title: "Notifoo"),
             // When navigating to the "/splash" route, build the SecondScreen widget.
+            '/home': (context) => Homepage(title: "Home"),
             '/second': (context) => TestPage(title: "Test"),
             '/splash': (context) => SplashScreen(),
             '/signin': (context) => SignIn(),
             '/profile': (context) => Profile(title: "Profile"),
+            '/app': (context) => App(),
           },
         ),
 
