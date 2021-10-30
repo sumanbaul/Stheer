@@ -17,15 +17,15 @@ class BottomBar {
                     );
               },
             ),
-            // IconButton(
-            //   icon: Icon(Icons.blur_on, color: Colors.white),
-            //   onPressed: () {
-            //     Navigator.popAndPushNamed(context, '/second'
-            //         //   MaterialPageRoute(
-            //         //       builder: (context) => TestPage(title: "Test Page")),
-            //         );
-            //   },
-            // ),
+            IconButton(
+              icon: Icon(Icons.blur_on, color: Colors.white),
+              onPressed: () {
+                Navigator.popAndPushNamed(context, '/second'
+                    //   MaterialPageRoute(
+                    //       builder: (context) => TestPage(title: "Test Page")),
+                    );
+              },
+            ),
             IconButton(
               icon: Icon(Icons.person, color: Colors.white),
               onPressed: () {
