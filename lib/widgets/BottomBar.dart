@@ -32,10 +32,10 @@ class BottomBar {
                 Navigator.popAndPushNamed(context, '/profile');
               },
             ),
-            IconButton(
-              icon: Icon(Icons.account_box, color: Colors.white),
-              onPressed: () {},
-            )
+            // IconButton(
+            //   icon: Icon(Icons.account_box, color: Colors.white),
+            //   onPressed: () {},
+            // )
           ],
         ),
       ),
