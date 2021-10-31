@@ -235,6 +235,10 @@ class _NotificationsListerState extends State<NotificationsLister> {
         child: getNotificationListBody(),
       ),
       floatingActionButton: FloatingActionButton(
+        //backgroundColor: Color(0xffeeaeca),
+        splashColor: Color(0xff94bbe9),
+        hoverColor: Color(0xffeeaeca),
+        focusColor: Color(0xff94bbe9),
         onPressed: started ? stopListening : startListening,
         tooltip: 'Start/Stop sensing',
         child: _loading
@@ -276,7 +280,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
                   decoration: BoxDecoration(
                     color: Colors.black87,
                     border: Border.all(
-                      color: Colors.teal,
+                      color: Color(0xff94bbe9),
                     ),
                     borderRadius: BorderRadius.all(Radius.circular(20.0)),
                   ),

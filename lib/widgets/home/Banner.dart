@@ -187,10 +187,10 @@ class _BannerState extends State<BannerWidget> {
         BoxShadow(
           color: Color(0xffffdaea),
           blurRadius: 15.0, // soften the shadow
-          spreadRadius: 3.0, //extend the shadow
+          spreadRadius: 2.0, //extend the shadow
           offset: Offset(
-            -5.0, // Move to right 10  horizontally
-            -5.0, // Move to bottom 10 Vertically
+            -4.0, // Move to right 10  horizontally
+            -4.0, // Move to bottom 10 Vertically
           ),
         ),
         BoxShadow(
@@ -198,8 +198,8 @@ class _BannerState extends State<BannerWidget> {
           blurRadius: 15.0, // soften the shadow
           spreadRadius: 3.0, //extend the shadow
           offset: Offset(
-            5.0, // Move to right 10  horizontally
-            5.0, // Move to bottom 10 Vertically
+            4.0, // Move to right 10  horizontally
+            4.0, // Move to bottom 10 Vertically
           ),
         ),
       ],
@@ -267,19 +267,19 @@ class _BannerState extends State<BannerWidget> {
         BoxShadow(
           color: Color(0xffffdaea),
           blurRadius: 15.0, // soften the shadow
-          spreadRadius: 3.0, //extend the shadow
+          spreadRadius: 2.0, //extend the shadow
           offset: Offset(
-            -5.0, // Move to right 10  horizontally
-            -5.0, // Move to bottom 10 Vertically
+            -4.0, // Move to right 10  horizontally
+            -4.0, // Move to bottom 10 Vertically
           ),
         ),
         BoxShadow(
           color: Color(0xff84a6cd),
           blurRadius: 15.0, // soften the shadow
-          spreadRadius: 3.0, //extend the shadow
+          spreadRadius: 2.0, //extend the shadow
           offset: Offset(
-            5.0, // Move to right 10  horizontally
-            5.0, // Move to bottom 10 Vertically
+            4.0, // Move to right 10  horizontally
+            4.0, // Move to bottom 10 Vertically
           ),
         ),
       ],
