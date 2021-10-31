@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notifoo/widgets/Topbar.dart';
+import 'package:notifoo/widgets/home/Banner.dart';
+import 'package:path/path.dart';
 
 import 'NotificationsLister.dart';
 
@@ -23,16 +25,40 @@ class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: Topbar.getTopbar(widget.title),
-      body: NotificationsLister(),
-      // bottomNavigationBar: CustomButtomBar(
-      //   onTabSelected: _selectedIndex,
-      //   items: [
-      //     CustomBottomBarItem(icon: Icons.notifications),
-      //     CustomBottomBarItem(icon: Icons.food_bank),
-      //     CustomBottomBarItem(icon: Icons.person),
-      //   ],
-      // ),
-    );
+        backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
+        appBar: Topbar.getTopbar(widget.title),
+        body: Container(
+          child: Column(
+            children: [
+              BannerWidget(),
+              Container(
+                padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                decoration: BoxDecoration(
+                  // color: Colors.amber,
+
+                  //color: Colors.orange,
+                  shape: BoxShape.rectangle,
+                ),
+                child: Center(
+                  child: Text(
+                    'Notifications',
+                    style:
+                        TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              Expanded(child: Container(child: NotificationsLister()))
+            ],
+          ),
+        )
+        // NotificationsLister(),
+        );
   }
+
+  // Widget homeWidget = Container(
+  //   padding: const EdgeInsets.all(32),
+  //   child: Column(
+  //     children: [BannerWidget(), NotificationsLister()],
+  //   ),
+  // );
 }

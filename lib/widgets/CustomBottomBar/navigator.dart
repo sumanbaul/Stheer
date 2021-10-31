@@ -87,7 +87,7 @@ class AppState extends State<App> {
       // with multiple appbars on one screen
       // eventually breaking the app
       child: Scaffold(
-        //extendBody: true,
+        //xtendBody: true,
         // indexed stack shows only one child
         body: IndexedStack(
           index: currentTab,

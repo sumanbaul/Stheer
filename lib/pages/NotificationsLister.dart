@@ -10,8 +10,6 @@ import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:notifoo/model/Notifications.dart';
-import 'package:notifoo/widgets/Topbar.dart';
-import 'package:notifoo/widgets/BottomBar.dart';
 
 //Initialize singleton
 //#todo
@@ -230,10 +228,12 @@ class _NotificationsListerState extends State<NotificationsLister> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
+      backgroundColor: Colors.transparent,
       //appBar: Topbar.getTopbar(widget.title),
       //bottomNavigationBar: BottomBar.getBottomBar(context),
-      body: getNotificationListBody(),
+      body: Container(
+        child: getNotificationListBody(),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: started ? stopListening : startListening,
         tooltip: 'Start/Stop sensing',
@@ -298,8 +298,8 @@ class _NotificationsListerState extends State<NotificationsLister> {
                 // getCurrentApp(element.packageName).appName);
 
                 return Card(
-                  // key: ObjectKey(
-                  //     _apps), // this is a new change, might break the app!!!!!
+                  // key: ObjectKey(snapshot
+                  //     .data), // this is a new change, might break the app!!!!!
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6.0),
                   ),
@@ -338,7 +338,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
                         padding: const EdgeInsets.fromLTRB(0, 7, 0, 0),
                         child: Text(
                           DateTime.fromMillisecondsSinceEpoch(
-                                  int.parse(element.createAt))
+                                  (element.timestamp))
                               .toString()
                               .substring(0, 16),
                           style: TextStyle(color: Colors.white54, fontSize: 12),

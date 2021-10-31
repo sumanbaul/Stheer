@@ -37,7 +37,7 @@ class _MyAppState extends State<MyApp> {
           debugShowCheckedModeBanner: false,
           theme: ThemeData.dark().copyWith(
               primaryColor: Color(0xff0A0E21),
-              scaffoldBackgroundColor: Color(0xFF0A0E21),
+              scaffoldBackgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
               brightness: Brightness.dark),
           initialRoute: '/splash',
           routes: {
