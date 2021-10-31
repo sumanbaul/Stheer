@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:notifoo/helper/provider/google_sign_in.dart';
 import 'package:provider/provider.dart';
 
@@ -13,17 +14,25 @@ class LoggedInWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Logged In'),
+        elevation: 0.1,
+        backgroundColor: Color(0xffeeaeca),
+        title: Text('Logged In',
+            style: GoogleFonts.barlowSemiCondensed(
+              fontSize: 24,
+              letterSpacing: 1.5,
+              fontWeight: FontWeight.bold,
+            )),
         centerTitle: true,
         actions: [
-          TextButton(
-              onPressed: () {
-                //final provi = Provider.of<GoogleSignInProvider>(context, listen: GoogleSignInProvider.googleLogout());
-                final provider =
-                    Provider.of<GoogleSignInProvider>(context, listen: false);
-                provider.googleLogout();
-              },
-              child: Text('Logout'))
+          IconButton(
+            onPressed: () {
+              //final provi = Provider.of<GoogleSignInProvider>(context, listen: GoogleSignInProvider.googleLogout());
+              final provider =
+                  Provider.of<GoogleSignInProvider>(context, listen: false);
+              provider.googleLogout();
+            },
+            icon: Icon(Icons.logout),
+          )
         ],
       ),
       body: Container(

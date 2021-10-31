@@ -12,6 +12,10 @@ dependencies:
   flutter:
     sdk: flutter
 
+  
+  #fonts
+  google_fonts: ^2.1.0
+
   #Notifications
   flutter_notification_listener: ^1.0.7
   sticky_grouped_list: ^2.0.0-nullsafety.2

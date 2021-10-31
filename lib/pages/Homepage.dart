@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:notifoo/widgets/Topbar.dart';
 import 'package:notifoo/widgets/home/Banner.dart';
 import 'package:path/path.dart';
@@ -41,9 +42,22 @@ class _HomepageState extends State<Homepage> {
                 ),
                 child: Center(
                   child: Text(
-                    'Notifications',
-                    style:
-                        TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                    'Todays Notifications',
+                    style: GoogleFonts.barlowSemiCondensed(
+                      textStyle: TextStyle(
+                        letterSpacing: 1.2,
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        // shadows: [
+                        //   Shadow(
+                        //     blurRadius: 1.0,
+                        //     color: Color(0xffe2adc4),
+                        //     offset: Offset(-1.0, 1.0),
+                        //   ),
+                        // ],
+                      ),
+                    ),
                   ),
                 ),
               ),

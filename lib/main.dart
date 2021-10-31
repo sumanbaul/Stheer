@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:notifoo/helper/provider/google_sign_in.dart';
 import 'package:notifoo/pages/Homepage.dart';
 import 'package:notifoo/pages/Profile.dart';
@@ -30,15 +31,32 @@ class _MyAppState extends State<MyApp> {
     //getListOfApps();
   }
 
+  TextStyle getBarlowFont() {
+    return GoogleFonts.barlowSemiCondensed(
+      textStyle: TextStyle(
+        letterSpacing: 1.2,
+        //fontSize: 20.0,
+        // fontWeight: FontWeight.bold,
+        //color: Colors.white,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) => ChangeNotifierProvider(
         create: (context) => GoogleSignInProvider(),
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           theme: ThemeData.dark().copyWith(
-              primaryColor: Color(0xff0A0E21),
-              scaffoldBackgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-              brightness: Brightness.dark),
+            primaryColor: Color(0xff0A0E21),
+            scaffoldBackgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
+            brightness: Brightness.dark,
+            textTheme: TextTheme(
+              bodyText2: getBarlowFont(),
+              bodyText1: getBarlowFont(),
+              subtitle1: getBarlowFont(),
+            ),
+          ),
           initialRoute: '/splash',
           routes: {
             // When navigating to the "/" route, build the FirstScreen widget.

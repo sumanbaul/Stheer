@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Topbar {
   static getTopbar(String title) {
     final topAppBar = AppBar(
       elevation: 0.1,
-      backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-      title: Text(title),
+      backgroundColor: Color(0xffeeaeca),
+      title: Text(
+        title,
+        style: GoogleFonts.barlowSemiCondensed(
+          fontSize: 24,
+          letterSpacing: 1.5,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
       centerTitle: true,
       actions: <Widget>[
         IconButton(

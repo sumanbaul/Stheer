@@ -5,6 +5,7 @@ import 'package:notifoo/helper/provider/google_sign_in.dart';
 import 'package:notifoo/pages/SignIn.dart';
 import 'package:notifoo/widgets/BottomBar.dart';
 import 'package:notifoo/widgets/LoggedInWidget.dart';
+import 'package:notifoo/widgets/Topbar.dart';
 import 'package:provider/provider.dart';
 
 // class Profile extends StatefulWidget {
@@ -25,6 +26,7 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      //appBar: Topbar.getTopbar('Sign In'),
       body: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {

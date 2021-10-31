@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class BannerWidget extends StatefulWidget {
   BannerWidget({Key key}) : super(key: key);
@@ -7,12 +8,12 @@ class BannerWidget extends StatefulWidget {
   _BannerState createState() => _BannerState();
 }
 
-List<Color> _colors = [
-  Color.fromRGBO(58, 66, 86, 1.0),
-  Color.fromRGBO(52, 60, 79, 1)
-];
+List<Color> _colors = [Color(0xffeeaeca), Color(0xff94bbe9)];
 
 List<double> _stops = [0.0, 0.7];
+
+List<double> _startCircle = [-1.0, 0.7];
+List<double> _stopsCircle = [0.0, 0.7];
 
 class _BannerState extends State<BannerWidget> {
   Color gradientStart = Colors.transparent;
@@ -54,7 +55,7 @@ class _BannerState extends State<BannerWidget> {
             bottomRight: Radius.circular(30.0),
             bottomLeft: Radius.circular(30.0),
           )),
-      padding: const EdgeInsets.fromLTRB(15, 10, 15, 15),
+      padding: const EdgeInsets.fromLTRB(10, 7, 10, 15),
       height: 240,
       child: Row(
         children: [
@@ -95,18 +96,23 @@ class _BannerState extends State<BannerWidget> {
 
   Widget _getReadNotifications = Container(
     margin: EdgeInsets.only(top: 15),
-    padding: EdgeInsets.all(10),
+    padding: EdgeInsets.all(15),
     //decoration: BoxDecoration(color: Colors.orange, shape: BoxShape.circle),
     decoration: BoxDecoration(
       //border: Border.all(width: 3),
       color: Color.fromRGBO(58, 66, 86, 1.0),
+      gradient: LinearGradient(
+        //begin: Alignment.topLeft,
+        colors: _colors,
+        stops: _stopsCircle,
+      ),
       shape: BoxShape.circle,
       boxShadow: [
         //color: Colors.white, //background color of box
 
         BoxShadow(
-          color: Colors.white10,
-          blurRadius: 25.0, // soften the shadow
+          color: Color(0xffffdaea),
+          blurRadius: 15.0, // soften the shadow
           spreadRadius: 3.0, //extend the shadow
           offset: Offset(
             -5.0, // Move to right 10  horizontally
@@ -114,8 +120,8 @@ class _BannerState extends State<BannerWidget> {
           ),
         ),
         BoxShadow(
-          color: Colors.black38,
-          blurRadius: 25.0, // soften the shadow
+          color: Color(0xff84a6cd),
+          blurRadius: 15.0, // soften the shadow
           spreadRadius: 3.0, //extend the shadow
           offset: Offset(
             5.0, // Move to right 10  horizontally
@@ -130,39 +136,57 @@ class _BannerState extends State<BannerWidget> {
       children: [
         Center(
           child: Text(
-            '1000',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 30.0,
-              fontWeight: FontWeight.bold,
+            '1999',
+            style: GoogleFonts.lato(
+              textStyle: TextStyle(
+                letterSpacing: 1.2,
+                fontSize: 50.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                shadows: [
+                  Shadow(
+                    blurRadius: 1.0,
+                    color: Color(0xffe2adc4),
+                    offset: Offset(-1.0, 1.0),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
         Center(
           child: Text(
             'Unread',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
+            style: GoogleFonts.lato(
+              textStyle: TextStyle(
+                  color: Color.fromRGBO(58, 66, 86, 1.0),
+                  letterSpacing: 1,
+                  fontSize: 20.0),
             ),
           ),
-        )
+        ),
       ],
     ),
   );
 
   Widget _whatsAppNotifications = Container(
-    padding: EdgeInsets.all(20),
-    margin: EdgeInsets.only(bottom: 20, top: 15),
+    padding: EdgeInsets.all(15),
+    margin: EdgeInsets.only(bottom: 10, top: 10),
     //decoration: BoxDecoration(color: Colors.orange, shape: BoxShape.circle),
     decoration: BoxDecoration(
       color: Color.fromRGBO(58, 66, 86, 1.0),
+      gradient: LinearGradient(
+        //begin: Alignment.topLeft,
+        colors: _colors,
+        stops: _stopsCircle,
+      ),
       shape: BoxShape.circle,
       boxShadow: [
         //color: Colors.white, //background color of box
 
         BoxShadow(
-          color: Colors.white10,
-          blurRadius: 25.0, // soften the shadow
+          color: Color(0xffffdaea),
+          blurRadius: 15.0, // soften the shadow
           spreadRadius: 3.0, //extend the shadow
           offset: Offset(
             -5.0, // Move to right 10  horizontally
@@ -170,8 +194,88 @@ class _BannerState extends State<BannerWidget> {
           ),
         ),
         BoxShadow(
-          color: Colors.black38,
-          blurRadius: 25.0, // soften the shadow
+          color: Color(0xff84a6cd),
+          blurRadius: 15.0, // soften the shadow
+          spreadRadius: 3.0, //extend the shadow
+          offset: Offset(
+            5.0, // Move to right 10  horizontally
+            5.0, // Move to bottom 10 Vertically
+          ),
+        ),
+      ],
+    ),
+    child: Container(
+      margin: EdgeInsets.only(top: 15),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Center(
+            //heightFactor: 2,
+            child: Text(
+              '500',
+              style: GoogleFonts.lato(
+                textStyle: TextStyle(
+                  letterSpacing: 1.2,
+                  fontSize: 28.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  shadows: [
+                    Shadow(
+                      blurRadius: 1.0,
+                      color: Color(0xffe2adc4),
+                      offset: Offset(-1.0, 1.0),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Center(
+            child: Text(
+              'Msgs',
+              style: GoogleFonts.lato(
+                textStyle: TextStyle(
+                    color: Color.fromRGBO(58, 66, 86, 1.0),
+                    letterSpacing: 1,
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+          )
+        ],
+      ),
+    ),
+  );
+
+  Widget _gmailNotifications = Container(
+    padding: EdgeInsets.all(15),
+    margin: EdgeInsets.only(bottom: 10, top: 10),
+    //decoration: BoxDecoration(color: Colors.orange, shape: BoxShape.circle),
+    decoration: BoxDecoration(
+      // border: Border.all(width: 3),
+      color: Color.fromRGBO(58, 66, 86, 1.0),
+      gradient: LinearGradient(
+        //begin: Alignment.topLeft,
+        colors: _colors,
+        stops: _stopsCircle,
+      ),
+      shape: BoxShape.circle,
+      boxShadow: [
+        //color: Colors.white, //background color of box
+
+        BoxShadow(
+          color: Color(0xffffdaea),
+          blurRadius: 15.0, // soften the shadow
+          spreadRadius: 3.0, //extend the shadow
+          offset: Offset(
+            -5.0, // Move to right 10  horizontally
+            -5.0, // Move to bottom 10 Vertically
+          ),
+        ),
+        BoxShadow(
+          color: Color(0xff84a6cd),
+          blurRadius: 15.0, // soften the shadow
           spreadRadius: 3.0, //extend the shadow
           offset: Offset(
             5.0, // Move to right 10  horizontally
@@ -187,64 +291,40 @@ class _BannerState extends State<BannerWidget> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Center(
+            //heightFactor: 2,
             child: Text(
               '500',
-              style: TextStyle(color: Colors.blue),
+              style: GoogleFonts.lato(
+                textStyle: TextStyle(
+                  letterSpacing: 1.2,
+                  fontSize: 28.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  shadows: [
+                    Shadow(
+                      blurRadius: 1.0,
+                      color: Color(0xffe2adc4),
+                      offset: Offset(-1.0, 1.0),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
           Center(
-            child: Text('Whatsapp'),
+            child: Text(
+              'Mails',
+              style: GoogleFonts.lato(
+                textStyle: TextStyle(
+                    color: Color.fromRGBO(58, 66, 86, 1.0),
+                    letterSpacing: 1,
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
           )
         ],
       ),
-    ),
-  );
-
-  Widget _gmailNotifications = Container(
-    // margin: EdgeInsets.all(20),
-    padding: EdgeInsets.all(20),
-    //decoration: BoxDecoration(color: Colors.orange, shape: BoxShape.circle),
-    decoration: BoxDecoration(
-      // border: Border.all(width: 3),
-      color: Color.fromRGBO(58, 66, 86, 1.0),
-      shape: BoxShape.circle,
-      boxShadow: [
-        //color: Colors.white, //background color of box
-
-        BoxShadow(
-          color: Colors.white10,
-          blurRadius: 25.0, // soften the shadow
-          spreadRadius: 3.0, //extend the shadow
-          offset: Offset(
-            -5.0, // Move to right 10  horizontally
-            -5.0, // Move to bottom 10 Vertically
-          ),
-        ),
-        BoxShadow(
-          color: Colors.black38,
-          blurRadius: 25.0, // soften the shadow
-          spreadRadius: 3.0, //extend the shadow
-          offset: Offset(
-            5.0, // Move to right 10  horizontally
-            5.0, // Move to bottom 10 Vertically
-          ),
-        ),
-      ],
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Center(
-          child: Text(
-            '500',
-            style: TextStyle(color: Colors.blue),
-          ),
-        ),
-        Center(
-          child: Text('Emails'),
-        )
-      ],
     ),
   );
 }
