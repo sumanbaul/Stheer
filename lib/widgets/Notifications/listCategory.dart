@@ -1,8 +1,12 @@
+import 'dart:typed_data';
+
+import 'package:collection/collection.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
 import 'package:notifoo/helper/AppListHelper.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:notifoo/model/Notifications.dart';
+import 'package:notifoo/model/notificationCategory.dart';
 
 class NotificationCatgoryList extends StatefulWidget {
   NotificationCatgoryList({Key key, this.title}) : super(key: key);
@@ -16,6 +20,7 @@ class NotificationCatgoryList extends StatefulWidget {
 
 class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
   List<Notifications> _notifications = [];
+  List<NotificationCategory> _nc = [];
   final List<Application> _apps = AppListHelper().appListData;
   ApplicationWithIcon _currentApp;
 
@@ -24,6 +29,8 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
     DatabaseHelper.instance.initializeDatabase();
 
     super.initState();
+
+    getCategoryList();
   }
 
   Application getCurrentApp(String packageName) {
@@ -48,12 +55,42 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
     );
   }
 
+  Future<List<NotificationCategory>> getCategoryList() async {
+    var getNotifications = await DatabaseHelper.instance.getNotifications();
+    final listByPackageName = groupBy(getNotifications, (Notifications n) {
+      return n.packageName;
+    });
+
+    List<NotificationCategory> notificationsByCategory = [];
+
+    listByPackageName.forEach((key, value) {
+      var nc = NotificationCategory(
+          packageName: key,
+          appTitle: getCurrentApp(key).appName,
+          appIcon: _currentApp is ApplicationWithIcon
+              ? MemoryImage(_currentApp.icon)
+              : null,
+          tempIcon: Image.memory(_currentApp.icon),
+          message:
+              "You have " + value.length.toString() + " Unread notifications",
+          notificationCount: value.length);
+
+      notificationsByCategory.add(nc);
+    });
+
+    _nc = notificationsByCategory;
+    setState(
+        () {}); //this line is responsible for updating the view instantaneously
+
+    return notificationsByCategory;
+    //print(listByPackageName);
+  }
+
   getNotificationListBody() {
-    return FutureBuilder<List<Notifications>>(
-        future: DatabaseHelper.instance.getNotifications(),
+    return FutureBuilder<List<NotificationCategory>>(
+        future: getCategoryList(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            _notifications = snapshot.data;
             return Container(
               child: new ListView.builder(
                 itemCount: snapshot.data.length,
@@ -70,7 +107,8 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
   }
 
   Widget buildNotificationCard(BuildContext context, int index) {
-    var currentApp = getCurrentApp(_notifications[index].packageName);
+    // var currentApp = getCurrentApp(_notifications[index].packageName);
+    //var ncc = _nc[index];
 
     // final entry =
     return new Container(
@@ -83,22 +121,23 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
                   children: [
                     Row(
                       children: [
-                        CircleAvatar(
-                          child: ClipRRect(
-                            child: _currentApp is ApplicationWithIcon
-                                ? Image.memory(_currentApp.icon)
-                                : null,
-                            borderRadius: BorderRadius.circular(200.0),
+                        Center(
+                          child: CircleAvatar(
+                            radius: 30.0,
+                            backgroundImage: _nc[index].appIcon,
+                            // child: ClipRRect(
+                            //   child: _nc[index].tempIcon,
+                            //   borderRadius: BorderRadius.circular(200.0),
+                            // ),
+                            backgroundColor: Colors.transparent,
                           ),
-                          backgroundColor: Colors.transparent,
-                          radius: 30.0,
                         ),
                         // Text(_notifications[index].packageName),
-                        Text(_notifications[index].appTitle ??
-                            currentApp.appName),
+                        Text(_nc[index].appTitle),
+                        Text(_nc[index].message),
                       ],
                     ),
-                    Text(_notifications[index].text ?? "")
+                    Text(_nc[index].notificationCount.toString())
                   ],
                 ),
               ),

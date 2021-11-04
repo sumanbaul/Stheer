@@ -19,6 +19,8 @@ dependencies:
   #Notifications
   flutter_notification_listener: ^1.0.7
   sticky_grouped_list: ^2.0.0-nullsafety.2
+  collection: ^1.15.0
+
   
   device_apps: ^2.1.1
 

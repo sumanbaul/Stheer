@@ -89,6 +89,9 @@ class _NotificationsListerState extends State<NotificationsLister> {
           (event.packageName.contains("notifoo")) ||
           (event.packageName.contains("screenshot")) ||
           (event.title.contains("WhatsApp")) ||
+          (event.packageName.contains("deskclock")) ||
+          (event.packageName.contains("wellbeing")) ||
+          (event.packageName.contains("weather2")) ||
           (event.packageName.contains("gallery"))) {
         //print(event.packageName);
       } else {
