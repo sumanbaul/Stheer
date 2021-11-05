@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:collection/collection.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:notifoo/helper/AppListHelper.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:notifoo/model/Notifications.dart';
@@ -87,6 +88,7 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
   }
 
   getNotificationListBody() {
+    // debugPaintSizeEnabled = true;
     return FutureBuilder<List<NotificationCategory>>(
         future: getCategoryList(),
         builder: (context, snapshot) {
@@ -107,35 +109,36 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
   }
 
   Widget buildNotificationCard(BuildContext context, int index) {
-    // var currentApp = getCurrentApp(_notifications[index].packageName);
-    //var ncc = _nc[index];
-
-    // final entry =
     return new Container(
       child: Card(
         child: Column(
           children: <Widget>[
             Container(
+              height: 80.0,
               child: Center(
                 child: Column(
                   children: [
-                    Row(
-                      children: [
-                        Center(
-                          child: CircleAvatar(
-                            radius: 30.0,
-                            backgroundImage: _nc[index].appIcon,
-                            // child: ClipRRect(
-                            //   child: _nc[index].tempIcon,
-                            //   borderRadius: BorderRadius.circular(200.0),
-                            // ),
-                            backgroundColor: Colors.transparent,
+                    Container(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Center(
+                            child: CircleAvatar(
+                              radius: 30.0,
+                              backgroundImage: _nc[index].appIcon,
+                              // child: ClipRRect(
+                              //   child: _nc[index].tempIcon,
+                              //   borderRadius: BorderRadius.circular(200.0),
+                              // ),
+                              backgroundColor: Colors.transparent,
+                            ),
                           ),
-                        ),
-                        // Text(_notifications[index].packageName),
-                        Text(_nc[index].appTitle),
-                        Text(_nc[index].message),
-                      ],
+                          // Text(_notifications[index].packageName),
+                          Text(_nc[index].appTitle),
+                          Text(_nc[index].message),
+                        ],
+                      ),
                     ),
                     Text(_nc[index].notificationCount.toString())
                   ],
