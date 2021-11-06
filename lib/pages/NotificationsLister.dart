@@ -319,7 +319,12 @@ class _NotificationsListerState extends State<NotificationsLister> {
                           EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
 
                       leading: _currentApp is ApplicationWithIcon
-                          ? Image.memory(_currentApp.icon)
+                          ? Image.memory(
+                              _currentApp.icon,
+                              gaplessPlayback: true,
+                              fit: BoxFit.cover,
+                              scale: 2,
+                            )
                           : null,
                       title: Container(
                         alignment: Alignment.topLeft,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notifoo/widgets/Notifications/ListUIBody.dart';
-import 'package:notifoo/widgets/Notifications/listCategory.dart';
+import 'package:notifoo/widgets/Notifications/list_category.dart';
 import 'package:notifoo/widgets/Topbar.dart';
 
 class TestPage extends StatefulWidget {
@@ -24,11 +24,11 @@ class _ListPageState extends State<TestPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-        appBar: Topbar.getTopbar(widget.title),
-        body: NotificationCatgoryList()
-        //bottomNavigationBar: BottomBar.getBottomBar(context),
-        );
+      backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
+      appBar: Topbar.getTopbar(widget.title),
+      body: NotificationCatgoryList(),
+      //bottomNavigationBar: BottomBar.getBottomBar(context),
+    );
   }
 } 
 

@@ -1,37 +1,50 @@
 import 'package:flutter/material.dart';
 
-class NotificationCategory {
+class NotificationModel {
   final int id;
   final String appTitle;
   final Image appIcon;
-  final Image tempIcon;
+  final String title;
+  final String text;
   final String message;
   final String packageName;
   final int timestamp;
-  final int notificationCount;
+  final String createAt;
+  final String eventJson;
+  final String summaryText;
+  final List<String> textLines;
+  //final String signature;
 
-  NotificationCategory(
+  //static const String TABLENAME = "notifications";
+
+  NotificationModel(
       {this.id,
-      this.appIcon,
-      this.tempIcon,
+      this.title,
       this.appTitle,
+      this.appIcon,
+      this.text,
       this.message,
       this.packageName,
       this.timestamp,
-      this.notificationCount
+      this.createAt,
+      this.eventJson,
+      this.summaryText,
+      this.textLines
       //this.signature
       });
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'title': title,
       'appTitle': appTitle,
       'appIcon': appIcon,
-      'tempIcon': tempIcon,
+      'text': text,
       'message': message,
       'packageName': packageName,
       'timestamp': timestamp,
-      'notificationCount': notificationCount
+      'createAt': createAt,
+      'eventJson': eventJson,
       //'signature': signature
     };
   }
