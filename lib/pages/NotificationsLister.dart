@@ -113,6 +113,12 @@ class _NotificationsListerState extends State<NotificationsLister> {
             //var xx = jsonresponse.containsKey('summaryText');
             if (!jsonresponse.containsKey('summaryText') &&
                 event.createAt.day >= today) {
+              //check
+              bool redundancy;
+              redundantNotificationCheck(event).then((bool value) {
+                redundancy = value;
+              });
+
               if ((event.text != flagEntry) && event.text != null) {
                 DatabaseHelper.instance.insertNotification(
                   Notifications(
@@ -175,6 +181,35 @@ class _NotificationsListerState extends State<NotificationsLister> {
     //   // NotificationsListener.promoteToForeground("");
     // }
     // print("Print Notification: $event");
+  }
+
+  Future<bool> redundantNotificationCheck(NotificationEvent event) async {
+    var getNotificationModel = await DatabaseHelper.instance
+        .getNotificationsByPackageToday(event.packageName);
+
+    Future<bool> entryFlag;
+
+    getNotificationModel.forEach((key) {
+      if (key.packageName.contains(event.packageName)) {
+        // var _notification = Notifications(
+        //     title: key.title,
+        //     text: key.text,
+        //     packageName: key.packageName,
+        //     timestamp: key.timestamp,
+        //     createAt: key.createAt,
+        //     message: key.message,
+        //     textLines: key.textLines);
+
+        if (key.title.contains(event.title) && key.text.contains(event.text)) {
+          entryFlag = Future<bool>.value(true);
+          //return Future<bool>.value(true);
+        } else {
+          entryFlag = Future<bool>.value(false);
+        }
+      }
+    });
+
+    return entryFlag;
   }
 
   void startListening() async {
@@ -383,8 +418,8 @@ class _NotificationsListerState extends State<NotificationsLister> {
   }
 
   onAppClicked(BuildContext context, Application app) {
-    final appName = SnackBar(content: Text(app.appName));
-    ScaffoldMessenger.of(context).showSnackBar(appName);
+    // final appName = SnackBar(content: Text(app.appName));
+    // ScaffoldMessenger.of(context).showSnackBar(appName);
 
     showDialog(
         context: context,

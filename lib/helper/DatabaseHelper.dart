@@ -76,6 +76,47 @@ class DatabaseHelper {
     });
   }
 
+  Future<List<Notifications>> getNotificationsByPackageToday(
+      String package) async {
+    final db = await database;
+
+    var now = DateTime.now();
+    var lastMidnight =
+        DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+
+    String whereString = 'timestamp >= ? and packageName = ?';
+    List<dynamic> whereArguments = [lastMidnight, package];
+
+    final List<Map<String, dynamic>> maps = await db.query(
+        Notifications.TABLENAME,
+        orderBy: 'createAt ASC',
+        where: whereString,
+        whereArgs: whereArguments);
+
+    return List.generate(maps.length, (i) {
+      return Notifications(
+          //  id: maps[i]['id'],
+          title: maps[i]['title'],
+          text: maps[i]['text'],
+          message: maps[i]['message'],
+          packageName: maps[i]['packageName'],
+          timestamp: maps[i]['timestamp'],
+          createAt: maps[i]['createAt'],
+          appTitle: maps[i]['appTitle']
+          // eventJson: maps[i]['eventJson'],
+          // signature: maps[i]['signature'],
+
+          // infoText: maps[i]['infoText'],
+          // summaryText: maps[i]['summaryText'],
+          // showWhen: maps[i]['showWhen'],
+          // package_name: maps[i]['package_name'],
+          // text: maps[i]['text'],
+          // subText: maps[i]['subText'],
+          // timestamp: maps[i]['timestamp'],
+          );
+    });
+  }
+
   // updateTodo(Notifications todo) async {
   //   final db = await database;
 

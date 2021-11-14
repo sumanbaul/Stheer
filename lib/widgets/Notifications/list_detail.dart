@@ -1,4 +1,5 @@
 import 'package:device_apps/device_apps.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:notifoo/helper/AppListHelper.dart';
@@ -22,6 +23,7 @@ class NotificationDetailList extends StatefulWidget {
 }
 
 class _NotificationCatgoryListState extends State<NotificationDetailList> {
+  ScrollController _controller = new ScrollController();
   final List<Color> _cardColors = [
     Color.fromRGBO(59, 66, 84, 1),
     Color.fromRGBO(41, 47, 61, 1)
@@ -53,6 +55,7 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
 
   @override
   Widget build(BuildContext context) {
+    //debugPaintSizeEnabled = true;
     return Scaffold(
       appBar: Topbar.getTopbar(widget.title),
       // backgroundColor: Colors.transparent,
@@ -71,7 +74,7 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
         print(key.title);
         var _notification = NotificationModel(
             title: key.title,
-            text: key.message,
+            text: key.text,
             packageName: key.packageName,
             appTitle: getCurrentApp(key.packageName).appName,
             appIcon: _currentApp is ApplicationWithIcon
@@ -94,12 +97,30 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
     // notificationList.sort(
     //     (a, b) => a.appTitle.toLowerCase().compareTo(b.appTitle.toLowerCase()));
     _notificationsList = notificationList;
-    setState(
-        () {}); //this line is responsible for updating the view instantaneously
+    // setState(
+    //     () {}); //this line is responsible for updating the view instantaneously
 
     return notificationList;
     //print(listByPackageName);
   }
+
+  // getNotificationListBody() {
+  //   return FutureBuilder<List<NotificationModel>>(
+  //       future: DatabaseHelper.instance.getNotifications(),
+  //       builder: (context, snapshot) {
+  //         if (snapshot.hasData) {
+  //           return new ListView.builder(
+  //               itemBuilder: buildNotificationCard,
+  //               physics: BouncingScrollPhysics(
+  //                 parent: AlwaysScrollableScrollPhysics(),
+  //               ));
+  //         }
+
+  //         else {
+
+  //         }
+  //       });
+  // }
 
   getNotificationListBody() {
     return FutureBuilder<List<NotificationModel>>(
@@ -119,7 +140,35 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
         });
   }
 
+  getTagButton() {
+    return Container(
+      height: 40.0,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20.0),
+          color: Colors.blueAccent, //Color.fromRGBO(84, 98, 117, 0.9),
+          boxShadow: [
+            BoxShadow(
+                color: Color.fromRGBO(84, 98, 117, 1),
+                blurRadius: 6,
+                spreadRadius: 1,
+                offset: Offset(-3, -3)),
+            BoxShadow(
+                color: Color.fromRGBO(40, 48, 59, 1),
+                blurRadius: 6,
+                spreadRadius: 1,
+                offset: Offset(3, 3)),
+          ]),
+      margin: EdgeInsets.fromLTRB(7, 10, 5, 10),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 5.0),
+        child: Text('#social'),
+      ),
+    );
+  }
+
   Widget buildNotificationCard(BuildContext context, int index) {
+    //var tempnotificationList = _notificationsList;
+    var size = MediaQuery.of(context).size;
     return Card(
       elevation: 0.0,
       color: Colors.transparent,
@@ -127,7 +176,7 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
       child: Column(
         children: <Widget>[
           Container(
-            height: 130,
+            height: 165,
             padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 12.0),
             decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -150,6 +199,7 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
                 ]),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -174,18 +224,20 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _notificationsList[index].title ??
-                                  _notificationsList[index].appTitle,
+                              _notificationsList[index].appTitle,
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 18.0),
                             ),
                             SizedBox(
                               height: 3.0,
                             ),
-                            Text(
-                              _notificationsList[index].text ?? "null",
-                              style: TextStyle(
-                                  color: Color.fromRGBO(196, 196, 196, 1)),
+                            Container(
+                              child: Text(
+                                _notificationsList[index].title ??
+                                    _notificationsList[index].text,
+                                style: TextStyle(
+                                    color: Color.fromRGBO(196, 196, 196, 1)),
+                              ),
                             )
                           ],
                         ),
@@ -197,9 +249,19 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0),
-                      child: Text(_notificationsList[index].text ?? "nnn"),
+                    Expanded(
+                      flex: 1,
+                      child: new SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        dragStartBehavior: DragStartBehavior.start,
+                        child: Container(
+                          padding: const EdgeInsets.only(top: 10.0),
+                          width: size.width * 0.67,
+                          height: 45.0,
+                          child: Text(_notificationsList[index].text ??
+                              "No text to display"),
+                        ),
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 10.0),
@@ -212,6 +274,25 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
                       ),
                     ),
                   ],
+                ),
+                Container(
+                  color: Colors.transparent,
+                  width: size.width,
+                  height: 45,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(), // new
+                    controller: _controller,
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      getTagButton(),
+                      getTagButton(),
+                      getTagButton(),
+                      getTagButton(),
+                      getTagButton(),
+                      getTagButton(),
+                      getTagButton(),
+                    ],
+                  ),
                 )
               ],
             ),
