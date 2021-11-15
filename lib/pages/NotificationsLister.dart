@@ -133,7 +133,10 @@ class _NotificationsListerState extends State<NotificationsLister> {
                       timestamp: event.timestamp,
                       createAt:
                           event.createAt.millisecondsSinceEpoch.toString(),
-                      eventJson: event.toString()
+                      eventJson: event.toString(),
+                      createdDate:
+                          DateTime.now().millisecondsSinceEpoch.toString(),
+                      isDeleted: 0
                       // infoText: jsonData["text"],
                       // showWhen: 1,
                       // subText: jsonData["text"],

@@ -23,14 +23,14 @@ class DatabaseHelper {
         version: 1, onCreate: (Database db, int version) async {
       await db.execute(
           // "CREATE TABLE notifications (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, infoText TEXT, summaryText TEXT, showWhen INTEGER, package_name TEXT, text TEXT,  subText TEXT, timestamp TEXT)");
-          "CREATE TABLE notifications (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, appTitle TEXT, text TEXT, message TEXT, packageName TEXT, timestamp INTEGER, createAt TEXT, eventJson TEXT)");
+          "CREATE TABLE notifications (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, appTitle TEXT, text TEXT, message TEXT, packageName TEXT, timestamp INTEGER, createAt TEXT, eventJson TEXT, createdDate TEXT, isDeleted INTEGER, UNIQUE(title , text))");
     });
   }
 
   insertNotification(Notifications notifications) async {
     final db = await database;
     var res = await db.insert(Notifications.TABLENAME, notifications.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace);
+        conflictAlgorithm: ConflictAlgorithm.ignore);
     return res;
   }
 
@@ -54,25 +54,27 @@ class DatabaseHelper {
 
     return List.generate(maps.length, (i) {
       return Notifications(
-          //  id: maps[i]['id'],
-          title: maps[i]['title'],
-          text: maps[i]['text'],
-          message: maps[i]['message'],
-          packageName: maps[i]['packageName'],
-          timestamp: maps[i]['timestamp'],
-          createAt: maps[i]['createAt'],
-          appTitle: maps[i]['appTitle']
-          // eventJson: maps[i]['eventJson'],
-          // signature: maps[i]['signature'],
+        //  id: maps[i]['id'],
+        title: maps[i]['title'],
+        text: maps[i]['text'],
+        message: maps[i]['message'],
+        packageName: maps[i]['packageName'],
+        timestamp: maps[i]['timestamp'],
+        createAt: maps[i]['createAt'],
+        appTitle: maps[i]['appTitle'],
+        createdDate: maps[i]['createdDate'],
+        isDeleted: maps[i]['isDeleted'],
+        // eventJson: maps[i]['eventJson'],
+        // signature: maps[i]['signature'],
 
-          // infoText: maps[i]['infoText'],
-          // summaryText: maps[i]['summaryText'],
-          // showWhen: maps[i]['showWhen'],
-          // package_name: maps[i]['package_name'],
-          // text: maps[i]['text'],
-          // subText: maps[i]['subText'],
-          // timestamp: maps[i]['timestamp'],
-          );
+        // infoText: maps[i]['infoText'],
+        // summaryText: maps[i]['summaryText'],
+        // showWhen: maps[i]['showWhen'],
+        // package_name: maps[i]['package_name'],
+        // text: maps[i]['text'],
+        // subText: maps[i]['subText'],
+        // timestamp: maps[i]['timestamp'],
+      );
     });
   }
 
@@ -89,7 +91,7 @@ class DatabaseHelper {
 
     final List<Map<String, dynamic>> maps = await db.query(
         Notifications.TABLENAME,
-        orderBy: 'createAt ASC',
+        orderBy: 'createAt DESC',
         where: whereString,
         whereArgs: whereArguments);
 

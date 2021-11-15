@@ -13,6 +13,8 @@ class NotificationModel {
   final String eventJson;
   final String summaryText;
   final List<String> textLines;
+  final String createdDate;
+  final int isDeleted;
   //final String signature;
 
   //static const String TABLENAME = "notifications";
@@ -29,7 +31,9 @@ class NotificationModel {
       this.createAt,
       this.eventJson,
       this.summaryText,
-      this.textLines
+      this.textLines,
+      this.createdDate,
+      this.isDeleted
       //this.signature
       });
 
@@ -45,6 +49,8 @@ class NotificationModel {
       'timestamp': timestamp,
       'createAt': createAt,
       'eventJson': eventJson,
+      'createdDate': createdDate,
+      'isDeleted': isDeleted
       //'signature': signature
     };
   }

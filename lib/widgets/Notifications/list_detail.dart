@@ -73,21 +73,24 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
         print(key.text);
         print(key.title);
         var _notification = NotificationModel(
-            title: key.title,
-            text: key.text,
-            packageName: key.packageName,
-            appTitle: getCurrentApp(key.packageName).appName,
-            appIcon: _currentApp is ApplicationWithIcon
-                ? Image.memory(
-                    _currentApp.icon,
-                    fit: BoxFit.cover,
-                    gaplessPlayback: true,
-                  )
-                : null,
-            timestamp: key.timestamp,
-            createAt: key.createAt,
-            message: key.message,
-            textLines: key.textLines);
+          title: key.title,
+          text: key.text,
+          packageName: key.packageName,
+          appTitle: getCurrentApp(key.packageName).appName,
+          appIcon: _currentApp is ApplicationWithIcon
+              ? Image.memory(
+                  _currentApp.icon,
+                  fit: BoxFit.cover,
+                  gaplessPlayback: true,
+                )
+              : null,
+          timestamp: key.timestamp,
+          createAt: key.createAt,
+          message: key.message,
+          textLines: key.textLines,
+          createdDate: key.createdDate,
+          isDeleted: key.isDeleted,
+        );
         notificationList.add(_notification);
       }
 
@@ -168,6 +171,14 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
 
   Widget buildNotificationCard(BuildContext context, int index) {
     //var tempnotificationList = _notificationsList;
+    var createdDate = _notificationsList[index].createdDate != null
+        ? DateTime.fromMillisecondsSinceEpoch(
+            int.parse(_notificationsList[index].createdDate))
+        : "Few moments ago";
+    // var createdDateFormatted =
+    //     DateTime.fromMillisecondsSinceEpoch(createdDateInMilliseconds) != 0 ?
+    //         "Few moments ago";
+
     var size = MediaQuery.of(context).size;
     return Card(
       elevation: 0.0,
@@ -176,7 +187,7 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
       child: Column(
         children: <Widget>[
           Container(
-            height: 165,
+            // height: 165,
             padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 12.0),
             decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -207,7 +218,7 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
                     Row(
                       children: [
                         CircleAvatar(
-                          radius: 25.0,
+                          //radius: 25.0,
                           //backgroundImage: _nc[index].appIcon,
                           child: _notificationsList[index].appIcon,
                           // child: ClipRRect(
@@ -224,7 +235,9 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _notificationsList[index].appTitle,
+                              _notificationsList[index].title ??
+                                  _notificationsList[index].appTitle,
+                              overflow: TextOverflow.fade,
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 18.0),
                             ),
@@ -233,8 +246,7 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
                             ),
                             Container(
                               child: Text(
-                                _notificationsList[index].title ??
-                                    _notificationsList[index].text,
+                                createdDate.toString(),
                                 style: TextStyle(
                                     color: Color.fromRGBO(196, 196, 196, 1)),
                               ),
@@ -256,23 +268,23 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
                         dragStartBehavior: DragStartBehavior.start,
                         child: Container(
                           padding: const EdgeInsets.only(top: 10.0),
-                          width: size.width * 0.67,
-                          height: 45.0,
+                          width: size.width, //* 0.67,
+                          //height: 45.0,
                           child: Text(_notificationsList[index].text ??
                               "No text to display"),
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0),
-                      child: Text(
-                        '2 minutes ago',
-                        style: TextStyle(
-                          color: Color.fromRGBO(196, 196, 196, 1),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(top: 10.0),
+                    //   child: Text(
+                    //     '2 minutes ago',
+                    //     style: TextStyle(
+                    //       color: Color.fromRGBO(196, 196, 196, 1),
+                    //       fontWeight: FontWeight.bold,
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
                 Container(
