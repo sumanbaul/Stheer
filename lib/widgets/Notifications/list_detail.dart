@@ -237,7 +237,7 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
                             Text(
                               _notificationsList[index].title ??
                                   _notificationsList[index].appTitle,
-                              overflow: TextOverflow.fade,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 18.0),
                             ),

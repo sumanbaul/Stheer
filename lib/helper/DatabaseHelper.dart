@@ -48,7 +48,7 @@ class DatabaseHelper {
 
     final List<Map<String, dynamic>> maps = await db.query(
         Notifications.TABLENAME,
-        orderBy: 'createAt ASC',
+        orderBy: 'createdDate DESC',
         where: whereString,
         whereArgs: whereArguments);
 
