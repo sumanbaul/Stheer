@@ -183,7 +183,7 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
     return Card(
       elevation: 0.0,
       color: Colors.transparent,
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       child: Column(
         children: <Widget>[
           Container(

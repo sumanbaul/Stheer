@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class BannerWidget extends StatefulWidget {
@@ -26,7 +27,8 @@ class _BannerState extends State<BannerWidget> {
 
   Widget bannerSection(BuildContext context) {
     double _width = MediaQuery.of(context).size.width * 0.55;
-
+    double _height = MediaQuery.of(context).size.height * 0.40;
+    //debugPaintSizeEnabled = true;
     return Container(
       margin: EdgeInsets.only(bottom: 25.0),
       decoration: BoxDecoration(
@@ -55,28 +57,65 @@ class _BannerState extends State<BannerWidget> {
             bottomRight: Radius.circular(30.0),
             bottomLeft: Radius.circular(30.0),
           )),
-      padding: const EdgeInsets.fromLTRB(10, 7, 10, 15),
-      height: 240,
-      child: Row(
-        children: [
-          Expanded(
-            /*1*/
-            child: Row(
+      padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+      height: _height,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 36.0),
+        child: Column(
+          children: [
+            Expanded(
+              child: Container(
+                height: 50,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(left: 7.0),
+                      child: Icon(Icons.menu),
+                    ),
+                    Container(
+                      child: Text(
+                        'Notifoo',
+                        style: GoogleFonts.barlowSemiCondensed(
+                          fontSize: 26,
+                          letterSpacing: 1.5,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(right: 7.0),
+                      child: Icon(Icons.menu_open),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Expanded(
-                  flex: 4,
-                  child: Container(
-                    height: 200,
-                    width: _width,
-                    color: Colors.transparent,
-                    padding: EdgeInsets.only(bottom: 20),
-                    child: _getReadNotifications,
+                  flex: 3,
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 200,
+                        //width: _width,
+                        color: Colors.transparent,
+                        padding: EdgeInsets.only(
+                          //left: 15,
+                          right: 15,
+                          bottom: 20,
+                        ),
+                        child: _getReadNotifications,
+                      ),
+                    ],
                   ),
                 ),
                 Expanded(
-                  flex: 3,
+                  flex: 2,
                   child: Column(
                     children: <Widget>[
                       _whatsAppNotifications,
@@ -87,16 +126,15 @@ class _BannerState extends State<BannerWidget> {
                 /*2*/
               ],
             ),
-          ),
-          /*3*/
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _getReadNotifications = Container(
-    margin: EdgeInsets.only(top: 15),
-    padding: EdgeInsets.all(15),
+    // margin: EdgeInsets.only(top: 0),
+    padding: EdgeInsets.all(0),
     //decoration: BoxDecoration(color: Colors.orange, shape: BoxShape.circle),
     decoration: BoxDecoration(
       //border: Border.all(width: 3),
@@ -113,19 +151,19 @@ class _BannerState extends State<BannerWidget> {
         BoxShadow(
           color: Color(0xffffdaea),
           blurRadius: 15.0, // soften the shadow
-          spreadRadius: 3.0, //extend the shadow
+          spreadRadius: 2.0, //extend the shadow
           offset: Offset(
-            -5.0, // Move to right 10  horizontally
-            -5.0, // Move to bottom 10 Vertically
+            -3.0, // Move to right 10  horizontally
+            -3.0, // Move to bottom 10 Vertically
           ),
         ),
         BoxShadow(
           color: Color(0xff84a6cd),
           blurRadius: 15.0, // soften the shadow
-          spreadRadius: 3.0, //extend the shadow
+          spreadRadius: 2.0, //extend the shadow
           offset: Offset(
-            5.0, // Move to right 10  horizontally
-            5.0, // Move to bottom 10 Vertically
+            3.0, // Move to right 10  horizontally
+            3.0, // Move to bottom 10 Vertically
           ),
         ),
       ],
@@ -170,8 +208,10 @@ class _BannerState extends State<BannerWidget> {
   );
 
   Widget _whatsAppNotifications = Container(
-    padding: EdgeInsets.all(15),
-    margin: EdgeInsets.only(bottom: 10, top: 10),
+    padding: EdgeInsets.all(20),
+    margin: EdgeInsets.only(
+      bottom: 15,
+    ),
     //decoration: BoxDecoration(color: Colors.orange, shape: BoxShape.circle),
     decoration: BoxDecoration(
       color: Color.fromRGBO(58, 66, 86, 1.0),
@@ -189,23 +229,23 @@ class _BannerState extends State<BannerWidget> {
           blurRadius: 15.0, // soften the shadow
           spreadRadius: 2.0, //extend the shadow
           offset: Offset(
-            -4.0, // Move to right 10  horizontally
-            -4.0, // Move to bottom 10 Vertically
+            -3.0, // Move to right 10  horizontally
+            -3.0, // Move to bottom 10 Vertically
           ),
         ),
         BoxShadow(
           color: Color(0xff84a6cd),
           blurRadius: 15.0, // soften the shadow
-          spreadRadius: 3.0, //extend the shadow
+          spreadRadius: 2.0, //extend the shadow
           offset: Offset(
-            4.0, // Move to right 10  horizontally
-            4.0, // Move to bottom 10 Vertically
+            3.0, // Move to right 10  horizontally
+            3.0, // Move to bottom 10 Vertically
           ),
         ),
       ],
     ),
     child: Container(
-      margin: EdgeInsets.only(top: 15),
+      //margin: EdgeInsets.only(top: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -213,7 +253,7 @@ class _BannerState extends State<BannerWidget> {
           Center(
             //heightFactor: 2,
             child: Text(
-              '500',
+              '501',
               style: GoogleFonts.lato(
                 textStyle: TextStyle(
                   letterSpacing: 1.2,
@@ -249,8 +289,10 @@ class _BannerState extends State<BannerWidget> {
   );
 
   Widget _gmailNotifications = Container(
-    padding: EdgeInsets.all(15),
-    margin: EdgeInsets.only(bottom: 10, top: 10),
+    padding: EdgeInsets.all(20),
+    margin: EdgeInsets.only(
+      bottom: 15,
+    ),
     //decoration: BoxDecoration(color: Colors.orange, shape: BoxShape.circle),
     decoration: BoxDecoration(
       // border: Border.all(width: 3),
@@ -267,25 +309,25 @@ class _BannerState extends State<BannerWidget> {
         BoxShadow(
           color: Color(0xffffdaea),
           blurRadius: 15.0, // soften the shadow
-          spreadRadius: 2.0, //extend the shadow
+          spreadRadius: 1.0, //extend the shadow
           offset: Offset(
-            -4.0, // Move to right 10  horizontally
-            -4.0, // Move to bottom 10 Vertically
+            -3.0, // Move to right 10  horizontally
+            -3.0, // Move to bottom 10 Vertically
           ),
         ),
         BoxShadow(
           color: Color(0xff84a6cd),
           blurRadius: 15.0, // soften the shadow
-          spreadRadius: 2.0, //extend the shadow
+          spreadRadius: 1.0, //extend the shadow
           offset: Offset(
-            4.0, // Move to right 10  horizontally
-            4.0, // Move to bottom 10 Vertically
+            3.0, // Move to right 10  horizontally
+            3.0, // Move to bottom 10 Vertically
           ),
         ),
       ],
     ),
     child: Container(
-      margin: EdgeInsets.only(top: 15),
+      //margin: EdgeInsets.only(top: 15),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,

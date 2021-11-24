@@ -118,7 +118,6 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
     return Card(
       elevation: 0.0,
       color: Colors.transparent,
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Stack(children: [
         Column(
           // crossAxisAlignment: CrossAxisAlignment.stretch,

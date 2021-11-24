@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:notifoo/widgets/Notifications/ListUIBody.dart';
 import 'package:notifoo/widgets/Notifications/list_category.dart';
 import 'package:notifoo/widgets/Topbar.dart';
 

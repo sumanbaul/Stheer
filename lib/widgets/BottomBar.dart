@@ -25,7 +25,7 @@ class BottomBar {
             IconButton(
               icon: Icon(Icons.blur_on, color: Colors.white),
               onPressed: () {
-                Navigator.popAndPushNamed(context, '/second'
+                Navigator.popAndPushNamed(context, '/pomodoro'
                     //   MaterialPageRoute(
                     //       builder: (context) => TestPage(title: "Test Page")),
                     );

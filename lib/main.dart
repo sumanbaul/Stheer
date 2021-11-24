@@ -68,6 +68,7 @@ class _MyAppState extends State<MyApp> {
             '/signin': (context) => SignIn(),
             '/profile': (context) => Profile(title: "Profile"),
             '/app': (context) => App(),
+            '/pomodoro': (context) => Profile(title: "Pomodoro"),
           },
         ),
 

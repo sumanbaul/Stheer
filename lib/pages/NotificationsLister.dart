@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 import 'package:notifoo/helper/AppListHelper.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
+import 'package:notifoo/widgets/Notifications/list_category.dart';
 import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:notifoo/model/Notifications.dart';
@@ -51,7 +52,8 @@ class _NotificationsListerState extends State<NotificationsLister> {
     // print(
     //   "send evt to ui: $evt",
     // );
-    final SendPort send = IsolateNameServer.lookupPortByName("_listener_");
+    final SendPort send =
+        IsolateNameServer.lookupPortByName("_notifoolistener_");
     if (send == null) print("can't find the sender");
     send?.send(evt);
   }
@@ -61,8 +63,8 @@ class _NotificationsListerState extends State<NotificationsLister> {
     NotificationsListener.initialize(callbackHandle: _callback);
 
     // this can fix restart<debug> can't handle error
-    IsolateNameServer.removePortNameMapping("_listener_");
-    IsolateNameServer.registerPortWithName(port.sendPort, "_listener_");
+    IsolateNameServer.removePortNameMapping("_notifoolistener_");
+    IsolateNameServer.registerPortWithName(port.sendPort, "_notifoolistener_");
     //IsolateNameServer.registerPortWithName(port.sendPort, "insta");
     port.listen((message) => onData(message));
 
@@ -155,7 +157,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
               DatabaseHelper.instance.insertNotification(
                 Notifications(
-                    title: jsonresponse["textLines"],
+                    title: jsonresponse["textLines"] as String,
                     text: event.text,
                     message: event.message,
                     packageName: event.packageName,
@@ -273,7 +275,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
       //appBar: Topbar.getTopbar(widget.title),
       //bottomNavigationBar: BottomBar.getBottomBar(context),
       body: Container(
-        child: getNotificationListBody(),
+        child: NotificationCatgoryList(), //getNotificationListBody(),
       ),
       floatingActionButton: FloatingActionButton(
         //backgroundColor: Color(0xffeeaeca),
