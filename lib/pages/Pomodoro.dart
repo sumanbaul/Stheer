@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:notifoo/widgets/Topbar.dart';
 import 'package:notifoo/widgets/button_widget.dart';
 
@@ -22,7 +23,10 @@ class _PomodoroState extends State<Pomodoro> {
   Timer timer;
 
   void resetTimer() {
-    setState(() => seconds = maxSeconds);
+    setState(() {
+      seconds = maxSeconds;
+      duration = Duration(seconds: seconds);
+    });
   }
 
   void stopTimer({bool reset = true}) {
@@ -161,11 +165,60 @@ class _PomodoroState extends State<Pomodoro> {
     final minutes = twoDigits(duration.inMinutes.remainder(60));
     final seconds = twoDigits(duration.inSeconds.remainder(60));
     //final seconds = twoDigits(duration.inMinutes.remainder(60));
-    return Text(
-      //'$f',
-      '$minutes:$seconds',
-      style: TextStyle(
-          fontWeight: FontWeight.bold, color: Colors.white, fontSize: 80),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        buildTimeCard(
+            time: minutes, header: 'MINUTES', textAlign: TextAlign.right),
+        const SizedBox(width: 4),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: EdgeInsets.only(right: 5),
+              child: Text(
+                ':',
+                style: TextStyle(fontSize: 70, letterSpacing: 1),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            )
+          ],
+        ),
+        buildTimeCard(
+            time: seconds, header: 'MINUTES', textAlign: TextAlign.right),
+        // Text(
+        //   //'$f',
+        //   '$minutes:$seconds',
+        //   style: TextStyle(
+        //       fontWeight: FontWeight.bold, color: Colors.white, fontSize: 80),
+        // ),
+      ],
     );
   }
+
+  Widget buildTimeCard({String time, String header, TextAlign textAlign}) =>
+      Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 68,
+            decoration: BoxDecoration(),
+            child: Text(
+              time,
+              textAlign: TextAlign.left,
+              style: GoogleFonts.barlowSemiCondensed(
+                textStyle: TextStyle(
+                  letterSpacing: 1.2,
+                  fontSize: 70.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          Text(header)
+        ],
+      );
 }
