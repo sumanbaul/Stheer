@@ -14,8 +14,10 @@ class Pomodoro extends StatefulWidget {
 }
 
 class _PomodoroState extends State<Pomodoro> {
-  Duration duration = Duration();
-  static const maxSeconds = 60;
+  static const maxSeconds = 60 * 25;
+
+  Duration duration = Duration(seconds: maxSeconds);
+
   int seconds = maxSeconds;
   Timer timer;
 
@@ -41,10 +43,24 @@ class _PomodoroState extends State<Pomodoro> {
       if (seconds > 0) {
         setState(() {
           seconds--;
+          duration = Duration(seconds: seconds); //seconds--;
+          //duration = Duration(seconds: 120);
         });
       } else {
         stopTimer(reset: false);
       }
+
+      // addTime();
+    });
+  }
+
+  void addTime() {
+    final addSeconds = 1;
+
+    setState(() {
+      final seconds = duration.inSeconds - addSeconds;
+
+      duration = Duration(seconds: seconds);
     });
   }
 
@@ -70,7 +86,8 @@ class _PomodoroState extends State<Pomodoro> {
 
   Widget buildButtons() {
     final isRunning = timer == null ? false : timer.isActive;
-    final isCompleted = seconds == maxSeconds || seconds == 0;
+    final isCompleted =
+        duration.inSeconds == maxSeconds || duration.inSeconds == 0;
 
     return isRunning || !isCompleted
         ? Row(
@@ -124,7 +141,7 @@ class _PomodoroState extends State<Pomodoro> {
             fit: StackFit.expand,
             children: [
               CircularProgressIndicator(
-                value: 1 - seconds / maxSeconds,
+                value: 1 - duration.inSeconds / maxSeconds,
                 valueColor: AlwaysStoppedAnimation(Colors.white),
                 backgroundColor: Colors.red,
                 strokeWidth: 12,
@@ -138,12 +155,17 @@ class _PomodoroState extends State<Pomodoro> {
       );
 
   Widget buildTime() {
+    // duration = Duration(seconds: seconds);
+
     String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final minutes = twoDigits(duration.inMinutes.remainder(60));
+    final seconds = twoDigits(duration.inSeconds.remainder(60));
     //final seconds = twoDigits(duration.inMinutes.remainder(60));
     return Text(
-      '$seconds',
+      //'$f',
+      '$minutes:$seconds',
       style: TextStyle(
-          fontWeight: FontWeight.bold, color: Colors.white, fontSize: 120),
+          fontWeight: FontWeight.bold, color: Colors.white, fontSize: 80),
     );
   }
 }
