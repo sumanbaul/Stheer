@@ -1,3 +1,4 @@
+import 'package:notifoo/model/pomodoro_timer.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -19,12 +20,20 @@ class DatabaseHelper {
   }
 
   initializeDatabase() async {
-    return await openDatabase(join(await getDatabasesPath(), databaseName),
-        version: 1, onCreate: (Database db, int version) async {
-      await db.execute(
+    return await openDatabase(
+      join(await getDatabasesPath(), databaseName),
+      version: 1,
+      onCreate: (Database db, int version) async {
+        await db.execute(
+          "CREATE TABLE tbl_pomodoro_log (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, taskName TEXT, duration TEXT, isCompleted INTEGER, createdDate DATETIME, isDeleted INTEGER)",
+        );
+
+        await db.execute(
           // "CREATE TABLE notifications (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, infoText TEXT, summaryText TEXT, showWhen INTEGER, package_name TEXT, text TEXT,  subText TEXT, timestamp TEXT)");
-          "CREATE TABLE notifications (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, appTitle TEXT, text TEXT, message TEXT, packageName TEXT, timestamp INTEGER, createAt TEXT, eventJson TEXT, createdDate TEXT, isDeleted INTEGER, UNIQUE(title , text))");
-    });
+          "CREATE TABLE notifications (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, appTitle TEXT, text TEXT, message TEXT, packageName TEXT, timestamp INTEGER, createAt TEXT, eventJson TEXT, createdDate TEXT, isDeleted INTEGER, UNIQUE(title , text))",
+        );
+      },
+    );
   }
 
   insertNotification(Notifications notifications) async {
@@ -131,5 +140,40 @@ class DatabaseHelper {
   deleteTodo(int id) async {
     var db = await database;
     db.delete(Notifications.TABLENAME, where: 'id = ?', whereArgs: [id]);
+  }
+
+  //Pomodoro
+  insertPomodoroTimer(PomodoroTimer pomodoroTimer) async {
+    final db = await database;
+    var res = await db.insert(PomodoroTimer.TABLENAME, pomodoroTimer.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.ignore);
+    return res;
+  }
+
+  Future<List<PomodoroTimer>> getPomodoroTimer() async {
+    final db = await database;
+
+    var now = DateTime.now();
+    var lastMidnight =
+        DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+
+    String whereString = 'timestamp >= ?';
+    List<dynamic> whereArguments = [lastMidnight];
+
+    final List<Map<String, dynamic>> maps = await db.query(
+        PomodoroTimer.TABLENAME,
+        orderBy: 'createdDate DESC',
+        where: whereString,
+        whereArgs: whereArguments);
+
+    return List.generate(maps.length, (i) {
+      return PomodoroTimer(
+        taskName: maps[i]['taskName'],
+        duration: maps[i]['duration'],
+        isCompleted: maps[i]['isCompleted'],
+        createdDate: maps[i]['createdDate'],
+        isDeleted: maps[i]['isDeleted'],
+      );
+    });
   }
 }
