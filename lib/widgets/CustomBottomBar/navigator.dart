@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notifoo/pages/Homepage.dart';
 import 'package:notifoo/pages/Pomodoro.dart';
-import 'package:notifoo/pages/Profile.dart';
 import 'package:notifoo/pages/TestPage.dart';
 import 'package:notifoo/widgets/CustomBottomBar/BottomNavigation.dart';
 

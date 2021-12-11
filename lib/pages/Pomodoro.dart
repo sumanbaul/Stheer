@@ -1,6 +1,4 @@
 import 'dart:async';
-
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
@@ -19,7 +17,8 @@ class Pomodoro extends StatefulWidget {
 
 class _PomodoroState extends State<Pomodoro> {
   static const maxSeconds = 60 * 25;
-
+  static var now =
+      DateTime.now().hour.toString() + DateTime.now().minute.toString();
   Duration duration = Duration(seconds: maxSeconds);
 
   int seconds = maxSeconds;
@@ -38,13 +37,22 @@ class _PomodoroState extends State<Pomodoro> {
     });
   }
 
+  String secondsToMinutes(int seconds) {
+    int minutes = (seconds / 60).truncate();
+    String minutesStr = (minutes % 60).toString().padLeft(2, '0');
+
+    return minutesStr;
+  }
+
   void stopTimer({bool reset = true}) {
     if (reset) {
       resetTimer();
 
+      var timeCompleted = Duration(seconds: seconds).inSeconds;
+      print(timeCompleted.toString());
       PomodoroTimer pomodoroTimer = new PomodoroTimer(
-        duration: maxSeconds.toString(),
-        taskName: "A new task",
+        duration: secondsToMinutes(timeCompleted),
+        taskName: "A new task " + now,
         isCompleted: 0,
       );
 
@@ -53,13 +61,7 @@ class _PomodoroState extends State<Pomodoro> {
     setState(() {
       timer.cancel();
 
-      PomodoroTimer pomodoroTimer = new PomodoroTimer(
-        duration: maxSeconds.toString(),
-        taskName: "A new task",
-        isCompleted: 0,
-      );
-
-      saveData(pomodoroTimer);
+      //saveData(pomodoroTimer);
     });
   }
 
@@ -83,21 +85,11 @@ class _PomodoroState extends State<Pomodoro> {
     });
   }
 
-  void addTime() {
-    final addSeconds = 1;
-
-    setState(() {
-      final seconds = duration.inSeconds - addSeconds;
-
-      duration = Duration(seconds: seconds);
-    });
-  }
-
   void saveData(PomodoroTimer pomodoroObj) {
     DatabaseHelper.instance.insertPomodoroTimer(PomodoroTimer(
       taskName: pomodoroObj.taskName,
       duration: pomodoroObj.duration,
-      createdDate: DateTime.now(),
+      createdDate: DateTime.now().toString(),
       isCompleted: pomodoroObj.isCompleted,
       isDeleted: pomodoroObj.isDeleted,
     ));
@@ -139,6 +131,7 @@ class _PomodoroState extends State<Pomodoro> {
                     leading: Icon(Icons.ac_unit_outlined),
                     title: Text(snapshot.data[index].taskName),
                     subtitle: Text(snapshot.data[index].duration),
+                    trailing: Text(snapshot.data[index].createdDate),
                   ),
                   physics: BouncingScrollPhysics(
                     parent: AlwaysScrollableScrollPhysics(),

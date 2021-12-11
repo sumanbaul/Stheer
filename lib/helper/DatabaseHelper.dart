@@ -1,3 +1,6 @@
+import 'dart:async';
+//import 'dart:io';
+
 import 'package:notifoo/model/pomodoro_timer.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -20,20 +23,31 @@ class DatabaseHelper {
   }
 
   initializeDatabase() async {
+    //Directory appDocDir = await getApplicationDocumentsDirectory();
+
+    //String appDocPath = appDocDir.path;
+
     return await openDatabase(
       join(await getDatabasesPath(), databaseName),
-      version: 1,
-      onCreate: (Database db, int version) async {
-        await db.execute(
-          "CREATE TABLE tbl_pomodoro_log (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, taskName TEXT, duration TEXT, isCompleted INTEGER, createdDate DATETIME, isDeleted INTEGER)",
-        );
-
-        await db.execute(
-          // "CREATE TABLE notifications (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, infoText TEXT, summaryText TEXT, showWhen INTEGER, package_name TEXT, text TEXT,  subText TEXT, timestamp TEXT)");
-          "CREATE TABLE notifications (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, appTitle TEXT, text TEXT, message TEXT, packageName TEXT, timestamp INTEGER, createAt TEXT, eventJson TEXT, createdDate TEXT, isDeleted INTEGER, UNIQUE(title , text))",
-        );
-      },
+      version: 2,
+      onCreate: _onCreate,
+      onUpgrade: (db, oldVersion, newVersion) => {},
     );
+  }
+
+  Future _onCreate(Database db, int version) async {
+    await db.execute(
+      'CREATE TABLE tblpomodorolog (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, taskName TEXT, duration TEXT, isCompleted INTEGER, createdDate TEXT, isDeleted INTEGER)',
+    );
+
+    await db.execute(
+      '''CREATE TABLE notifications (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, appTitle TEXT, text TEXT, message TEXT, packageName TEXT, timestamp INTEGER, createAt TEXT, eventJson TEXT, createdDate TEXT, isDeleted INTEGER, UNIQUE(title , text))''',
+    );
+  }
+
+  Future close() async {
+    final db = await instance.database;
+    db.close();
   }
 
   insertNotification(Notifications notifications) async {
@@ -157,7 +171,7 @@ class DatabaseHelper {
     var lastMidnight =
         DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
 
-    String whereString = 'timestamp >= ?';
+    String whereString = 'createdDate >= ?';
     List<dynamic> whereArguments = [lastMidnight];
 
     final List<Map<String, dynamic>> maps = await db.query(

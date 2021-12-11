@@ -11,9 +11,9 @@ class BannerWidget extends StatefulWidget {
 
 List<Color> _colors = [Color(0xffeeaeca), Color(0xff94bbe9)];
 
-List<double> _stops = [0.0, 0.7];
+//List<double> _stops = [0.0, 0.7];
 
-List<double> _startCircle = [-1.0, 0.7];
+//List<double> _startCircle = [-1.0, 0.7];
 List<double> _stopsCircle = [0.0, 0.7];
 
 class _BannerState extends State<BannerWidget> {
@@ -26,7 +26,7 @@ class _BannerState extends State<BannerWidget> {
   }
 
   Widget bannerSection(BuildContext context) {
-    double _width = MediaQuery.of(context).size.width * 0.55;
+    //double _width = MediaQuery.of(context).size.width * 0.55;
     double _height = MediaQuery.of(context).size.height * 0.40;
     //debugPaintSizeEnabled = true;
     return Container(

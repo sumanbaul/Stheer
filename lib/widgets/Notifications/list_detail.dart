@@ -9,13 +9,20 @@ import 'package:notifoo/widgets/Topbar.dart';
 
 class NotificationDetailList extends StatefulWidget {
   // In the constructor, require a Todo.
-  NotificationDetailList({Key key, this.packageName, this.title})
-      : super(key: key);
+  NotificationDetailList({
+    Key key,
+    this.packageName,
+    this.title,
+    this.appIcon,
+    this.appTitle,
+  }) : super(key: key);
   //NotificationCatgoryList({Key key, this.title}) : super(key: key);
   final AppListHelper appsListHelper = new AppListHelper();
 
   final String title;
   final String packageName;
+  final Image appIcon;
+  final String appTitle;
 
   @override
   _NotificationCatgoryListState createState() =>
@@ -30,8 +37,8 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
   ];
 
   List<NotificationModel> _notificationsList = [];
-  final List<Application> _apps = AppListHelper().appListData;
-  ApplicationWithIcon _currentApp;
+  // final List<Application> _apps = AppListHelper().appListData;
+  // ApplicationWithIcon _currentApp;
 
   @override
   void initState() {
@@ -42,16 +49,16 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
     getNotificationList();
   }
 
-  Application getCurrentApp(String packageName) {
-    if (_currentApp == null) {}
-    // getListOfApps().whenComplete(() => _apps);
-    for (var app in _apps) {
-      if (app.packageName == packageName) {
-        _currentApp = app;
-      }
-    }
-    return _currentApp;
-  }
+  // Application getCurrentApp(String packageName) {
+  //   if (_currentApp == null) {}
+  //   // getListOfApps().whenComplete(() => _apps);
+  //   for (var app in _apps) {
+  //     if (app.packageName == packageName) {
+  //       _currentApp = app;
+  //     }
+  //   }
+  //   return _currentApp;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -76,14 +83,8 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
           title: key.title,
           text: key.text,
           packageName: key.packageName,
-          appTitle: getCurrentApp(key.packageName).appName,
-          appIcon: _currentApp is ApplicationWithIcon
-              ? Image.memory(
-                  _currentApp.icon,
-                  fit: BoxFit.cover,
-                  gaplessPlayback: true,
-                )
-              : null,
+          appTitle: widget.appTitle,
+          appIcon: widget.appIcon != null ? widget.appIcon : null,
           timestamp: key.timestamp,
           createAt: key.createAt,
           message: key.message,

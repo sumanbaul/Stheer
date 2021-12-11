@@ -38,6 +38,8 @@ dependencies:
   # State Management
   provider: ^6.0.1
 
+  #path_provider: ^2.0.8
+
     # When depending on this package from a real application you should use:
     #   flutter_notification_listener: ^x.y.z
     # See https://dart.dev/tools/pub/dependencies#version-constraints
