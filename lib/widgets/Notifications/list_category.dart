@@ -50,6 +50,10 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
 
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      //this line is responsible for updating the view instantaneously
+    });
+
     return Scaffold(
       // backgroundColor: Colors.transparent,
       body: getNotificationListBody(),
@@ -66,6 +70,7 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
     List<NotificationCategory> notificationsByCategory = [];
 
     listByPackageName.forEach((key, value) {
+      print("this is getting printed");
       var nc = NotificationCategory(
           packageName: key,
           appTitle: getCurrentApp(key).appName,
@@ -88,8 +93,6 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
     notificationsByCategory.sort(
         (a, b) => a.appTitle.toLowerCase().compareTo(b.appTitle.toLowerCase()));
     _nc = notificationsByCategory;
-    setState(
-        () {}); //this line is responsible for updating the view instantaneously
 
     return notificationsByCategory;
     //print(listByPackageName);
