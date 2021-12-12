@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:notifoo/helper/AppListHelper.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
+import 'package:notifoo/helper/datetime_ago.dart';
 import 'package:notifoo/model/Notifications.dart';
 import 'package:notifoo/model/notificationCategory.dart';
 import 'package:notifoo/widgets/Notifications/list_detail.dart';
@@ -20,7 +21,7 @@ class NotificationCatgoryList extends StatefulWidget {
 
 class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
   //List<Notifications> _notifications = [];
-  List<Color> _colors = [Color(0xffff6198), Color(0xffffb861)];
+  List<Color> _colors = [Color.fromRGBO(94, 109, 145, 1.0), Colors.transparent];
   //List<Color> _colors = [Color(0xff635eff), Color(0xffffb861)];
   //List<Color> _colors = [Color(0xff635eff), Color(0xff5fd5ff)];
 
@@ -56,7 +57,23 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
 
     return Scaffold(
       // backgroundColor: Colors.transparent,
-      body: getNotificationListBody(),
+      body: new Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(30.0),
+            topRight: Radius.circular(30.0),
+          ),
+          gradient: LinearGradient(
+            colors: _colors,
+
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            //stops: _stops
+          ),
+        ),
+        child: getNotificationListBody(),
+      ),
     );
   }
 
@@ -70,10 +87,10 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
     List<NotificationCategory> notificationsByCategory = [];
 
     listByPackageName.forEach((key, value) {
-      print("this is getting printed");
+      // print(value[value.length - 1].createdDate);
       var nc = NotificationCategory(
-          packageName: key,
-          appTitle: getCurrentApp(key).appName,
+          packageName: value[0].packageName,
+          appTitle: getCurrentApp(value[0].packageName).appName,
           appIcon: _currentApp is ApplicationWithIcon
               ? Image.memory(
                   _currentApp.icon,
@@ -83,6 +100,7 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
                 )
               : null,
           tempIcon: Image.memory(_currentApp.icon),
+          timestamp: value[0].timestamp,
           message:
               "You have " + value.length.toString() + " Unread notifications",
           notificationCount: value.length);
@@ -90,8 +108,7 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
       notificationsByCategory.add(nc);
     });
 
-    notificationsByCategory.sort(
-        (a, b) => a.appTitle.toLowerCase().compareTo(b.appTitle.toLowerCase()));
+    notificationsByCategory.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     _nc = notificationsByCategory;
 
     return notificationsByCategory;
@@ -118,8 +135,9 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
   }
 
   Widget buildNotificationCard(BuildContext context, int index) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+    return Container(
+      margin: EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
       child: Card(
         elevation: 0.0,
         color: Colors.transparent,
@@ -129,7 +147,7 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
             // mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               Container(
-                margin: EdgeInsets.only(bottom: 10),
+                //  margin: EdgeInsets.only(bottom: 10),
                 height: 100,
                 padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 12.0),
                 decoration: BoxDecoration(
@@ -149,12 +167,12 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
                           color: Color.fromRGBO(84, 98, 117, 1),
                           blurRadius: 8,
                           spreadRadius: 2,
-                          offset: Offset(-4, -4)),
+                          offset: Offset(-3, -3)),
                       BoxShadow(
                           color: Color.fromRGBO(40, 48, 59, 1),
                           blurRadius: 8,
                           spreadRadius: 2,
-                          offset: Offset(4, 4)),
+                          offset: Offset(3, 3)),
                     ]),
                 child: Container(
                   child: Column(
@@ -215,11 +233,9 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
                           Padding(
                             padding: const EdgeInsets.only(top: 10.0),
                             child: Text(
-                              '2 minutes ago',
+                              readTimestamp((_nc[index].timestamp)),
                               style: TextStyle(
-                                color: Color.fromRGBO(196, 196, 196, 1),
-                                fontWeight: FontWeight.bold,
-                              ),
+                                  color: Colors.white54, fontSize: 12),
                             ),
                           ),
                         ],
@@ -233,9 +249,9 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
           new Positioned.fill(
               child: new Material(
                   type: MaterialType.transparency,
-                  borderRadius: BorderRadius.circular(20),
                   color: Colors.transparent,
                   child: new InkWell(
+                    borderRadius: BorderRadius.circular(20),
                     onTap: () => {
                       print('tapped'),
                       Navigator.push(

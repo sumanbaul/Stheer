@@ -24,6 +24,8 @@ dependencies:
   
   device_apps: ^2.1.1
 
+  intl: ^0.17.0
+
   # Database
   sqflite: ^2.0.0+4
   path: ^1.8.0

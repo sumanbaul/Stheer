@@ -1,9 +1,9 @@
-import 'package:device_apps/device_apps.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:notifoo/helper/AppListHelper.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
+import 'package:notifoo/helper/datetime_ago.dart';
 import 'package:notifoo/model/list_detail_model.dart';
 import 'package:notifoo/widgets/Topbar.dart';
 
@@ -77,8 +77,8 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
 
     getNotificationModel.forEach((key) {
       if (key.packageName.contains(widget.packageName)) {
-        print(key.text);
-        print(key.title);
+        // print(key.text);
+        // print(key.title);
         var _notification = NotificationModel(
           title: key.title,
           text: key.text,
@@ -235,19 +235,26 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              _notificationsList[index].title ??
-                                  _notificationsList[index].appTitle,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 18.0),
+                            Container(
+                              width: size.width - 130,
+                              child: new Text(
+                                _notificationsList[index].title ??
+                                    _notificationsList[index].appTitle,
+                                //overflow: TextOverflow.clip,
+                                maxLines: 1,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18.0,
+                                    overflow: TextOverflow.ellipsis),
+                              ),
                             ),
                             SizedBox(
                               height: 3.0,
                             ),
                             Container(
                               child: Text(
-                                createdDate.toString(),
+                                readTimestamp(int.parse(
+                                    _notificationsList[index].createdDate)),
                                 style: TextStyle(
                                     color: Color.fromRGBO(196, 196, 196, 1)),
                               ),
