@@ -55,25 +55,23 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
       //this line is responsible for updating the view instantaneously
     });
 
-    return Scaffold(
-      // backgroundColor: Colors.transparent,
-      body: new Container(
-        decoration: BoxDecoration(
-          shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(30.0),
-            topRight: Radius.circular(30.0),
-          ),
-          gradient: LinearGradient(
-            colors: _colors,
-
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            //stops: _stops
-          ),
+    return new Container(
+      height: 600,
+      padding: EdgeInsets.only(top: 15.0),
+      decoration: BoxDecoration(
+        shape: BoxShape.rectangle,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30.0),
+          topRight: Radius.circular(30.0),
         ),
-        child: getNotificationListBody(),
+        gradient: LinearGradient(
+          colors: _colors,
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          //stops: _stops
+        ),
       ),
+      child: getNotificationListBody(),
     );
   }
 
@@ -116,22 +114,77 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
   }
 
   getNotificationListBody() {
-    //debugPaintSizeEnabled = true;
-    return FutureBuilder<List<NotificationCategory>>(
-        future: getCategoryList(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return new ListView.builder(
-              itemCount: snapshot.data.length,
-              itemBuilder: buildNotificationCard,
-              physics: BouncingScrollPhysics(
-                parent: AlwaysScrollableScrollPhysics(),
+    debugPaintSizeEnabled = false;
+    return Column(
+      children: [
+        Container(
+          height: 30,
+          margin: EdgeInsets.only(bottom: 10.0),
+          padding: EdgeInsets.symmetric(horizontal: 30.0),
+          //color: Colors.blueAccent,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    onPrimary: Colors.black87,
+                    primary: Colors.grey[300],
+                    minimumSize: Size(88, 36),
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                    )),
+                onPressed: () {},
+                child: Text('Today'),
               ),
-            );
-          } else {
-            return Container();
-          }
-        });
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    onPrimary: Colors.white24,
+                    primary: Colors.grey[600],
+                    minimumSize: Size(88, 36),
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                    )),
+                onPressed: () {},
+                child: Text('Yesterday'),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    onPrimary: Colors.white24,
+                    primary: Colors.grey[600],
+                    minimumSize: Size(88, 36),
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                    )),
+                onPressed: () {},
+                child: Text('History'),
+              )
+            ],
+          ),
+        ),
+        Flexible(
+          child: Container(
+            child: FutureBuilder<List<NotificationCategory>>(
+                future: getCategoryList(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return new ListView.builder(
+                      itemCount: snapshot.data.length,
+                      itemBuilder: buildNotificationCard,
+                      physics: BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics(),
+                      ),
+                    );
+                  } else {
+                    return new Container();
+                  }
+                }),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget buildNotificationCard(BuildContext context, int index) {

@@ -38,10 +38,10 @@ class _HomepageState extends State<Homepage> {
                 BannerWidget(),
                 Container(
                   color: Colors.transparent,
-                  padding: EdgeInsets.only(bottom: 10.0),
+                  padding: EdgeInsets.only(bottom: 15.0),
                   child: Center(
                     child: Text(
-                      'Todays Notifications',
+                      "Today's Notifications",
                       style: GoogleFonts.barlowSemiCondensed(
                         textStyle: TextStyle(
                           letterSpacing: 1.5,

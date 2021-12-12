@@ -275,6 +275,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
       //appBar: Topbar.getTopbar(widget.title),
       //bottomNavigationBar: BottomBar.getBottomBar(context),
       body: Container(
+        height: 800,
         child: NotificationCatgoryList(), //getNotificationListBody(),
       ),
       floatingActionButton: FloatingActionButton(
