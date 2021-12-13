@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:notifoo/helper/provider/google_sign_in.dart';
 import 'package:notifoo/pages/Homepage.dart';
@@ -15,7 +16,7 @@ import 'package:firebase_core/firebase_core.dart';
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
+  debugPaintSizeEnabled = true;
   runApp(MyApp());
 }
 
