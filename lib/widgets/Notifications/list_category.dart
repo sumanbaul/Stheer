@@ -114,7 +114,7 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
   }
 
   getNotificationListBody() {
-    debugPaintSizeEnabled = false;
+    //debugPaintSizeEnabled = false;
     return Column(
       children: [
         Container(
@@ -166,11 +166,12 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
         ),
         Flexible(
           child: Container(
+            margin: EdgeInsets.only(top: 0.0),
             child: FutureBuilder<List<NotificationCategory>>(
                 future: getCategoryList(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    return new ListView.builder(
+                    return ListView.builder(
                       itemCount: snapshot.data.length,
                       itemBuilder: buildNotificationCard,
                       physics: BouncingScrollPhysics(
@@ -189,10 +190,11 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
 
   Widget buildNotificationCard(BuildContext context, int index) {
     return Container(
-      margin: EdgeInsets.only(bottom: 10),
+      margin: EdgeInsets.only(bottom: 15),
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
       child: Card(
         elevation: 0.0,
+        margin: EdgeInsets.only(top: 0.0),
         color: Colors.transparent,
         child: Stack(children: [
           Column(
@@ -280,15 +282,20 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(top: 10.0),
-                            child: Text(_nc[index].message),
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              _nc[index].message,
+                              style: TextStyle(
+                                fontSize: 13.0,
+                              ),
+                            ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 10.0),
+                            padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
                               readTimestamp((_nc[index].timestamp)),
                               style: TextStyle(
-                                  color: Colors.white54, fontSize: 12),
+                                  color: Colors.white54, fontSize: 13),
                             ),
                           ),
                         ],

@@ -42,7 +42,7 @@ class _BannerState extends State<BannerWidget> {
 
   Widget bannerSection(BuildContext context) {
     //double _width = MediaQuery.of(context).size.width * 0.55;
-    double _height = MediaQuery.of(context).size.height * 0.40;
+    double _height = 325; //MediaQuery.of(context).size.height * 0.40;
 
     return Container(
       margin: EdgeInsets.only(bottom: 15.0),
@@ -110,7 +110,7 @@ class _BannerState extends State<BannerWidget> {
                 ),
               ),
               Container(
-                height: 160,
+                height: 148,
                 color: Colors.transparent,
                 // padding: EdgeInsets.only(
                 //   left: 15,
@@ -200,7 +200,7 @@ class _BannerState extends State<BannerWidget> {
               style: GoogleFonts.lato(
                 textStyle: TextStyle(
                   letterSpacing: 1.2,
-                  fontSize: 50.0,
+                  fontSize: 45.0,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                   shadows: [
