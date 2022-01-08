@@ -3,6 +3,7 @@ import 'package:notifoo/pages/Homepage.dart';
 import 'package:notifoo/pages/Pomodoro.dart';
 import 'package:notifoo/pages/Profile.dart';
 import 'package:notifoo/pages/TestPage.dart';
+import 'package:notifoo/pages/pomodoro_home.dart';
 import 'package:notifoo/widgets/CustomBottomBar/BottomNavigation.dart';
 
 import 'TabItem.dart';
@@ -33,11 +34,18 @@ class AppState extends State<App> {
         title: 'Pomodoro',
       ),
     ),
+    // TabItem(
+    //   tabName: "Settings",
+    //   icon: Icons.settings,
+    //   page: Profile(
+    //     title: 'Profile',
+    //   ),
+    // ),
     TabItem(
-      tabName: "Settings",
+      tabName: "Pomodoro Home",
       icon: Icons.settings,
-      page: Profile(
-        title: 'Profile',
+      page: PomodoroHome(
+        title: 'Pomodoro Home',
       ),
     ),
   ];

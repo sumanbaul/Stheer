@@ -4,36 +4,34 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:notifoo/widgets/Topbar.dart';
 
-class BannerWidget extends StatefulWidget {
-  BannerWidget({Key key}) : super(key: key);
+class PomodoroBannerW extends StatefulWidget {
+  PomodoroBannerW({Key key}) : super(key: key);
 
   @override
-  _BannerState createState() => _BannerState();
+  _PomodoroBannerW createState() => _PomodoroBannerW();
 }
 
-List<Color> _colors = [Color(0xffeeaeca), Color(0xff94bbe9)];
+//List<Color> _colors = [Color(0xffeeaeca), Color(0xff94bbe9)];
+List<Color> _colors = [Color(0xffEAE6DB), Color(0xff94A5AA)];
 
-//List<double> _stops = [0.0, 0.7];
-
-//List<double> _startCircle = [-1.0, 0.7];
 List<double> _stopsCircle = [0.0, 0.7];
 
-class _BannerState extends State<BannerWidget> {
+class _PomodoroBannerW extends State<PomodoroBannerW> {
   Color gradientStart = Colors.transparent;
   Color gradientEnd = Colors.black;
   String _totalNotifications;
 
   @override
   void initState() {
-    DatabaseHelper.instance.initializeDatabase();
+    // DatabaseHelper.instance.initializeDatabase();
 
     super.initState();
 
-    getTotalNotifications().then((String result) {
-      setState(() {
-        _totalNotifications = result;
-      });
-    });
+    // getTotalNotifications().then((String result) {
+    //   setState(() {
+    //     _totalNotifications = result;
+    //   });
+    // });
   }
 
   @override
@@ -43,7 +41,7 @@ class _BannerState extends State<BannerWidget> {
 
   Widget bannerSection(BuildContext context) {
     //double _width = MediaQuery.of(context).size.width * 0.55;
-    double _height = 320; //MediaQuery.of(context).size.height * 0.40;
+    double _height = 305; //MediaQuery.of(context).size.height * 0.40;
 
     return Container(
       margin: EdgeInsets.only(bottom: 15.0),
@@ -82,7 +80,7 @@ class _BannerState extends State<BannerWidget> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Topbar.getTopbar('Notifoo'),
+              Topbar.getTopbar('Pomodoro'),
               Container(
                 height: 148,
                 color: Colors.transparent,
@@ -91,11 +89,18 @@ class _BannerState extends State<BannerWidget> {
                 //   right: 15,
                 //   bottom: 20,
                 // ),
-                child: Center(child: _getReadNotifications()),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Center(child: _getReadNotifications()),
+                    Center(child: _getReadNotifications()),
+                  ],
+                ),
               ),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 15.0),
-                margin: EdgeInsets.only(top: 20.0),
+                margin: EdgeInsets.only(top: 0.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -130,7 +135,7 @@ class _BannerState extends State<BannerWidget> {
   Widget _getReadNotifications() {
     return Container(
       // margin: EdgeInsets.only(top: 0),
-      padding: EdgeInsets.all(20),
+      padding: EdgeInsets.all(35),
       //decoration: BoxDecoration(color: Colors.orange, shape: BoxShape.circle),
       decoration: BoxDecoration(
         //border: Border.all(width: 3),
@@ -170,7 +175,7 @@ class _BannerState extends State<BannerWidget> {
         children: [
           Center(
             child: Text(
-              '$_totalNotifications',
+              '20', //'$_totalNotifications',
               style: GoogleFonts.lato(
                 textStyle: TextStyle(
                   letterSpacing: 1.2,
@@ -190,7 +195,7 @@ class _BannerState extends State<BannerWidget> {
           ),
           Center(
             child: Text(
-              'Unread alerts',
+              'Complete',
               textAlign: TextAlign.center,
               style: GoogleFonts.barlowCondensed(
                 textStyle: TextStyle(

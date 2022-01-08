@@ -23,6 +23,33 @@ class Topbar {
       ],
     );
 
-    return topAppBar;
+    final newTopBar = Container(
+      height: 45,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: EdgeInsets.only(left: 7.0),
+            child: Icon(Icons.menu),
+          ),
+          Text(
+            title,
+            style: GoogleFonts.barlowSemiCondensed(
+              fontSize: 26,
+              letterSpacing: 1.5,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.only(right: 7.0),
+            child: Icon(Icons.menu_open),
+          ),
+        ],
+      ),
+    );
+
+    return newTopBar;
   }
 }

@@ -196,15 +196,6 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
     getNotificationModel.forEach((key) {
       if (key.packageName.contains(event.packageName)) {
-        // var _notification = Notifications(
-        //     title: key.title,
-        //     text: key.text,
-        //     packageName: key.packageName,
-        //     timestamp: key.timestamp,
-        //     createAt: key.createAt,
-        //     message: key.message,
-        //     textLines: key.textLines);
-
         if (key.title.contains(event.title) && key.text.contains(event.text)) {
           entryFlag = Future<bool>.value(true);
           //return Future<bool>.value(true);
@@ -233,8 +224,11 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
     if (!isR) {
       await NotificationsListener.startService(
-          title: "Notifoo listening",
-          description: "Let's scrape the notifactions...");
+        title: "Notifoo listening",
+        description: "Let's scrape the notifactions...",
+        subTitle: "Service",
+        //foreground: AppButtonAction(),
+      );
     }
 
     setState(() {

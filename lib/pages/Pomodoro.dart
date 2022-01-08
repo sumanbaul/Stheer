@@ -99,17 +99,22 @@ class _PomodoroState extends State<Pomodoro> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-      appBar: Topbar.getTopbar(widget.title),
-      body: Container(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              buildTimer(),
-              buildButtons(),
-              buildCounterList(),
-            ],
+      //appBar: Topbar.getTopbar(widget.title),
+      body: SafeArea(
+        maintainBottomViewPadding: true,
+        top: false,
+        child: Container(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Topbar.getTopbar(widget.title),
+                buildTimer(),
+                buildButtons(),
+                buildCounterList(),
+              ],
+            ),
           ),
         ),
       ),
