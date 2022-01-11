@@ -98,7 +98,7 @@ class _PomodoroState extends State<Pomodoro> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
+      backgroundColor: Color(0xff624072), //Color.fromRGBO(58, 66, 86, 1.0),
       //appBar: Topbar.getTopbar(widget.title),
       body: SafeArea(
         maintainBottomViewPadding: true,

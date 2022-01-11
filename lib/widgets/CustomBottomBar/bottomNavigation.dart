@@ -14,7 +14,7 @@ class BottomNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.black87,
       type: BottomNavigationBarType.fixed,
       items: tabs
           .map(
