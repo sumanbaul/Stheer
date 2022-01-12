@@ -14,7 +14,10 @@ class PomodoroBannerW extends StatefulWidget {
 //List<Color> _colors = [Color(0xffeeaeca), Color(0xff94bbe9)];
 List<Color> _colors = [Color(0xffb2f4ff), Color(0xff160040)];
 List<Color> _bannerColors = [Color(0xfff56aa2), Color(0xffF48CC5)];
-List<Color> _counterColors2 = [Color(0xffF48CC5), Color(0xffF56AA2)];
+List<Color> _counterColors2 = [
+  Color(0xffF48CC5),
+  Color(0xffF56AA2),
+];
 List<Color> _counterShadows = [Color(0xfffcb0da), Color(0xffe83582)];
 
 List<double> _stopsCircle = [0.0, 0.7];
@@ -52,12 +55,12 @@ class _PomodoroBannerW extends State<PomodoroBannerW> {
           boxShadow: [
             //color: Colors.white, //background color of box
             BoxShadow(
-              color: Colors.black26,
+              color: Color(0xffc197c9),
               blurRadius: 25.0, // soften the shadow
-              spreadRadius: 3.0, //extend the shadow
+              spreadRadius: 2.0, //extend the shadow
               offset: Offset(
-                5.0, // Move to right 10  horizontally
-                5.0, // Move to bottom 10 Vertically
+                3.0, // Move to right 10  horizontally
+                3.0, // Move to bottom 10 Vertically
               ),
             )
           ],
