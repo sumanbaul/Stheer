@@ -95,22 +95,74 @@ class _PomodoroSavedListWState extends State<PomodoroSavedListW> {
                   itemBuilder: (context, index) => Container(
                       //padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Colors.white24,
+                        borderRadius: BorderRadius.circular(18),
+                        color: Color(0xffeeaeca),
+                        border:
+                            Border.all(width: 1.0, color: _counterShadows[1]),
+                        boxShadow: [
+                          //color: Colors.white, //background color of box
+
+                          BoxShadow(
+                            color: Color(0xffffe8e8), //_bgColor[0],
+                            blurRadius: 15.0, // soften the shadow
+                            spreadRadius: 1.0, //extend the shadow
+                            offset: Offset(
+                              -4.0, // Move to right 10  horizontally
+                              -4.0, // Move to bottom 10 Vertically
+                            ),
+                          ),
+                          BoxShadow(
+                            color: _counterShadows[1],
+                            blurRadius: 15.0, // soften the shadow
+                            spreadRadius: 1.0, //extend the shadow
+                            offset: Offset(
+                              3.0, // Move to right 10  horizontally
+                              3.0, // Move to bottom 10 Vertically
+                            ),
+                          ),
+                        ],
                       ),
-                      margin: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                      child: Row(
+                      margin: EdgeInsets.fromLTRB(30, 0, 30, 20),
+                      child: Flex(
+                        direction: Axis.horizontal,
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Container(
-                            width: MediaQuery.of(context).size.width * 0.1,
+                            //width: MediaQuery.of(context).size.width * 0.1,
                             height: 70,
-                            child: Icon(Icons.ac_unit_outlined),
+                            child: Icon(
+                              Icons.ac_unit_outlined,
+                              color: Colors.white,
+                            ),
                           ),
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            child: Text(snapshot.data[index].taskName),
+                          Flex(
+                            direction: Axis.vertical,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                //  width: MediaQuery.of(context).size.width * 0.5,
+                                child: Text(
+                                  snapshot.data[index].taskName,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                //width: MediaQuery.of(context).size.width * 0.5,
+                                child: Text(
+                                  snapshot.data[index].duration,
+                                  style: TextStyle(
+                                    color: Color(0xffa9abd6),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           Container(
                             width: MediaQuery.of(context).size.width * 0.2,
