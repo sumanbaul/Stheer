@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:notifoo/widgets/Pomodoro/BannerPomodoro.dart';
 import 'package:notifoo/widgets/Pomodoro/PomodoroTaskWidget.dart';
+import 'package:notifoo/widgets/Pomodoro/pomodoroSavedListW.dart';
 import 'package:notifoo/widgets/Topbar.dart';
+import 'package:notifoo/widgets/headline.dart';
 import 'package:notifoo/widgets/home/Banner.dart';
 
 class PomodoroHome extends StatefulWidget {
@@ -25,6 +27,7 @@ class _PomodoroHomeState extends State<PomodoroHome> {
         maintainBottomViewPadding: true,
         top: false,
         child: Container(
+          //height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: _pagePomodoroColor,
@@ -34,10 +37,24 @@ class _PomodoroHomeState extends State<PomodoroHome> {
               //stops: _stops
             ),
           ),
-          child: Column(
+          child: Stack(
+            fit: StackFit.loose,
+            alignment: AlignmentDirectional.topStart,
             children: [
-              PomodoroBannerW(),
-              TaskWidget(),
+              Container(
+                height: 500,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    PomodoroBannerW(),
+                    Headline(title: "Today's Focus"),
+                    TaskWidget(),
+                    Headline(title: "Pomodoros"),
+                  ],
+                ),
+              ),
+              PomodoroSavedListW(),
             ],
           ),
         ),

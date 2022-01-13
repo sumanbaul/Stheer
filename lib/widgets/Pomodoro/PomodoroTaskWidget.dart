@@ -12,19 +12,29 @@ List<Color> _counterShadows = [
   Color(0xffc197c9),
 ];
 
+List<Color> _widgetBgColor = [
+  Color(0xffffffff),
+  Color(0xfffae2ff),
+];
+
 List<Color> _buttonShadows = [
   Color(0xfffcedff),
   Color(0xffffe2d3),
 ];
 Widget _calendarWidget() {
   return Container(
-    height: 100,
+    height: 120,
     width: 180,
     padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
     margin: EdgeInsets.only(right: 15.0),
     decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: Colors.white,
+        //color: Colors.white,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          colors: _widgetBgColor,
+          end: Alignment.bottomRight,
+        ),
         boxShadow: [
           //color: Colors.white, //background color of box
 
@@ -40,7 +50,7 @@ Widget _calendarWidget() {
         ]),
     //color: Colors.white,
     child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
@@ -52,7 +62,8 @@ Widget _calendarWidget() {
               Text(
                 '10:10 AM',
                 style: TextStyle(
-                  color: Colors.grey,
+                  color: Color(0xffa9abd6),
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
@@ -131,7 +142,7 @@ class _TaskWidgetState extends State<TaskWidget> {
           scrollDirection: Axis.horizontal,
           physics: BouncingScrollPhysics(),
           child: Container(
-            padding: EdgeInsets.fromLTRB(20, 10, 20, 20),
+            padding: EdgeInsets.fromLTRB(25, 10, 15, 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
