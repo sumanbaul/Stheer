@@ -23,7 +23,7 @@ List<Color> _buttonShadows = [
 ];
 Widget _calendarWidget() {
   return Container(
-    height: 120,
+    height: 100,
     width: 180,
     padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
     margin: EdgeInsets.only(right: 15.0),

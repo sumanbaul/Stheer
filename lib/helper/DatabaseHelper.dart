@@ -1,6 +1,5 @@
 import 'dart:async';
-//import 'dart:io';
-
+import 'package:notifoo/model/apps.dart';
 import 'package:notifoo/model/pomodoro_timer.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -15,6 +14,18 @@ class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._();
   static Database _database;
 
+  //Queries
+  String _deviceAppsTable =
+      "CREATE TABLE deviceapps (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, appName TEXT, apkFilePath TEXT,packageName TEXT,versionName TEXT, versionCode TEXT,dataDir TEXT, systemApp INTEGER, installTimeMillis INTEGER,  category TEXT,  enabled INTEGER)";
+  String _pomodoroLogTable =
+      "CREATE TABLE tblpomodorolog (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, taskName TEXT, duration TEXT, isCompleted INTEGER, createdDate TEXT, isDeleted INTEGER)";
+  String _notificationsLogTable =
+      '''CREATE TABLE notifications (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, appTitle TEXT, text TEXT, message TEXT, packageName TEXT, timestamp INTEGER, createAt TEXT, eventJson TEXT, createdDate TEXT, isDeleted INTEGER, UNIQUE(title , text))''';
+
+  //V3 Alter table
+  String _deviceAppsAlterTableV3 =
+      "ALTER TABLE deviceapps ADD COLUMN apkFilePath TEXT, packageName TEXT, versionCode TEXT";
+
   Future<Database> get database async {
     if (_database == null) {
       return await initializeDatabase();
@@ -26,23 +37,38 @@ class DatabaseHelper {
     //Directory appDocDir = await getApplicationDocumentsDirectory();
 
     //String appDocPath = appDocDir.path;
+    // String path = join(await getDatabasesPath(), databaseName);
+    // print("Path: $path");
+    // final db = await database;
+    //print("Version: $db.getVersion()");
 
     return await openDatabase(
       join(await getDatabasesPath(), databaseName),
-      version: 2,
+      version: 4,
       onCreate: _onCreate,
-      onUpgrade: (db, oldVersion, newVersion) => {},
+      onUpgrade: (db, oldVersion, newVersion) => {
+        if (oldVersion == 2)
+          {
+            // db.execute(_deviceAppsTable),
+            db.execute(_deviceAppsAlterTableV3),
+          }
+        else if (oldVersion == 3)
+          {db.execute(_deviceAppsAlterTableV3), db.close()}
+      },
     );
   }
 
   Future _onCreate(Database db, int version) async {
-    await db.execute(
-      'CREATE TABLE tblpomodorolog (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, taskName TEXT, duration TEXT, isCompleted INTEGER, createdDate TEXT, isDeleted INTEGER)',
-    );
+    //print(db.setVersion(2));
+    //String _version = _database.getVersion().toString();
+    // print("DB Version: $_version");
 
-    await db.execute(
-      '''CREATE TABLE notifications (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, appTitle TEXT, text TEXT, message TEXT, packageName TEXT, timestamp INTEGER, createAt TEXT, eventJson TEXT, createdDate TEXT, isDeleted INTEGER, UNIQUE(title , text))''',
-    );
+    //await db.setVersion(4);
+    await db.execute(_pomodoroLogTable);
+
+    await db.execute(_notificationsLogTable);
+
+    await db.execute(_deviceAppsTable);
   }
 
   Future close() async {
@@ -187,6 +213,35 @@ class DatabaseHelper {
         isCompleted: maps[i]['isCompleted'],
         createdDate: maps[i]['createdDate'],
         isDeleted: maps[i]['isDeleted'],
+      );
+    });
+  }
+
+// Device Apps
+  insertDeviceApps(Apps application) async {
+    final db = await database;
+    var res = await db.insert(Apps.TABLENAME, application.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.ignore);
+    return res;
+  }
+
+  Future<List<Apps>> getInstalledApps() async {
+    final db = await database;
+
+    final List<Map<String, dynamic>> maps = await db.query(Apps.TABLENAME);
+
+    return List.generate(maps.length, (i) {
+      return Apps(
+        appName: maps[i]['appName'],
+        apkFilePath: maps[i]['apkFilePath'],
+        packageName: maps[i]['packageName'],
+        versionName: maps[i]['versionName'],
+        versionCode: maps[i]['versionCode'],
+        dataDir: maps[i]['dataDir'],
+        systemApp: maps[i]['systemApp'],
+        installTimeMillis: maps[i]['installTimeMillis'],
+        category: maps[i]['category'],
+        enabled: maps[i]['enabled'],
       );
     });
   }
