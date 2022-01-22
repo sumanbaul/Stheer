@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 import 'package:notifoo/helper/AppListHelper.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
+import 'package:notifoo/model/apps.dart';
 import 'package:notifoo/widgets/Notifications/list_category.dart';
 import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 import 'package:device_apps/device_apps.dart';
@@ -26,7 +27,8 @@ class NotificationsLister extends StatefulWidget {
 
 class _NotificationsListerState extends State<NotificationsLister> {
   List<NotificationEvent> _log = [];
-  final List<Application> _apps = AppListHelper().appListData;
+  final List<Apps> _apps = AppListHelper().appListData;
+
   ApplicationWithIcon _currentApp;
 
   bool appsLoaded = false;
@@ -81,7 +83,16 @@ class _NotificationsListerState extends State<NotificationsLister> {
     //var getData = DatabaseHelper.instance.getNotifications();
   }
 
-  void onData(NotificationEvent event) {
+  Future<Application> getCurrentApp(String packageName) async {
+    Application app;
+
+    if (packageName != "") {
+      app = await DeviceApps.getApp('com.frandroid.app');
+    }
+    return app;
+  }
+
+  void onData(NotificationEvent event) async {
     print(event);
     setState(() {
       //packageName = event.packageName.toString().split('.').last.capitalizeFirstofEach;
@@ -97,84 +108,80 @@ class _NotificationsListerState extends State<NotificationsLister> {
           (event.packageName.contains("gallery"))) {
         //print(event.packageName);
       } else {
-        for (var app in _apps) {
-          //print(app);
-          if (app.packageName == event.packageName) {
-            _currentApp = app;
-            packageName = event.packageName;
-            // print("Success Package Found: " + app.packageName);
-            //var jsondata2 = json.decode(event.toString());
-            Map<String, dynamic> jsonresponse = json.decode(event.toString());
+        var app = getCurrentApp(event.packageName);
+        _currentApp = app.then((value) => value) as Application;
 
-            //var jsonData = json.decoder.convert(event.toString());
-            _log.add(event);
-            var createatday = event.createAt.day;
-            print("Create AT Day: $createatday");
-            var today = new DateTime.now().day;
-            print('today: $today');
-            //var xx = jsonresponse.containsKey('summaryText');
-            if (!jsonresponse.containsKey('summaryText') &&
-                event.createAt.day >= today) {
-              //check
-              bool redundancy;
-              redundantNotificationCheck(event).then((bool value) {
-                redundancy = value;
-              });
+        _currentApp = app as Application;
+        packageName = event.packageName;
+        // print("Success Package Found: " + app.packageName);
+        //var jsondata2 = json.decode(event.toString());
+        Map<String, dynamic> jsonresponse = json.decode(event.toString());
 
-              if ((event.text != flagEntry) && event.text != null) {
-                DatabaseHelper.instance.insertNotification(
-                  Notifications(
-                      title: event.title,
-                      appTitle: _currentApp.appName,
-                      // appIcon: _currentApp is ApplicationWithIcon
-                      //     ? Image.memory(_currentApp.icon)
-                      //     : null,
-                      text: event.text,
-                      message: event.message,
-                      packageName: event.packageName,
-                      timestamp: event.timestamp,
-                      createAt:
-                          event.createAt.millisecondsSinceEpoch.toString(),
-                      eventJson: event.toString(),
-                      createdDate:
-                          DateTime.now().millisecondsSinceEpoch.toString(),
-                      isDeleted: 0
-                      // infoText: jsonData["text"],
-                      // showWhen: 1,
-                      // subText: jsonData["text"],
-                      // timestamp: event.timestamp.toString(),
-                      // packageName: jsonData["packageName"],
-                      // text: jsonData["text"],
-                      // summaryText: jsonData["summaryText"] ?? ""
-                      ),
-                );
-              }
-              flagEntry = event.text;
-            } else {
-              // # TODO fix here
+        //var jsonData = json.decoder.convert(event.toString());
+        _log.add(event);
+        var createatday = event.createAt.day;
+        print("Create AT Day: $createatday");
+        var today = new DateTime.now().day;
+        print('today: $today');
+        //var xx = jsonresponse.containsKey('summaryText');
+        if (!jsonresponse.containsKey('summaryText') &&
+            event.createAt.day >= today) {
+          //check
+          bool redundancy;
+          redundantNotificationCheck(event).then((bool value) {
+            redundancy = value;
+          });
 
-              // var titleLength = jsonresponse["textLines"].length;
-
-              DatabaseHelper.instance.insertNotification(
-                Notifications(
-                    title: jsonresponse["textLines"] as String,
-                    text: event.text,
-                    message: event.message,
-                    packageName: event.packageName,
-                    timestamp: event.timestamp,
-                    createAt: event.createAt.toString(),
-                    eventJson: event.toString()
-                    // infoText: jsonData["text"],
-                    // showWhen: 1,
-                    // subText: jsonData["text"],
-                    // timestamp: event.timestamp.toString(),
-                    // packageName: jsonData["packageName"],
-                    // text: jsonData["text"],
-                    // summaryText: jsonData["summaryText"] ?? ""
-                    ),
-              );
-            }
+          if ((event.text != flagEntry) && event.text != null) {
+            DatabaseHelper.instance.insertNotification(
+              Notifications(
+                  title: event.title,
+                  appTitle: _currentApp.appName,
+                  // appIcon: _currentApp is ApplicationWithIcon
+                  //     ? Image.memory(_currentApp.icon)
+                  //     : null,
+                  text: event.text,
+                  message: event.message,
+                  packageName: event.packageName,
+                  timestamp: event.timestamp,
+                  createAt: event.createAt.millisecondsSinceEpoch.toString(),
+                  eventJson: event.toString(),
+                  createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
+                  isDeleted: 0
+                  // infoText: jsonData["text"],
+                  // showWhen: 1,
+                  // subText: jsonData["text"],
+                  // timestamp: event.timestamp.toString(),
+                  // packageName: jsonData["packageName"],
+                  // text: jsonData["text"],
+                  // summaryText: jsonData["summaryText"] ?? ""
+                  ),
+            );
           }
+          flagEntry = event.text;
+        } else {
+          // # TODO fix here
+
+          // var titleLength = jsonresponse["textLines"].length;
+
+          DatabaseHelper.instance.insertNotification(
+            Notifications(
+                title: jsonresponse["textLines"] as String,
+                text: event.text,
+                message: event.message,
+                packageName: event.packageName,
+                timestamp: event.timestamp,
+                createAt: event.createAt.toString(),
+                eventJson: event.toString()
+                // infoText: jsonData["text"],
+                // showWhen: 1,
+                // subText: jsonData["text"],
+                // timestamp: event.timestamp.toString(),
+                // packageName: jsonData["packageName"],
+                // text: jsonData["text"],
+                // summaryText: jsonData["summaryText"] ?? ""
+                ),
+          );
         }
       }
     });
@@ -252,15 +259,15 @@ class _NotificationsListerState extends State<NotificationsLister> {
     });
   }
 
-  Application getCurrentApp(String packageName) {
-    // getListOfApps().whenComplete(() => _apps);
-    for (var app in _apps) {
-      if (app.packageName == packageName) {
-        _currentApp = app;
-      }
-    }
-    return _currentApp;
-  }
+  // Application getCurrentApp(String packageName) {
+  //   // getListOfApps().whenComplete(() => _apps);
+  //   for (var app in _apps) {
+  //     if (app.packageName == packageName) {
+  //       _currentApp = app as Application;
+  //     }
+  //   }
+  //   return _currentApp;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -397,8 +404,9 @@ class _NotificationsListerState extends State<NotificationsLister> {
                       trailing:
                           //  Text(entry.packageName.toString().split('.').last),
                           Icon(Icons.keyboard_arrow_right),
-                      onTap: () => onAppClicked(
-                          context, getCurrentApp(element.packageName)),
+                      // onTap: () => onAppClicked(
+                      //     context, getCurrentApp(element.packageName),
+                      //     ),
                     ),
                   ),
                 );

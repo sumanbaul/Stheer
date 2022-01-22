@@ -6,6 +6,7 @@ import 'package:notifoo/helper/AppListHelper.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:notifoo/helper/datetime_ago.dart';
 import 'package:notifoo/model/Notifications.dart';
+import 'package:notifoo/model/apps.dart';
 import 'package:notifoo/model/notificationCategory.dart';
 import 'package:notifoo/widgets/Notifications/list_detail.dart';
 
@@ -26,27 +27,40 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
   //List<Color> _colors = [Color(0xff635eff), Color(0xff5fd5ff)];
 
   List<NotificationCategory> _nc = [];
-  final List<Application> _apps = AppListHelper().appListData;
+
+  List<Apps> _apps;
   ApplicationWithIcon _currentApp;
 
   @override
   void initState() {
     DatabaseHelper.instance.initializeDatabase();
 
-    super.initState();
-
+    asyncMethod();
     getCategoryList();
+
+    super.initState();
   }
 
-  Application getCurrentApp(String packageName) {
-    if (_currentApp == null) {}
-    // getListOfApps().whenComplete(() => _apps);
-    for (var app in _apps) {
-      if (app.packageName == packageName) {
-        _currentApp = app;
-      }
+  void asyncMethod() async {
+    _apps = await AppListHelper().appsDataFromDB;
+  }
+
+  Future<Application> getCurrentApp(String packageName) async {
+    // if (_currentApp == null) {}
+    // // getListOfApps().whenComplete(() => _apps);
+    // for (var app in _apps) {
+    //   if (app.packageName == packageName) {
+    //     _currentApp = app as Application;
+    //   }
+    // }
+    // return _currentApp;
+
+    Application app;
+
+    if (packageName != "") {
+      app = await DeviceApps.getApp('com.frandroid.app');
     }
-    return _currentApp;
+    return app;
   }
 
   @override
@@ -84,30 +98,34 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
 
     List<NotificationCategory> notificationsByCategory = [];
 
-    listByPackageName.forEach((key, value) {
-      // print(value[value.length - 1].createdDate);
-      var nc = NotificationCategory(
-          packageName: value[0].packageName,
-          appTitle: getCurrentApp(value[0].packageName).appName,
-          appIcon: _currentApp is ApplicationWithIcon
-              ? Image.memory(
-                  _currentApp.icon,
-                  //height: 30.0,
-                  fit: BoxFit.cover,
-                  gaplessPlayback: true,
-                )
-              : null,
-          tempIcon: Image.memory(_currentApp.icon),
-          timestamp: value[0].timestamp,
-          message:
-              "You have " + value.length.toString() + " Unread notifications",
-          notificationCount: value.length);
+    if (listByPackageName.length > 0) {
+      listByPackageName.forEach((key, value) {
+        // print(value[value.length - 1].createdDate);
+        var nc = NotificationCategory(
+            packageName: value[0].packageName,
+            appTitle: getCurrentApp(value[0].packageName)
+                .then((value) => value)
+                .toString(),
+            appIcon: _currentApp is ApplicationWithIcon
+                ? Image.memory(
+                    _currentApp.icon,
+                    //height: 30.0,
+                    fit: BoxFit.cover,
+                    gaplessPlayback: true,
+                  )
+                : null,
+            tempIcon: Image.memory(_currentApp.icon),
+            timestamp: value[0].timestamp,
+            message:
+                "You have " + value.length.toString() + " Unread notifications",
+            notificationCount: value.length);
 
-      notificationsByCategory.add(nc);
-    });
-
-    notificationsByCategory.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-    _nc = notificationsByCategory;
+        notificationsByCategory.add(nc);
+        notificationsByCategory
+            .sort((a, b) => b.timestamp.compareTo(a.timestamp));
+        _nc = notificationsByCategory;
+      });
+    }
 
     return notificationsByCategory;
     //print(listByPackageName);
