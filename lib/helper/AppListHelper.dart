@@ -24,8 +24,8 @@ abstract class AppsListBase {
   Future<List<Apps>> _appsFromDB;
   List<Apps> _appList;
 
-  Future<List<Application>> get appsData => _apps;
-  Future<List<Apps>> get appsDataFromDB => _appsFromDB;
+  // Future<List<Application>> get appsData => _apps;
+  // Future<List<Apps>> get appsDataFromDB => _appsFromDB;
   List<Apps> get appListData => _appList;
 
   void setStateAuthUrl(List<Apps> _newapplist) {

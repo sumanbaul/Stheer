@@ -27,9 +27,10 @@ class NotificationsLister extends StatefulWidget {
 
 class _NotificationsListerState extends State<NotificationsLister> {
   List<NotificationEvent> _log = [];
-  final List<Apps> _apps = AppListHelper().appListData;
+  // final List<Apps> _apps = AppListHelper().appListData;
 
-  ApplicationWithIcon _currentApp;
+  Application _currentApp;
+  Image _icon;
 
   bool appsLoaded = false;
 
@@ -84,95 +85,84 @@ class _NotificationsListerState extends State<NotificationsLister> {
   }
 
   Future<Application> getCurrentApp(String packageName) async {
+    //Apps app;
     Application app;
-
     if (packageName != "") {
-      app = await DeviceApps.getApp('com.frandroid.app');
+      // getCurrentAppWithIcon(packageName);
+      // app = await DeviceApps.getApp('com.frandroid.app');
+      AppListHelper().appListData.forEach((element) async {
+        if (element.packageName == packageName) {
+          _currentApp = await DeviceApps.getApp(packageName);
+          // _currentApp = app;
+          //_icon = app.icon;
+          //Application appxx = app;
+        }
+      });
     }
-    return app;
+    return app; // as Application;
+  }
+
+  Future<void> getCurrentAppWithIcon(String packageName) async {
+    _currentApp = await DeviceApps.getApp(packageName);
   }
 
   void onData(NotificationEvent event) async {
+    await getCurrentApp(event.packageName);
     print(event);
-    setState(() {
-      //packageName = event.packageName.toString().split('.').last.capitalizeFirstofEach;
-      if (event.packageName.contains("skydrive") ||
-          (event.packageName.contains("service")) ||
-          // (event.packageName.contains("android")) ||
-          (event.packageName.contains("notifoo")) ||
-          (event.packageName.contains("screenshot")) ||
-          (event.title.contains("WhatsApp")) ||
-          (event.packageName.contains("deskclock")) ||
-          (event.packageName.contains("wellbeing")) ||
-          (event.packageName.contains("weather2")) ||
-          (event.packageName.contains("gallery"))) {
-        //print(event.packageName);
-      } else {
-        var app = getCurrentApp(event.packageName);
-        _currentApp = app.then((value) => value) as Application;
 
-        _currentApp = app as Application;
-        packageName = event.packageName;
-        // print("Success Package Found: " + app.packageName);
-        //var jsondata2 = json.decode(event.toString());
-        Map<String, dynamic> jsonresponse = json.decode(event.toString());
+    //packageName = event.packageName.toString().split('.').last.capitalizeFirstofEach;
+    if (event.packageName.contains("skydrive") ||
+        (event.packageName.contains("service")) ||
+        // (event.packageName.contains("android")) ||
+        (event.packageName.contains("notifoo")) ||
+        (event.packageName.contains("screenshot")) ||
+        (event.title.contains("WhatsApp")) ||
+        (event.packageName.contains("deskclock")) ||
+        (event.packageName.contains("wellbeing")) ||
+        (event.packageName.contains("weather2")) ||
+        (event.packageName.contains("gallery"))) {
+      //print(event.packageName);
+    } else {
+      // var xyz = currentApp as Application;
+      //_currentApp = app.then((value) => value) as Application;
 
-        //var jsonData = json.decoder.convert(event.toString());
-        _log.add(event);
-        var createatday = event.createAt.day;
-        print("Create AT Day: $createatday");
-        var today = new DateTime.now().day;
-        print('today: $today');
-        //var xx = jsonresponse.containsKey('summaryText');
-        if (!jsonresponse.containsKey('summaryText') &&
-            event.createAt.day >= today) {
-          //check
-          bool redundancy;
-          redundantNotificationCheck(event).then((bool value) {
-            redundancy = value;
-          });
+      //_currentApp = app as Application;
+      packageName = event.packageName;
+      // print("Success Package Found: " + app.packageName);
+      //var jsondata2 = json.decode(event.toString());
+      Map<String, dynamic> jsonresponse = json.decode(event.toString());
 
-          if ((event.text != flagEntry) && event.text != null) {
-            DatabaseHelper.instance.insertNotification(
-              Notifications(
-                  title: event.title,
-                  appTitle: _currentApp.appName,
-                  // appIcon: _currentApp is ApplicationWithIcon
-                  //     ? Image.memory(_currentApp.icon)
-                  //     : null,
-                  text: event.text,
-                  message: event.message,
-                  packageName: event.packageName,
-                  timestamp: event.timestamp,
-                  createAt: event.createAt.millisecondsSinceEpoch.toString(),
-                  eventJson: event.toString(),
-                  createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
-                  isDeleted: 0
-                  // infoText: jsonData["text"],
-                  // showWhen: 1,
-                  // subText: jsonData["text"],
-                  // timestamp: event.timestamp.toString(),
-                  // packageName: jsonData["packageName"],
-                  // text: jsonData["text"],
-                  // summaryText: jsonData["summaryText"] ?? ""
-                  ),
-            );
-          }
-          flagEntry = event.text;
-        } else {
-          // # TODO fix here
+      //var jsonData = json.decoder.convert(event.toString());
+      _log.add(event);
+      var createatday = event.createAt.day;
+      print("Create AT Day: $createatday");
+      var today = new DateTime.now().day;
+      print('today: $today');
+      //var xx = jsonresponse.containsKey('summaryText');
+      if (!jsonresponse.containsKey('summaryText') &&
+          event.createAt.day >= today) {
+        //check
+        bool redundancy;
+        redundantNotificationCheck(event).then((bool value) {
+          redundancy = value;
+        });
 
-          // var titleLength = jsonresponse["textLines"].length;
-
+        if ((event.text != flagEntry) && event.text != null) {
           DatabaseHelper.instance.insertNotification(
             Notifications(
-                title: jsonresponse["textLines"] as String,
+                title: event.title,
+                appTitle: _currentApp.appName,
+                // appIcon: _currentApp is ApplicationWithIcon
+                //     ? Image.memory(_currentApp.icon)
+                //     : null,
                 text: event.text,
                 message: event.message,
                 packageName: event.packageName,
                 timestamp: event.timestamp,
-                createAt: event.createAt.toString(),
-                eventJson: event.toString()
+                createAt: event.createAt.millisecondsSinceEpoch.toString(),
+                eventJson: event.toString(),
+                createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
+                isDeleted: 0
                 // infoText: jsonData["text"],
                 // showWhen: 1,
                 // subText: jsonData["text"],
@@ -183,8 +173,33 @@ class _NotificationsListerState extends State<NotificationsLister> {
                 ),
           );
         }
+        flagEntry = event.text;
+      } else {
+        // # TODO fix here
+
+        // var titleLength = jsonresponse["textLines"].length;
+
+        DatabaseHelper.instance.insertNotification(
+          Notifications(
+              title: jsonresponse["textLines"] as String,
+              text: event.text,
+              message: event.message,
+              packageName: event.packageName,
+              timestamp: event.timestamp,
+              createAt: event.createAt.toString(),
+              eventJson: event.toString()
+              // infoText: jsonData["text"],
+              // showWhen: 1,
+              // subText: jsonData["text"],
+              // timestamp: event.timestamp.toString(),
+              // packageName: jsonData["packageName"],
+              // text: jsonData["text"],
+              // summaryText: jsonData["summaryText"] ?? ""
+              ),
+        );
       }
-    });
+    }
+    setState(() {});
     // if (!event.packageName.contains("example") ||
     //     !event.packageName.contains("skydrive") ||
     //     !event.packageName.contains("skydrive") ||
@@ -343,6 +358,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
             itemBuilder: (_, Notifications element) {
               if (element != null) {
                 getCurrentApp(element.packageName);
+
                 //print('Current App: ' +
                 // getCurrentApp(element.packageName).appName);
 
@@ -361,12 +377,14 @@ class _NotificationsListerState extends State<NotificationsLister> {
                           EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
 
                       leading: _currentApp is ApplicationWithIcon
-                          ? Image.memory(
-                              _currentApp.icon,
-                              gaplessPlayback: true,
-                              fit: BoxFit.cover,
-                              scale: 2,
-                            )
+                          ?
+                          // Image.memory(
+                          //     _currentApp.icon,
+                          //     gaplessPlayback: true,
+                          //     fit: BoxFit.cover,
+                          //     scale: 2,
+                          //   )
+                          null
                           : null,
                       title: Container(
                         alignment: Alignment.topLeft,

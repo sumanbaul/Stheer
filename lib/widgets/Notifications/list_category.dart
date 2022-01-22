@@ -12,7 +12,7 @@ import 'package:notifoo/widgets/Notifications/list_detail.dart';
 
 class NotificationCatgoryList extends StatefulWidget {
   NotificationCatgoryList({Key key, this.title}) : super(key: key);
-  final AppListHelper appsListHelper = new AppListHelper();
+  // final AppListHelper appsListHelper = new AppListHelper();
 
   final String title;
   @override
@@ -34,15 +34,13 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
   @override
   void initState() {
     DatabaseHelper.instance.initializeDatabase();
-
-    asyncMethod();
+    getAppsData();
     getCategoryList();
-
     super.initState();
   }
 
-  void asyncMethod() async {
-    _apps = await AppListHelper().appsDataFromDB;
+  void getAppsData() async {
+    _apps = AppListHelper().appListData;
   }
 
   Future<Application> getCurrentApp(String packageName) async {
@@ -58,7 +56,7 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
     Application app;
 
     if (packageName != "") {
-      app = await DeviceApps.getApp('com.frandroid.app');
+      app = await DeviceApps.getApp(packageName);
     }
     return app;
   }
