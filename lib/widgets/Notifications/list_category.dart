@@ -102,17 +102,19 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
         var nc = NotificationCategory(
             packageName: value[0].packageName,
             appTitle: getCurrentApp(value[0].packageName)
-                .then((value) => value)
+                .then((value) => value.appName)
                 .toString(),
-            appIcon: _currentApp is ApplicationWithIcon
-                ? Image.memory(
-                    _currentApp.icon,
-                    //height: 30.0,
-                    fit: BoxFit.cover,
-                    gaplessPlayback: true,
-                  )
-                : null,
-            tempIcon: Image.memory(_currentApp.icon),
+            appIcon: Image.network(
+                'https://picsum.photos/250?image=9'), // _currentApp is ApplicationWithIcon
+            //?
+            // Image.memory(
+            //     _currentApp.icon,
+            //     //height: 30.0,
+            //     fit: BoxFit.cover,
+            //     gaplessPlayback: true,
+            //   )
+            //: null,
+            // tempIcon: Image.memory(_currentApp.icon),
             timestamp: value[0].timestamp,
             message:
                 "You have " + value.length.toString() + " Unread notifications",

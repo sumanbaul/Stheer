@@ -27,7 +27,7 @@ class NotificationsLister extends StatefulWidget {
 
 class _NotificationsListerState extends State<NotificationsLister> {
   List<NotificationEvent> _log = [];
-  // final List<Apps> _apps = AppListHelper().appListData;
+  List<Apps> _apps = AppListHelper().appListData;
 
   Application _currentApp;
   Image _icon;
@@ -81,12 +81,16 @@ class _NotificationsListerState extends State<NotificationsLister> {
       started = isR;
     });
 
+    //get apps code new
+
+    _apps = AppListHelper().appListData;
+
     //var getData = DatabaseHelper.instance.getNotifications();
   }
 
-  Future<Application> getCurrentApp(String packageName) async {
+  Apps getCurrentApp(String packageName) {
     //Apps app;
-    Application app;
+    Apps app;
     if (packageName != "") {
       // getCurrentAppWithIcon(packageName);
       // app = await DeviceApps.getApp('com.frandroid.app');
