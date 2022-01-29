@@ -111,7 +111,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
   }
 
   void onData(NotificationEvent event) async {
-    await getCurrentApp(event.packageName);
+    await getCurrentAppWithIcon(event.packageName);
     print(event);
 
     //packageName = event.packageName.toString().split('.').last.capitalizeFirstofEach;

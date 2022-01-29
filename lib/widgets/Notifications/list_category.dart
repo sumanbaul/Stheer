@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:notifoo/helper/AppListHelper.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
+import 'package:notifoo/helper/InstalledAppsHelper.dart';
 import 'package:notifoo/helper/datetime_ago.dart';
 import 'package:notifoo/model/Notifications.dart';
 import 'package:notifoo/model/apps.dart';
@@ -97,35 +98,77 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
     List<NotificationCategory> notificationsByCategory = [];
 
     if (listByPackageName.length > 0) {
-      listByPackageName.forEach((key, value) {
+      // for (var k in listByPackageName.keys) {
+      //   for (int j = 0; j < listByPackageName[k].length; j++) {
+      //     var _app = await getCurrentApp(listByPackageName[k][j].packageName);
+      //     var nc = NotificationCategory(
+      //         packageName: _app.packageName,
+      //         appTitle: _app.appName,
+      //         // appIcon: _app is ApplicationWithIcon ?? Image.memory(
+      //         //   InstalledAppsHelper.getCurrentAppWithIcon( _app.packageName)
+      //         //                               : null
+      //         //                           .icon)
+      //         timestamp: listByPackageName[k][j].timestamp,
+      //         message: "You have " +
+      //             listByPackageName.length.toString() +
+      //             " Unread notifications",
+      //         notificationCount: listByPackageName.length);
+
+      //     notificationsByCategory.add(nc);
+      //     notificationsByCategory
+      //         .sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      //     _nc = notificationsByCategory;
+      //   }
+      // }
+
+      listByPackageName.forEach((key, value) async {
         // print(value[value.length - 1].createdDate);
+        var _app = await getCurrentApp(key);
+
         var nc = NotificationCategory(
-            packageName: value[0].packageName,
-            appTitle: getCurrentApp(value[0].packageName)
-                .then((value) => value.appName)
-                .toString(),
-            appIcon: Image.network(
-                'https://picsum.photos/250?image=9'), // _currentApp is ApplicationWithIcon
-            //?
-            // Image.memory(
-            //     _currentApp.icon,
-            //     //height: 30.0,
-            //     fit: BoxFit.cover,
-            //     gaplessPlayback: true,
-            //   )
-            //: null,
-            // tempIcon: Image.memory(_currentApp.icon),
+            packageName: _app.packageName,
+            appTitle: _app.appName,
+            appIcon: _app is ApplicationWithIcon
+                ? Image.memory(
+                    _currentApp.icon,
+                    //height: 30.0,
+                    fit: BoxFit.cover,
+                    gaplessPlayback: true,
+                  )
+                : null,
+            //tempIcon: Image.memory(_currentApp.icon),
             timestamp: value[0].timestamp,
             message:
                 "You have " + value.length.toString() + " Unread notifications",
             notificationCount: value.length);
 
         notificationsByCategory.add(nc);
+
+        notificationsByCategory.add(nc);
         notificationsByCategory
             .sort((a, b) => b.timestamp.compareTo(a.timestamp));
         _nc = notificationsByCategory;
       });
+
+      // for (int i = 0; i < value.length; i++) {
+      //   var nc = NotificationCategory(
+      //     packageName: _app.packageName,
+      //     appTitle: _app.appName,
+      //     appIcon: Image.network(
+      //         'https://picsum.photos/250?image=9'), // _currentApp is ApplicationWithIcon
+
+      //     timestamp: value[i].timestamp,
+      //     message:
+      //         "You have " + value.length.toString() + " Unread notifications",
+      //     notificationCount: value.length,
+      //   );
+      //   notificationsByCategory.add(nc);
+      // }
+
     }
+
+    notificationsByCategory.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    _nc = notificationsByCategory;
 
     return notificationsByCategory;
     //print(listByPackageName);
