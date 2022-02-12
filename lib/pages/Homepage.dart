@@ -36,30 +36,7 @@ class _HomepageState extends State<Homepage> {
             child: Column(
               children: [
                 BannerWidget(),
-                Container(
-                  color: Colors.transparent,
-                  padding: EdgeInsets.only(bottom: 15.0),
-                  child: Center(
-                    child: Text(
-                      "Today's Notifications",
-                      style: GoogleFonts.barlowSemiCondensed(
-                        textStyle: TextStyle(
-                          letterSpacing: 1.5,
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          // shadows: [
-                          //   Shadow(
-                          //     blurRadius: 1.0,
-                          //     color: Color(0xffe2adc4),
-                          //     offset: Offset(-1.0, 1.0),
-                          //   ),
-                          // ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                _buildHeader("Today's Notifications"),
                 Container(
                   child: Expanded(
                     child: NotificationsLister(),
@@ -71,6 +48,33 @@ class _HomepageState extends State<Homepage> {
         )
         // NotificationsLister(),
         );
+  }
+
+  Container _buildHeader(String title) {
+    return Container(
+      color: Colors.transparent,
+      padding: EdgeInsets.only(bottom: 15.0),
+      child: Center(
+        child: Text(
+          title,
+          style: GoogleFonts.barlowSemiCondensed(
+            textStyle: TextStyle(
+              letterSpacing: 1.5,
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              // shadows: [
+              //   Shadow(
+              //     blurRadius: 1.0,
+              //     color: Color(0xffe2adc4),
+              //     offset: Offset(-1.0, 1.0),
+              //   ),
+              // ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   // Widget homeWidget = Container(
