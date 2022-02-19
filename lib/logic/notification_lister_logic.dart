@@ -2,9 +2,12 @@ import 'dart:convert';
 import 'dart:isolate';
 import 'dart:ui';
 
+import 'package:device_apps/device_apps.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
+import 'package:notifoo/helper/AppListHelper.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:notifoo/model/Notifications.dart';
+import 'package:notifoo/model/apps.dart';
 import 'package:notifoo/model/notification_lister_model.dart';
 
 class NotificationListerPageLogic {
@@ -132,5 +135,85 @@ class NotificationListerPageLogic {
     }
 
     // print("Print Notification: $event");
+  }
+
+  Future<bool> redundantNotificationCheck(NotificationEvent event) async {
+    var getNotificationModel = await DatabaseHelper.instance
+        .getNotificationsByPackageToday(event.packageName);
+
+    Future<bool> entryFlag;
+
+    getNotificationModel.forEach((key) {
+      if (key.packageName.contains(event.packageName)) {
+        if (key.title.contains(event.title) && key.text.contains(event.text)) {
+          entryFlag = Future<bool>.value(true);
+          //return Future<bool>.value(true);
+        } else {
+          entryFlag = Future<bool>.value(false);
+        }
+      }
+    });
+
+    return entryFlag;
+  }
+
+  Apps getCurrentApp(String packageName) {
+    //Apps app;
+    Apps app;
+    if (packageName != "") {
+      // getCurrentAppWithIcon(packageName);
+      // app = await DeviceApps.getApp('com.frandroid.app');
+      AppListHelper().appListData.forEach((element) async {
+        if (element.packageName == packageName) {
+          _model.app = await DeviceApps.getApp(packageName);
+          // _currentApp = app;
+          //_icon = app.icon;
+          //Application appxx = app;
+        }
+      });
+    }
+    return app; // as Application;
+  }
+
+  void startListening() async {
+    print("start listening");
+
+    var hasPermission = await NotificationsListener.hasPermission;
+    if (!hasPermission) {
+      print("no permission, so open settings");
+      NotificationsListener.openPermissionSettings();
+      return;
+    }
+
+    var isR = await NotificationsListener.isRunning;
+
+    if (!isR) {
+      await NotificationsListener.startService(
+        title: "Notifoo listening",
+        description: "Let's scrape the notifactions...",
+        subTitle: "Service",
+        //foreground: AppButtonAction(),
+      );
+    }
+
+    // setState(() {
+    //   _model.started = true;
+    //   _loading = false;
+    // });
+  }
+
+  void stopListening() async {
+    print("stop listening");
+
+    // setState(() {
+    //   _loading = true;
+    // });
+
+    await NotificationsListener.stopService();
+
+    // setState(() {
+    //   started = false;
+    //   _loading = false;
+    // });
   }
 }

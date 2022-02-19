@@ -266,9 +266,9 @@ class _NotificationsListerState extends State<NotificationsLister> {
   void stopListening() async {
     print("stop listening");
 
-    setState(() {
-      _loading = true;
-    });
+    // setState(() {
+    //   _loading = true;
+    // });
 
     await NotificationsListener.stopService();
 
