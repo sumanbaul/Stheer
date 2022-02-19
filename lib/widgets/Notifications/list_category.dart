@@ -56,7 +56,8 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
     Application app;
 
     if (packageName != "") {
-      app = await DeviceApps.getApp(packageName);
+      app = await DeviceApps.getApp(packageName, true);
+      //_currentApp = app;
     }
     return app;
   }
