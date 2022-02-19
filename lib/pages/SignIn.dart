@@ -14,7 +14,7 @@ class SignIn extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-      appBar: Topbar.getTopbar('Sign In'),
+      //appBar: Topbar.getTopbar('Sign In'),
       //bottomNavigationBar: BottomBar.getBottomBar(context),
       body: Padding(
         padding: EdgeInsets.all(32),

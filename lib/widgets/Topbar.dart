@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:notifoo/widgets/navigation/nav_drawer.dart';
 
 class Topbar {
   static getTopbar(String title) {
@@ -17,7 +18,7 @@ class Topbar {
       centerTitle: true,
       actions: <Widget>[
         IconButton(
-          icon: Icon(Icons.list),
+          icon: Icon(Icons.cabin),
           onPressed: () {},
         )
       ],
@@ -32,7 +33,12 @@ class Topbar {
         children: [
           Container(
             padding: EdgeInsets.only(left: 7.0),
-            child: Icon(Icons.menu),
+            child: IconButton(
+              icon: Icon(Icons.menu),
+              onPressed: () {
+                return NavDrawer();
+              },
+            ),
           ),
           Text(
             title,

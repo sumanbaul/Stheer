@@ -64,7 +64,7 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
   Widget build(BuildContext context) {
     //debugPaintSizeEnabled = true;
     return Scaffold(
-      appBar: Topbar.getTopbar(widget.title),
+      //appBar: Topbar.getTopbar(widget.title),
       // backgroundColor: Colors.transparent,
       body: getNotificationListBody(),
     );
