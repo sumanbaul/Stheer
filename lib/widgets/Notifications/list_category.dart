@@ -284,14 +284,26 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
                             children: [
                               CircleAvatar(
                                 radius: 25.0,
+
+                                backgroundImage: _nc[index].appIcon.image,
                                 //backgroundImage: _nc[index].appIcon,
-                                child: _nc[index].appIcon,
+                                //child: _nc[index].appIcon,
                                 // child: ClipRRect(
                                 //   child: _nc[index].appIcon,
                                 //   borderRadius: BorderRadius.circular(100.0),
                                 // ),
                                 backgroundColor: Colors.white10,
                               ),
+                              // ClipOval(
+                              //   child: Image(
+                              //     image: _nc[index].appIcon.image,
+                              //     fit: BoxFit.cover,
+                              //     width: 50.0,
+                              //     height: 50.0,
+                              //     gaplessPlayback: true,
+                              //     alignment: Alignment.center,
+                              //   ),
+                              // ),
                               SizedBox(
                                 width: 8,
                               ),

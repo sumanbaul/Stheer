@@ -260,11 +260,16 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
                                 height: 3.0,
                               ),
                               Container(
-                                child: Text(
-                                  readTimestamp(int.parse(item.createdDate)),
-                                  style: TextStyle(
-                                      color: Color.fromRGBO(196, 196, 196, 1)),
-                                ),
+                                child: item.createdDate != null
+                                    ? Text(
+                                        readTimestamp(
+                                          int.parse(item.createdDate),
+                                        ),
+                                        style: TextStyle(
+                                            color: Color.fromRGBO(
+                                                196, 196, 196, 1)),
+                                      )
+                                    : Text("null"), // TODO
                               )
                             ],
                           ),
