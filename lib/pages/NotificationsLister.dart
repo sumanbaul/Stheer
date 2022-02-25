@@ -83,7 +83,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
     //get apps code new
 
-    _apps = AppListHelper().appListData;
+    //_apps = AppListHelper().appListData;
 
     //var getData = DatabaseHelper.instance.getNotifications();
   }
@@ -94,14 +94,19 @@ class _NotificationsListerState extends State<NotificationsLister> {
     if (packageName != "") {
       // getCurrentAppWithIcon(packageName);
       // app = await DeviceApps.getApp('com.frandroid.app');
-      AppListHelper().appListData.forEach((element) async {
-        if (element.packageName == packageName) {
-          _currentApp = await DeviceApps.getApp(packageName);
-          // _currentApp = app;
-          //_icon = app.icon;
-          //Application appxx = app;
-        }
-      });
+      //_currentApp = await DeviceApps.getApp(packageName);
+      _currentApp = (() async {
+        await DeviceApps.getApp(packageName);
+      })() as Application;
+
+      // AppListHelper().appListData.forEach((element) async {
+      //   if (element.packageName == packageName) {
+      //     _currentApp = await DeviceApps.getApp(packageName);
+      //     // _currentApp = app;
+      //     //_icon = app.icon;
+      //     //Application appxx = app;
+      //   }
+      // });
     }
     return app; // as Application;
   }
@@ -185,7 +190,8 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
         DatabaseHelper.instance.insertNotification(
           Notifications(
-              title: jsonresponse["textLines"] as String,
+              title: jsonresponse["textLines"] ??
+                  jsonresponse["textLines"] as String,
               text: event.text,
               message: event.message,
               packageName: event.packageName,
@@ -220,16 +226,18 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
     Future<bool> entryFlag;
 
-    getNotificationModel.forEach((key) {
-      if (key.packageName.contains(event.packageName)) {
-        if (key.title.contains(event.title) && key.text.contains(event.text)) {
-          entryFlag = Future<bool>.value(true);
-          //return Future<bool>.value(true);
-        } else {
-          entryFlag = Future<bool>.value(false);
-        }
-      }
-    });
+    getNotificationModel ??
+        getNotificationModel.forEach((key) {
+          if (key.packageName.contains(event.packageName)) {
+            if (key.title.contains(event.title) &&
+                key.text.contains(event.text)) {
+              entryFlag = Future<bool>.value(true);
+              //return Future<bool>.value(true);
+            } else {
+              entryFlag = Future<bool>.value(false);
+            }
+          }
+        });
 
     return entryFlag;
   }

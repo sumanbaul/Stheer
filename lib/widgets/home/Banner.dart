@@ -29,11 +29,11 @@ class _BannerState extends State<BannerWidget> {
 
     super.initState();
 
-    getTotalNotifications().then((String result) {
-      setState(() {
-        _totalNotifications = result;
-      });
-    });
+    // getTotalNotifications().then((String result) {
+    //   setState(() {
+    //     _totalNotifications = result;
+    //   });
+    // });
   }
 
   @override
@@ -41,76 +41,107 @@ class _BannerState extends State<BannerWidget> {
     return Container(child: bannerSection(context));
   }
 
+  @override
+  void didUpdateWidget(BannerWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    setState(() {});
+  }
+
   Widget bannerSection(BuildContext context) {
     //double _width = MediaQuery.of(context).size.width * 0.55;
     double _height = 320; //MediaQuery.of(context).size.height * 0.40;
 
-    return Container(
-      margin: EdgeInsets.only(bottom: 15.0),
-      decoration: BoxDecoration(
-          boxShadow: [
-            //color: Colors.white, //background color of box
-            BoxShadow(
-              color: Colors.black38,
-              blurRadius: 25.0, // soften the shadow
-              spreadRadius: 3.0, //extend the shadow
-              offset: Offset(
-                5.0, // Move to right 10  horizontally
-                5.0, // Move to bottom 10 Vertically
-              ),
-            )
-          ],
-          gradient: LinearGradient(
-            colors: _colors,
+    return StreamBuilder<String>(
+        initialData: "0",
+        stream: getTotalNotifications.asBroadcastStream(),
+        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.connectionState == ConnectionState.active ||
+              snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasError) {
+              return const Center(child: Text('Error'));
+            } else if (snapshot.hasData) {
+              _totalNotifications = snapshot.data.toString();
+              return Container(
+                margin: EdgeInsets.only(bottom: 15.0),
+                decoration: BoxDecoration(
+                    boxShadow: [
+                      //color: Colors.white, //background color of box
+                      BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: 25.0, // soften the shadow
+                        spreadRadius: 3.0, //extend the shadow
+                        offset: Offset(
+                          5.0, // Move to right 10  horizontally
+                          5.0, // Move to bottom 10 Vertically
+                        ),
+                      )
+                    ],
+                    gradient: LinearGradient(
+                      colors: _colors,
 
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            //stops: _stops
-          ),
-          color: Colors.orange,
-          shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.only(
-            bottomRight: Radius.circular(30.0),
-            bottomLeft: Radius.circular(30.0),
-          )),
-      padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
-      height: _height,
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 15.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Topbar.getTopbar('Notifoo'),
-              Container(
-                height: 148,
-                color: Colors.transparent,
-                // padding: EdgeInsets.only(
-                //   left: 15,
-                //   right: 15,
-                //   bottom: 20,
-                // ),
-                child: Center(child: _getReadNotifications()),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 15.0),
-                margin: EdgeInsets.only(top: 20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    _getbox1,
-                    _getbox1,
-                    _getbox1,
-                  ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      //stops: _stops
+                    ),
+                    color: Colors.orange,
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.only(
+                      bottomRight: Radius.circular(30.0),
+                      bottomLeft: Radius.circular(30.0),
+                    )),
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+                height: _height,
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 15.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Topbar.getTopbar('Notifoo'),
+                        Container(
+                          height: 148,
+                          color: Colors.transparent,
+                          // padding: EdgeInsets.only(
+                          //   left: 15,
+                          //   right: 15,
+                          //   bottom: 20,
+                          // ),
+                          child: Center(
+                            child:
+                                _getReadNotifications(snapshot.data.toString()),
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 15.0),
+                          margin: EdgeInsets.only(top: 20.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              _getbox1,
+                              _getbox1,
+                              _getbox1,
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
                 ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
+              );
+            } else {
+              return const Text('Empty data');
+            }
+          } else {
+            return Text('State: ${snapshot.connectionState}');
+          }
+        });
   }
 
   Widget _getbox1 = Container(
@@ -127,7 +158,7 @@ class _BannerState extends State<BannerWidget> {
     ),
   );
 
-  Widget _getReadNotifications() {
+  Widget _getReadNotifications(String notificationCount) {
     return Container(
       // margin: EdgeInsets.only(top: 0),
       padding: EdgeInsets.all(20),
@@ -170,7 +201,7 @@ class _BannerState extends State<BannerWidget> {
         children: [
           Center(
             child: Text(
-              '$_totalNotifications',
+              notificationCount, //'$_totalNotifications',
               style: GoogleFonts.lato(
                 textStyle: TextStyle(
                   letterSpacing: 1.2,
@@ -370,7 +401,12 @@ class _BannerState extends State<BannerWidget> {
   );
 }
 
-Future<String> getTotalNotifications() async {
+// Future<String> getTotalNotifications() async {
+//   var getNotifications = await DatabaseHelper.instance.getNotifications();
+//   return getNotifications.length.toString();
+// }
+
+Stream<String> getTotalNotifications = (() async* {
   var getNotifications = await DatabaseHelper.instance.getNotifications();
-  return getNotifications.length.toString();
-}
+  yield getNotifications.length.toString();
+})();
