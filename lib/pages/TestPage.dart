@@ -24,7 +24,7 @@ class _ListPageState extends State<TestPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-      appBar: Topbar.getTopbar(widget.title),
+      //appBar: Topbar.getTopbar(widget.title),
       body: NotificationCatgoryList(),
       //bottomNavigationBar: BottomBar.getBottomBar(context),
     );

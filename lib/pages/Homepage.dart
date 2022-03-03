@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:notifoo/widgets/CustomBottomBar/navigationDrawerWidget.dart';
 import 'package:notifoo/widgets/Topbar.dart';
+import 'package:notifoo/widgets/buttons/button_widget.dart';
 import 'package:notifoo/widgets/home/Banner.dart';
-import 'package:notifoo/widgets/navigation/nav_drawer.dart';
+//import 'package:notifoo/widgets/navigation/nav_drawer.dart';
 import 'NotificationsLister.dart';
 
 class Homepage extends StatefulWidget {
@@ -59,20 +61,25 @@ class _HomepageState extends State<Homepage> {
         //   ), // Populate the Drawer in the next step.
         // ), //NavDrawer(),
         //appBar: Topbar.getTopbar('ss'),
-        body: SafeArea(
-          maintainBottomViewPadding: true,
-          top: false,
-          child: Container(
-            child: Column(
-              children: [
-                BannerWidget(),
-                _buildHeader("Today's Notifications"),
-                Container(
-                  child: Expanded(
-                    child: NotificationsLister(),
+        drawer: NavigationDrawerWidget(),
+        body: Builder(
+          builder: (context) => SafeArea(
+            maintainBottomViewPadding: true,
+            top: false,
+            child: Container(
+              child: Column(
+                children: [
+                  BannerWidget(
+                    onClicked: () => Scaffold.of(context).openDrawer(),
                   ),
-                )
-              ],
+                  _buildHeader("Today's Notifications"),
+                  Container(
+                    child: Expanded(
+                      child: NotificationsLister(),
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         )

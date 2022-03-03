@@ -8,6 +8,7 @@ import 'package:notifoo/widgets/CustomBottomBar/BottomNavigation.dart';
 import 'package:notifoo/widgets/navigation/nav_drawer.dart';
 
 import 'TabItem.dart';
+import 'navigationDrawerWidget.dart';
 
 class App extends StatefulWidget {
   @override
@@ -99,34 +100,35 @@ class AppState extends State<App> {
       child: Scaffold(
         //xtendBody: true,
         // indexed stack shows only one child
-        drawer: Drawer(
-          child: ListView(
-            // Important: Remove any padding from the ListView.
-            padding: EdgeInsets.zero,
-            children: [
-              const DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                ),
-                child: Text('Drawer Header'),
-              ),
-              ListTile(
-                title: const Text('Item 1'),
-                onTap: () {
-                  // Update the state of the app.
-                  // ...
-                },
-              ),
-              ListTile(
-                title: const Text('Item 2'),
-                onTap: () {
-                  // Update the state of the app.
-                  // ...
-                },
-              ),
-            ],
-          ), // Populate the Drawer in the next step.
-        ), //NavDrawer(),
+        // drawer: Drawer(
+        //   child: ListView(
+        //     // Important: Remove any padding from the ListView.
+        //     padding: EdgeInsets.zero,
+        //     children: [
+        //       const DrawerHeader(
+        //         decoration: BoxDecoration(
+        //           color: Colors.blue,
+        //         ),
+        //         child: Text('Drawer Header'),
+        //       ),
+        //       ListTile(
+        //         title: const Text('Item 1'),
+        //         onTap: () {
+        //           // Update the state of the app.
+        //           // ...
+        //         },
+        //       ),
+        //       ListTile(
+        //         title: const Text('Item 2 test'),
+        //         onTap: () {
+        //           // Update the state of the app.
+        //           // ...
+        //         },
+        //       ),
+        //     ],
+        //   ), // Populate the Drawer in the next step.
+        // ), //NavDrawer(),
+        //drawer: NavigationDrawerWidget(),
         body: IndexedStack(
           index: currentTab,
           children: tabs.map((e) => e.page).toList(),

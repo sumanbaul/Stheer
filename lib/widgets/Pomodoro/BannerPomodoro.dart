@@ -86,7 +86,9 @@ class _PomodoroBannerW extends State<PomodoroBannerW> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Topbar.getTopbar('Pomodoro'),
+              Topbar(
+                title: 'Pomodoro',
+              ),
               Container(
                 height: 148,
                 color: Colors.transparent,

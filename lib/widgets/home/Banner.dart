@@ -5,8 +5,9 @@ import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:notifoo/widgets/Topbar.dart';
 
 class BannerWidget extends StatefulWidget {
-  BannerWidget({Key key}) : super(key: key);
-
+  BannerWidget({Key key, this.title, this.onClicked}) : super(key: key);
+  final String title;
+  final VoidCallback onClicked;
   @override
   _BannerState createState() => _BannerState();
 }
@@ -48,6 +49,11 @@ class _BannerState extends State<BannerWidget> {
     setState(() {});
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   Widget bannerSection(BuildContext context) {
     //double _width = MediaQuery.of(context).size.width * 0.55;
     double _height = 320; //MediaQuery.of(context).size.height * 0.40;
@@ -66,75 +72,80 @@ class _BannerState extends State<BannerWidget> {
               return const Center(child: Text('Error'));
             } else if (snapshot.hasData) {
               _totalNotifications = snapshot.data.toString();
-              return Container(
-                margin: EdgeInsets.only(bottom: 15.0),
-                decoration: BoxDecoration(
-                    boxShadow: [
-                      //color: Colors.white, //background color of box
-                      BoxShadow(
-                        color: Colors.black38,
-                        blurRadius: 25.0, // soften the shadow
-                        spreadRadius: 3.0, //extend the shadow
-                        offset: Offset(
-                          5.0, // Move to right 10  horizontally
-                          5.0, // Move to bottom 10 Vertically
-                        ),
-                      )
-                    ],
-                    gradient: LinearGradient(
-                      colors: _colors,
-
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      //stops: _stops
-                    ),
-                    color: Colors.orange,
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.only(
-                      bottomRight: Radius.circular(30.0),
-                      bottomLeft: Radius.circular(30.0),
-                    )),
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
-                height: _height,
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 15.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Topbar.getTopbar('Notifoo'),
-                        Container(
-                          height: 148,
-                          color: Colors.transparent,
-                          // padding: EdgeInsets.only(
-                          //   left: 15,
-                          //   right: 15,
-                          //   bottom: 20,
-                          // ),
-                          child: Center(
-                            child:
-                                _getReadNotifications(snapshot.data.toString()),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 15.0),
-                          margin: EdgeInsets.only(top: 20.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              _getbox1,
-                              _getbox1,
-                              _getbox1,
-                            ],
+              return Builder(builder: (context) {
+                return Container(
+                  margin: EdgeInsets.only(bottom: 15.0),
+                  decoration: BoxDecoration(
+                      boxShadow: [
+                        //color: Colors.white, //background color of box
+                        BoxShadow(
+                          color: Colors.black38,
+                          blurRadius: 25.0, // soften the shadow
+                          spreadRadius: 3.0, //extend the shadow
+                          offset: Offset(
+                            5.0, // Move to right 10  horizontally
+                            5.0, // Move to bottom 10 Vertically
                           ),
                         )
                       ],
+                      gradient: LinearGradient(
+                        colors: _colors,
+
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        //stops: _stops
+                      ),
+                      color: Colors.orange,
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.only(
+                        bottomRight: Radius.circular(30.0),
+                        bottomLeft: Radius.circular(30.0),
+                      )),
+                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+                  height: _height,
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 15.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Topbar(
+                            title: "Notifoo",
+                            onClicked: widget.onClicked,
+                          ),
+                          Container(
+                            height: 148,
+                            color: Colors.transparent,
+                            // padding: EdgeInsets.only(
+                            //   left: 15,
+                            //   right: 15,
+                            //   bottom: 20,
+                            // ),
+                            child: Center(
+                              child: _getReadNotifications(
+                                  snapshot.data.toString()),
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 15.0),
+                            margin: EdgeInsets.only(top: 20.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                _getbox1,
+                                _getbox1,
+                                _getbox1,
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
+                );
+              });
             } else {
               return const Text('Empty data');
             }

@@ -109,7 +109,9 @@ class _PomodoroState extends State<Pomodoro> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Topbar.getTopbar(widget.title),
+                Topbar(
+                  title: widget.title,
+                ),
                 buildTimer(),
                 buildButtons(),
                 buildCounterList(),
