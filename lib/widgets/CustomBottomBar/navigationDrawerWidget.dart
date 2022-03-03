@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:notifoo/pages/Pomodoro.dart';
+import 'package:notifoo/pages/TestPage.dart';
 
 class NavigationDrawerWidget extends StatelessWidget {
   final padding = EdgeInsets.symmetric(horizontal: 20);
@@ -183,13 +185,13 @@ class NavigationDrawerWidget extends StatelessWidget {
     switch (index) {
       case 0:
         Navigator.of(context).push(MaterialPageRoute(
-            //builder: (context) => PeoplePage(),
-            ));
+          builder: (context) => TestPage(),
+        ));
         break;
       case 1:
         Navigator.of(context).push(MaterialPageRoute(
-            // builder: (context) => FavouritesPage(),
-            ));
+          builder: (context) => Pomodoro(),
+        ));
         break;
     }
   }
