@@ -11,7 +11,7 @@ import 'package:notifoo/pages/TestPage.dart';
 import 'package:notifoo/widgets/CustomBottomBar/navigator.dart';
 import 'helper/DatabaseHelper.dart';
 //import 'model/apps.dart';
-import 'pages/NotificationsLister.dart';
+import 'widgets/Notifications/NotificationsLister.dart';
 import 'package:provider/provider.dart';
 
 import 'package:firebase_core/firebase_core.dart';
