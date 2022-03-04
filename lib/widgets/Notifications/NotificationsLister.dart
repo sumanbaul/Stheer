@@ -9,32 +9,34 @@ import 'package:notifoo/helper/AppListHelper.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:notifoo/model/apps.dart';
 import 'package:notifoo/widgets/Notifications/list_category.dart';
+import 'package:notifoo/widgets/buttons/appActionButton.dart';
 import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:notifoo/model/Notifications.dart';
 
 //Initialize singleton
 //#todo
-final AppListHelper appsListHelper = new AppListHelper();
+//final AppListHelper appsListHelper = new AppListHelper();
 
 class NotificationsLister extends StatefulWidget {
-  NotificationsLister({Key key, this.title}) : super(key: key);
+  NotificationsLister({Key key}) : super(key: key);
 
-  final String title;
   @override
   _NotificationsListerState createState() => _NotificationsListerState();
 }
 
 class _NotificationsListerState extends State<NotificationsLister> {
-  List<NotificationEvent> _log = [];
-  List<Apps> _apps = AppListHelper().appListData;
+  List<NotificationEvent> _log = []; // check what this variable is doing??????
+
+  //List<Apps> _apps = AppListHelper().appListData;
 
   Application _currentApp;
   Image _icon;
 
   bool appsLoaded = false;
 
-  String flagEntry;
+  String
+      flagEntry; //this variable need to check later, after notfications logic is cleaned
 
   bool started = false;
   bool _loading = false;
@@ -74,18 +76,12 @@ class _NotificationsListerState extends State<NotificationsLister> {
     // don't use the default receivePort
     // NotificationsListener.receivePort.listen((evt) => onData(evt));
 
-    var isR = await NotificationsListener.isRunning;
-    print("""Service is ${!isR ? "not " : ""}aleary running""");
+    var isServiceRunning = await NotificationsListener.isRunning;
+    print("""Service is ${!isServiceRunning ? "not " : ""}aleary running""");
 
     setState(() {
-      started = isR;
+      started = isServiceRunning;
     });
-
-    //get apps code new
-
-    //_apps = AppListHelper().appListData;
-
-    //var getData = DatabaseHelper.instance.getNotifications();
   }
 
   Apps getCurrentApp(String packageName) {
@@ -111,67 +107,92 @@ class _NotificationsListerState extends State<NotificationsLister> {
     return app; // as Application;
   }
 
-  Future<void> getCurrentAppWithIcon(String packageName) async {
+  Future<Application> getCurrentAppWithIcon(String packageName) async {
     _currentApp = await DeviceApps.getApp(packageName);
+    return _currentApp;
   }
 
+//critical function below
+//This function is triggered on receiving of data from port
   void onData(NotificationEvent event) async {
-    await getCurrentAppWithIcon(event.packageName);
-    print(event);
+    var eventAppWithIcon = await getCurrentAppWithIcon(event.packageName);
+    print(event); // this is needed for later
 
-    //packageName = event.packageName.toString().split('.').last.capitalizeFirstofEach;
-    if (event.packageName.contains("skydrive") ||
-        (event.packageName.contains("service")) ||
-        // (event.packageName.contains("android")) ||
-        (event.packageName.contains("notifoo")) ||
-        (event.packageName.contains("screenshot")) ||
-        (event.title.contains("WhatsApp")) ||
-        (event.packageName.contains("deskclock")) ||
-        (event.packageName.contains("wellbeing")) ||
-        (event.packageName.contains("weather2")) ||
-        (event.packageName.contains("gallery"))) {
-      //print(event.packageName);
-    } else {
-      // var xyz = currentApp as Application;
-      //_currentApp = app.then((value) => value) as Application;
+    if (!eventAppWithIcon.systemApp) {
+      if (event.packageName.contains("skydrive") ||
+          (event.packageName.contains("service")) ||
+          // (event.packageName.contains("android")) ||
+          (event.packageName.contains("notifoo")) ||
+          (event.packageName.contains("screenshot")) ||
+          (event.title.contains("WhatsApp")) ||
+          (event.packageName.contains("deskclock")) ||
+          (event.packageName.contains("wellbeing")) ||
+          (event.packageName.contains("weather2")) ||
+          (event.packageName.contains("gallery"))) {
+        //print(event.packageName);
+      } else {
+        //_currentApp = app as Application;
+        packageName = event.packageName;
+        // print("Success Package Found: " + app.packageName);
+        //var jsondata2 = json.decode(event.toString());
+        Map<String, dynamic> jsonresponse = json.decode(event.toString());
 
-      //_currentApp = app as Application;
-      packageName = event.packageName;
-      // print("Success Package Found: " + app.packageName);
-      //var jsondata2 = json.decode(event.toString());
-      Map<String, dynamic> jsonresponse = json.decode(event.toString());
+        _log.add(event);
+        var createatday = event.createAt.day;
+        print("Create AT Day: $createatday");
+        var today = new DateTime.now().day;
+        print('today: $today');
+        //var xx = jsonresponse.containsKey('summaryText');
+        if (!jsonresponse.containsKey('summaryText') &&
+            event.createAt.day >= today) {
+          //check
+          bool redundancy;
+          redundantNotificationCheck(event).then((bool value) {
+            redundancy = value;
+          });
 
-      //var jsonData = json.decoder.convert(event.toString());
-      _log.add(event);
-      var createatday = event.createAt.day;
-      print("Create AT Day: $createatday");
-      var today = new DateTime.now().day;
-      print('today: $today');
-      //var xx = jsonresponse.containsKey('summaryText');
-      if (!jsonresponse.containsKey('summaryText') &&
-          event.createAt.day >= today) {
-        //check
-        bool redundancy;
-        redundantNotificationCheck(event).then((bool value) {
-          redundancy = value;
-        });
+          if ((event.text != flagEntry) && event.text != null) {
+            DatabaseHelper.instance.insertNotification(
+              Notifications(
+                  title: event.title,
+                  appTitle: _currentApp.appName,
+                  // appIcon: _currentApp is ApplicationWithIcon
+                  //     ? Image.memory(_currentApp.icon)
+                  //     : null,
+                  text: event.text,
+                  message: event.message,
+                  packageName: event.packageName,
+                  timestamp: event.timestamp,
+                  createAt: event.createAt.millisecondsSinceEpoch.toString(),
+                  eventJson: event.toString(),
+                  createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
+                  isDeleted: 0
+                  // infoText: jsonData["text"],
+                  // showWhen: 1,
+                  // subText: jsonData["text"],
+                  // timestamp: event.timestamp.toString(),
+                  // packageName: jsonData["packageName"],
+                  // text: jsonData["text"],
+                  // summaryText: jsonData["summaryText"] ?? ""
+                  ),
+            );
+          }
+          flagEntry = event.text;
+        } else {
+          // # TODO fix here
 
-        if ((event.text != flagEntry) && event.text != null) {
+          // var titleLength = jsonresponse["textLines"].length;
+
           DatabaseHelper.instance.insertNotification(
             Notifications(
-                title: event.title,
-                appTitle: _currentApp.appName,
-                // appIcon: _currentApp is ApplicationWithIcon
-                //     ? Image.memory(_currentApp.icon)
-                //     : null,
+                title: jsonresponse["textLines"] ??
+                    jsonresponse["textLines"] as String,
                 text: event.text,
                 message: event.message,
                 packageName: event.packageName,
                 timestamp: event.timestamp,
-                createAt: event.createAt.millisecondsSinceEpoch.toString(),
-                eventJson: event.toString(),
-                createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
-                isDeleted: 0
+                createAt: event.createAt.toString(),
+                eventJson: event.toString()
                 // infoText: jsonData["text"],
                 // showWhen: 1,
                 // subText: jsonData["text"],
@@ -182,33 +203,9 @@ class _NotificationsListerState extends State<NotificationsLister> {
                 ),
           );
         }
-        flagEntry = event.text;
-      } else {
-        // # TODO fix here
-
-        // var titleLength = jsonresponse["textLines"].length;
-
-        DatabaseHelper.instance.insertNotification(
-          Notifications(
-              title: jsonresponse["textLines"] ??
-                  jsonresponse["textLines"] as String,
-              text: event.text,
-              message: event.message,
-              packageName: event.packageName,
-              timestamp: event.timestamp,
-              createAt: event.createAt.toString(),
-              eventJson: event.toString()
-              // infoText: jsonData["text"],
-              // showWhen: 1,
-              // subText: jsonData["text"],
-              // timestamp: event.timestamp.toString(),
-              // packageName: jsonData["packageName"],
-              // text: jsonData["text"],
-              // summaryText: jsonData["summaryText"] ?? ""
-              ),
-        );
       }
     }
+
     setState(() {});
     // if (!event.packageName.contains("example") ||
     //     !event.packageName.contains("skydrive") ||
@@ -244,9 +241,9 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
   void startListening() async {
     print("start listening");
-    setState(() {
-      _loading = true;
-    });
+    // setState(() {
+    //   _loading = true;
+    // });
     var hasPermission = await NotificationsListener.hasPermission;
     if (!hasPermission) {
       print("no permission, so open settings");
@@ -263,12 +260,11 @@ class _NotificationsListerState extends State<NotificationsLister> {
         subTitle: "Service",
         //foreground: AppButtonAction(),
       );
+      setState(() {
+        started = true;
+        //_loading = false;
+      });
     }
-
-    setState(() {
-      started = true;
-      _loading = false;
-    });
   }
 
   void stopListening() async {
@@ -285,16 +281,6 @@ class _NotificationsListerState extends State<NotificationsLister> {
       _loading = false;
     });
   }
-
-  // Application getCurrentApp(String packageName) {
-  //   // getListOfApps().whenComplete(() => _apps);
-  //   for (var app in _apps) {
-  //     if (app.packageName == packageName) {
-  //       _currentApp = app as Application;
-  //     }
-  //   }
-  //   return _currentApp;
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -314,7 +300,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
         onPressed: started ? stopListening : startListening,
         tooltip: 'Start/Stop sensing',
         child: _loading
-            ? Icon(Icons.close)
+            ? Icon(Icons.hourglass_bottom_outlined)
             : (started ? Icon(Icons.close) : Icon(Icons.play_arrow)),
       ),
     );
@@ -476,23 +462,5 @@ class _NotificationsListerState extends State<NotificationsLister> {
             ],
           );
         });
-  }
-}
-
-class AppButtonAction extends StatelessWidget {
-  final String label;
-  final VoidCallback onPressed;
-
-  AppButtonAction({this.label, this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: () {
-        onPressed?.call();
-        Navigator.of(context).maybePop();
-      },
-      child: Text(label),
-    );
   }
 }

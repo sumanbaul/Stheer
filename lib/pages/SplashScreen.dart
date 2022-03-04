@@ -5,10 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:notifoo/helper/AppListHelper.dart';
 import 'dart:async';
 
-import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:notifoo/model/apps.dart';
 import 'package:notifoo/services/installedApps.dart';
-import 'package:notifoo/widgets/CustomBottomBar/navigator.dart';
 
 Future<List<Application>> apps;
 List<Application> _apps = [];
@@ -25,7 +23,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     //DatabaseHelper.instance.initializeDatabase();
-    apps = AppListHelper.getListOfApps(); //appListHelper.appsData;
+    //apps = AppListHelper.getListOfApps(); //appListHelper.appsData;
 
     // @override
     //checkIfDataAvaiable();
@@ -50,6 +48,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //getAppsData(context);
     return Scaffold(
       body: Center(
         child: CircularProgressIndicator(),
@@ -94,15 +93,25 @@ class _SplashScreenState extends State<SplashScreen> {
   //Get set apps data
   Future<void> getAppsData() async {
     InstalledApps _installedApps = new InstalledApps();
-    await _installedApps.getAppsList();
-    _appsListNew = _installedApps.listOfApps;
+    //await _installedApps.getAppsList();
+    // _appsListNew = _installedApps.listOfApps;
 
     //sets app data to singleton object
-    setAppData(_installedApps.listOfApps);
+    //  _appsListNew ?? setAppData(_installedApps.listOfApps);
 
+    Timer(
+        Duration(seconds: 2),
+        () => Navigator.of(context)
+            .pushNamedAndRemoveUntil('/app', (Route<dynamic> route) => false));
+
+    // Navigator.of(context)
+    //     .pushNamedAndRemoveUntil('/app', (Route<dynamic> route) => false);
+    //return _appsListNew;
+  }
+
+  loadAndRedirectToApp(BuildContext context) {
     Navigator.of(context)
         .pushNamedAndRemoveUntil('/app', (Route<dynamic> route) => false);
-    //return _appsListNew;
   }
 
   void setAppData(List<Apps> apps) {

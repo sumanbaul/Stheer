@@ -17,7 +17,7 @@ class NotificationDetailList extends StatefulWidget {
     this.appTitle,
   }) : super(key: key);
   //NotificationCatgoryList({Key key, this.title}) : super(key: key);
-  final AppListHelper appsListHelper = new AppListHelper();
+  //final AppListHelper appsListHelper = new AppListHelper();
 
   final String title;
   final String packageName;

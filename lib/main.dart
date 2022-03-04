@@ -66,7 +66,7 @@ class _MyAppState extends State<MyApp> {
           initialRoute: '/splash',
           routes: {
             // When navigating to the "/" route, build the FirstScreen widget.
-            '/': (context) => NotificationsLister(title: "Notifoo"),
+            '/': (context) => NotificationsLister(),
             // When navigating to the "/splash" route, build the SecondScreen widget.
             '/home': (context) => Homepage(title: "Home"),
             '/second': (context) => TestPage(title: "Test"),

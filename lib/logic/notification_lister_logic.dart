@@ -157,23 +157,23 @@ class NotificationListerPageLogic {
     return entryFlag;
   }
 
-  Apps getCurrentApp(String packageName) {
-    //Apps app;
-    Apps app;
-    if (packageName != "") {
-      // getCurrentAppWithIcon(packageName);
-      // app = await DeviceApps.getApp('com.frandroid.app');
-      AppListHelper().appListData.forEach((element) async {
-        if (element.packageName == packageName) {
-          _model.app = await DeviceApps.getApp(packageName);
-          // _currentApp = app;
-          //_icon = app.icon;
-          //Application appxx = app;
-        }
-      });
-    }
-    return app; // as Application;
-  }
+  // Apps getCurrentApp(String packageName) {
+  //   //Apps app;
+  //   Apps app;
+  //   if (packageName != "") {
+  //     // getCurrentAppWithIcon(packageName);
+  //     // app = await DeviceApps.getApp('com.frandroid.app');
+  //     AppListHelper().appListData.forEach((element) async {
+  //       if (element.packageName == packageName) {
+  //         _model.app = await DeviceApps.getApp(packageName);
+  //         // _currentApp = app;
+  //         //_icon = app.icon;
+  //         //Application appxx = app;
+  //       }
+  //     });
+  //   }
+  //   return app; // as Application;
+  // }
 
   void startListening() async {
     print("start listening");

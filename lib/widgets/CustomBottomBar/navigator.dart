@@ -8,7 +8,6 @@ import 'package:notifoo/widgets/CustomBottomBar/BottomNavigation.dart';
 import 'package:notifoo/widgets/navigation/nav_drawer.dart';
 
 import 'TabItem.dart';
-import 'navigationDrawerWidget.dart';
 
 class App extends StatefulWidget {
   @override

@@ -34,7 +34,7 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
   @override
   void initState() {
     DatabaseHelper.instance.initializeDatabase();
-    getAppsData();
+    //getAppsData();
     getCategoryList();
     super.initState();
   }
