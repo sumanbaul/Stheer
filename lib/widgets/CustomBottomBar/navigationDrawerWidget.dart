@@ -8,8 +8,8 @@ class NavigationDrawerWidget extends StatelessWidget {
   final user = FirebaseAuth.instance.currentUser;
   @override
   Widget build(BuildContext context) {
-    final name = user != null ? user.displayName : 'Sarah Abs';
-    final email = user != null ? user.email : 'sarah@abs.com';
+    final name = user != null ? user.displayName : '';
+    final email = user != null ? user.email : '';
     final backupImg =
         'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80';
     final urlImage = user != null ? user.photoURL : backupImg;
@@ -112,19 +112,23 @@ class NavigationDrawerWidget extends StatelessWidget {
             children: [
               CircleAvatar(radius: 30, backgroundImage: NetworkImage(urlImage)),
               SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: TextStyle(fontSize: 20, color: Colors.white),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    email,
-                    style: TextStyle(fontSize: 14, color: Colors.white),
-                  ),
-                ],
+              Container(
+                width: 140,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      email,
+                      style: TextStyle(fontSize: 14, color: Colors.white),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
               Spacer(),
               CircleAvatar(

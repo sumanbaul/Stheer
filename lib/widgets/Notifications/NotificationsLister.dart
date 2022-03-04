@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:isolate';
 import 'dart:ui';
 import 'dart:async';
+import 'package:clear_all_notifications/clear_all_notifications.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
@@ -177,6 +178,8 @@ class _NotificationsListerState extends State<NotificationsLister> {
                   ),
             );
           }
+
+          initClearNotificationsState();
           flagEntry = event.text;
         } else {
           // # TODO fix here
@@ -280,6 +283,10 @@ class _NotificationsListerState extends State<NotificationsLister> {
       started = false;
       _loading = false;
     });
+  }
+
+  Future<void> initClearNotificationsState() async {
+    ClearAllNotifications.clear();
   }
 
   @override
