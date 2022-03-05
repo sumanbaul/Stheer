@@ -28,8 +28,8 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
 
   List<NotificationCategory> _nc = [];
 
-  List<Apps> _apps;
-  ApplicationWithIcon _currentApp;
+  //List<Apps> _apps;
+  //ApplicationWithIcon _currentApp;
 
   @override
   void initState() {
@@ -39,20 +39,12 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
     super.initState();
   }
 
-  void getAppsData() async {
-    _apps = AppListHelper().appListData;
-  }
+  /////unused method
+  // void getAppsData() async {
+  //   _apps = AppListHelper().appListData;
+  // }
 
   Future<Application> getCurrentApp(String packageName) async {
-    // if (_currentApp == null) {}
-    // // getListOfApps().whenComplete(() => _apps);
-    // for (var app in _apps) {
-    //   if (app.packageName == packageName) {
-    //     _currentApp = app as Application;
-    //   }
-    // }
-    // return _currentApp;
-
     Application app;
 
     if (packageName != "") {
@@ -64,9 +56,9 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
 
   @override
   Widget build(BuildContext context) {
-    setState(() {
-      //this line is responsible for updating the view instantaneously
-    });
+    // setState(() {
+    //   //this line is responsible for updating the view instantaneously
+    // });
 
     return new Container(
       height: 600,
@@ -211,13 +203,16 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
         Flexible(
           child: Container(
             margin: EdgeInsets.only(top: 0.0),
-            child: FutureBuilder<List<NotificationCategory>>(
-                future: getCategoryList(),
+            child: StreamBuilder<List<NotificationCategory>>(
+                stream: Stream.fromFuture(getCategoryList()),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return ListView.builder(
                       itemCount: snapshot.data.length,
-                      itemBuilder: buildNotificationCard,
+                      itemBuilder: (context, index) {
+                        return NotificationsCard(
+                            notificationsCategoryList: _nc, index: index);
+                      },
                       physics: BouncingScrollPhysics(
                         parent: AlwaysScrollableScrollPhysics(),
                       ),
@@ -231,8 +226,15 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
       ],
     );
   }
+}
 
-  Widget buildNotificationCard(BuildContext context, int index) {
+class NotificationsCard extends StatelessWidget {
+  const NotificationsCard({Key key, this.index, this.notificationsCategoryList})
+      : super(key: key);
+  final int index;
+  final List<NotificationCategory> notificationsCategoryList;
+
+  buildNotificationCard(BuildContext context, int index) {
     return Container(
       margin: EdgeInsets.only(bottom: 15),
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
@@ -285,7 +287,10 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
                               CircleAvatar(
                                 radius: 25.0,
 
-                                backgroundImage: _nc[index].appIcon.image,
+                                backgroundImage:
+                                    notificationsCategoryList[index]
+                                        .appIcon
+                                        .image,
                                 //backgroundImage: _nc[index].appIcon,
                                 //child: _nc[index].appIcon,
                                 // child: ClipRRect(
@@ -313,7 +318,7 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    _nc[index].appTitle,
+                                    notificationsCategoryList[index].appTitle,
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18.0),
@@ -340,7 +345,7 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
                           Padding(
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
-                              _nc[index].message,
+                              notificationsCategoryList[index].message,
                               style: TextStyle(
                                 fontSize: 13.0,
                               ),
@@ -349,7 +354,8 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
                           Padding(
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
-                              readTimestamp((_nc[index].timestamp)),
+                              readTimestamp(
+                                  (notificationsCategoryList[index].timestamp)),
                               style: TextStyle(
                                   color: Colors.white54, fontSize: 13),
                             ),
@@ -374,10 +380,11 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => NotificationDetailList(
-                            packageName: _nc[index].packageName,
-                            title: _nc[index].appTitle,
-                            appIcon: _nc[index].appIcon,
-                            appTitle: _nc[index].appTitle,
+                            packageName:
+                                notificationsCategoryList[index].packageName,
+                            title: notificationsCategoryList[index].appTitle,
+                            appIcon: notificationsCategoryList[index].appIcon,
+                            appTitle: notificationsCategoryList[index].appTitle,
                           ),
                         ),
                       ),
@@ -386,5 +393,10 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
         ]),
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return buildNotificationCard(context, this.index);
   }
 }

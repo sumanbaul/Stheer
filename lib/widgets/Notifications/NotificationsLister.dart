@@ -265,7 +265,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
       );
       setState(() {
         started = true;
-        //_loading = false;
+        _loading = false;
       });
     }
   }
