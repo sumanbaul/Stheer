@@ -34,19 +34,13 @@ class BottomNavigation extends StatelessWidget {
   BottomNavigationBarItem _buildItem(
       {int index, IconData icon, String tabName}) {
     return BottomNavigationBarItem(
-      icon: Icon(
-        icon,
-        color: _tabColor(index: index),
-      ),
-      // ignore: deprecated_member_use
-      title: Text(
-        tabName,
-        style: TextStyle(
+        icon: Icon(
+          icon,
           color: _tabColor(index: index),
-          fontSize: 12,
         ),
-      ),
-    );
+        // ignore: deprecated_member_use
+        label: tabName,
+        tooltip: tabName);
   }
 
   Color _tabColor({int index}) {
