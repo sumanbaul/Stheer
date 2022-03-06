@@ -60,7 +60,7 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
     //   //this line is responsible for updating the view instantaneously
     // });
 
-    return new Container(
+    return Container(
       height: 600,
       padding: EdgeInsets.only(top: 15.0),
       decoration: BoxDecoration(
@@ -218,7 +218,9 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
                       ),
                     );
                   } else {
-                    return new Container();
+                    return Container(
+                      child: CircularProgressIndicator(),
+                    );
                   }
                 }),
           ),

@@ -64,6 +64,31 @@ class _NotificationsListerState extends State<NotificationsLister> {
     send?.send(evt);
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      //appBar: Topbar.getTopbar(widget.title),
+      //bottomNavigationBar: BottomBar.getBottomBar(context),
+      body: Container(
+        height: 800,
+        padding: EdgeInsets.zero,
+        child: NotificationCatgoryList(), //getNotificationListBody(),
+      ),
+      floatingActionButton: FloatingActionButton(
+        //backgroundColor: Color(0xffeeaeca),
+        splashColor: Color(0xff94bbe9),
+        hoverColor: Color(0xffeeaeca),
+        focusColor: Color(0xff94bbe9),
+        onPressed: started ? stopListening : startListening,
+        tooltip: 'Start/Stop sensing',
+        child: _loading
+            ? Icon(Icons.hourglass_bottom_outlined)
+            : (started ? Icon(Icons.close) : Icon(Icons.play_arrow)),
+      ),
+    );
+  }
+
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     NotificationsListener.initialize(callbackHandle: _callback);
@@ -244,9 +269,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
   void startListening() async {
     print("start listening");
-    // setState(() {
-    //   _loading = true;
-    // });
+
     var hasPermission = await NotificationsListener.hasPermission;
     if (!hasPermission) {
       print("no permission, so open settings");
@@ -272,11 +295,6 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
   void stopListening() async {
     print("stop listening");
-
-    // setState(() {
-    //   _loading = true;
-    // });
-
     await NotificationsListener.stopService();
 
     setState(() {
@@ -287,30 +305,6 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
   Future<void> initClearNotificationsState() async {
     ClearAllNotifications.clear();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      //appBar: Topbar.getTopbar(widget.title),
-      //bottomNavigationBar: BottomBar.getBottomBar(context),
-      body: Container(
-        height: 800,
-        child: NotificationCatgoryList(), //getNotificationListBody(),
-      ),
-      floatingActionButton: FloatingActionButton(
-        //backgroundColor: Color(0xffeeaeca),
-        splashColor: Color(0xff94bbe9),
-        hoverColor: Color(0xffeeaeca),
-        focusColor: Color(0xff94bbe9),
-        onPressed: started ? stopListening : startListening,
-        tooltip: 'Start/Stop sensing',
-        child: _loading
-            ? Icon(Icons.hourglass_bottom_outlined)
-            : (started ? Icon(Icons.close) : Icon(Icons.play_arrow)),
-      ),
-    );
   }
 
   getNotificationListBody() {
