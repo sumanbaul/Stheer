@@ -286,18 +286,22 @@ class NotificationsCard extends StatelessWidget {
                             children: [
                               CircleAvatar(
                                 radius: 25.0,
-
-                                backgroundImage:
-                                    notificationsCategoryList[index]
-                                        .appIcon
-                                        .image,
+                                child: CircleAvatar(
+                                    backgroundColor: Colors.transparent,
+                                    //clipBehavior: Clip.hardEdge,
+                                    child: notificationsCategoryList[index]
+                                        .appIcon),
+                                // backgroundImage:
+                                //     notificationsCategoryList[index]
+                                //         .appIcon
+                                //         .image,
                                 //backgroundImage: _nc[index].appIcon,
                                 //child: _nc[index].appIcon,
                                 // child: ClipRRect(
                                 //   child: _nc[index].appIcon,
                                 //   borderRadius: BorderRadius.circular(100.0),
                                 // ),
-                                backgroundColor: Colors.white10,
+                                backgroundColor: Colors.black12,
                               ),
                               // ClipOval(
                               //   child: Image(
