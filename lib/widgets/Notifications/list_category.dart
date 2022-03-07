@@ -28,6 +28,8 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
   //List<Color> _colors = [Color(0xff635eff), Color(0xffffb861)];
   //List<Color> _colors = [Color(0xff635eff), Color(0xff5fd5ff)];
 
+  bool isToday = false;
+
   List<NotificationCategory> _nc = [];
 
   //List<Apps> _apps;
@@ -93,33 +95,6 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
     List<NotificationCategory> notificationsByCategory = [];
 
     if (listByPackageName.length > 0) {
-      // for (var k in listByPackageName.keys) {
-      //   for (int j = 0; j < listByPackageName[k].length; j++) {
-      //     var _app = await getCurrentApp(listByPackageName[k][j].packageName);
-      //     var nc = NotificationCategory(
-      //         packageName: _app.packageName,
-      //         appTitle: _app.appName,
-      //         appIcon: _app is ApplicationWithIcon
-      //             ? Image.memory(
-      //                 _currentApp.icon,
-      //                 //height: 30.0,
-      //                 fit: BoxFit.cover,
-      //                 gaplessPlayback: true,
-      //               )
-      //             : null,
-      //         timestamp: listByPackageName[k][j].timestamp,
-      //         message: "You have " +
-      //             listByPackageName.length.toString() +
-      //             " Unread notifications",
-      //         notificationCount: listByPackageName.length);
-
-      //     notificationsByCategory.add(nc);
-      //     notificationsByCategory
-      //         .sort((a, b) => b.timestamp.compareTo(a.timestamp));
-      //     _nc = notificationsByCategory;
-      //   }
-      // }
-
       listByPackageName.forEach((key, value) async {
         // print(value[value.length - 1].createdDate);
         var _app = await (getCurrentApp(value[0].packageName));
@@ -148,18 +123,10 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
     notificationsByCategory
         .sort((a, b) => b.timestamp!.compareTo(a.timestamp!));
     _nc = notificationsByCategory;
-
-    //print(listByPackageName);
-
-    // setState(() {
-    //   _nc = notificationsByCategory;
-    // });
-
     return notificationsByCategory;
   }
 
-  getNotificationListBody() {
-    //debugPaintSizeEnabled = false;
+  Widget getNotificationListBody() {
     return Column(
       children: [
         Container(
@@ -172,26 +139,36 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
             children: [
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    onPrimary: Colors.black87,
-                    primary: Colors.grey[300],
+                    onPrimary: isToday ? Colors.black87 : Colors.white24,
+                    primary: isToday ? Colors.grey[300] : Colors.grey[600],
                     minimumSize: Size(88, 36),
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
                     )),
-                onPressed: () => getCategoryList(0),
+                onPressed: () async {
+                  await getCategoryList(0);
+                  setState(() {
+                    isToday = true;
+                  });
+                },
                 child: Text('Today'),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    onPrimary: Colors.white24,
-                    primary: Colors.grey[600],
+                    onPrimary: isToday ? Colors.white24 : Colors.black87,
+                    primary: isToday ? Colors.grey[600] : Colors.grey[300],
                     minimumSize: Size(88, 36),
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
                     )),
-                onPressed: () => getCategoryList(1),
+                onPressed: () async {
+                  await getCategoryList(1);
+                  setState(() {
+                    isToday = false;
+                  });
+                },
                 child: Text('Yesterday'),
               ),
               ElevatedButton(
@@ -210,10 +187,17 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
           ),
         ),
         Flexible(
+          flex: 1,
+          fit: FlexFit.tight,
           child: Container(
+            padding: EdgeInsets.only(top: 0),
+            //height: 200,
+            // decoration: BoxDecoration(color: Colors.brown),
             margin: EdgeInsets.only(top: 0.0),
             child: StreamBuilder<List<NotificationCategory>>(
-                stream: Stream.fromFuture(getCategoryList(0)),
+                stream: isToday
+                    ? Stream.fromFuture(getCategoryList(0))
+                    : Stream.fromFuture(getCategoryList(1)),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return ListView.builder(
