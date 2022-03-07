@@ -24,12 +24,15 @@ class _BannerState extends State<BannerWidget> {
   Color? gradientEnd = Colors.black;
   String? _totalNotifications;
 
+  Future<String>? totalNotifications;
+
   @override
   void initState() {
     DatabaseHelper.instance.initializeDatabase();
 
     super.initState();
 
+    totalNotifications = getTotalNotifications();
     // getTotalNotifications().then((String result) {
     //   setState(() {
     //     _totalNotifications = result;
@@ -58,101 +61,101 @@ class _BannerState extends State<BannerWidget> {
     //double _width = MediaQuery.of(context).size.width * 0.55;
     double _height = 320; //MediaQuery.of(context).size.height * 0.40;
 
-    return StreamBuilder<String>(
+    return FutureBuilder<String>(
         initialData: "0",
-        stream: getTotalNotifications.asBroadcastStream(),
+        future: totalNotifications,
         builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.connectionState == ConnectionState.active ||
-              snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasError) {
-              return const Center(child: Text('Error'));
-            } else if (snapshot.hasData) {
-              _totalNotifications = snapshot.data.toString();
-              return Builder(builder: (context) {
-                return Container(
-                  margin: EdgeInsets.only(bottom: 15.0),
-                  decoration: BoxDecoration(
-                      boxShadow: [
-                        //color: Colors.white, //background color of box
-                        BoxShadow(
-                          color: Colors.black38,
-                          blurRadius: 25.0, // soften the shadow
-                          spreadRadius: 3.0, //extend the shadow
-                          offset: Offset(
-                            5.0, // Move to right 10  horizontally
-                            5.0, // Move to bottom 10 Vertically
-                          ),
-                        )
-                      ],
-                      gradient: LinearGradient(
-                        colors: _colors,
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+              return Text('none');
+            case ConnectionState.active:
+            case ConnectionState.waiting:
+              return CircularProgressIndicator();
+            case ConnectionState.done:
+              if (snapshot.hasData) {
+                return buildBanner(_height, snapshot.data.toString());
+              } else {
+                return buildBanner(_height, '0');
+              }
 
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        //stops: _stops
-                      ),
-                      color: Colors.orange,
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.only(
-                        bottomRight: Radius.circular(30.0),
-                        bottomLeft: Radius.circular(30.0),
-                      )),
-                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
-                  height: _height,
-                  child: SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 15.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Topbar(
-                            title: "Notifoo",
-                            onClicked: widget.onClicked,
-                          ),
-                          Container(
-                            height: 148,
-                            color: Colors.transparent,
-                            // padding: EdgeInsets.only(
-                            //   left: 15,
-                            //   right: 15,
-                            //   bottom: 20,
-                            // ),
-                            child: Center(
-                              child: _getReadNotifications(
-                                  snapshot.data.toString()),
-                            ),
-                          ),
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 15.0),
-                            margin: EdgeInsets.only(top: 20.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                _getbox1,
-                                _getbox1,
-                                _getbox1,
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              });
-            } else {
-              return const Text('Empty data');
-            }
-          } else {
-            return Text('State: ${snapshot.connectionState}');
+            default:
+              return Text('default');
           }
         });
+  }
+
+  Widget buildBanner(double height, String nCount) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 15.0),
+      decoration: BoxDecoration(
+          boxShadow: [
+            //color: Colors.white, //background color of box
+            BoxShadow(
+              color: Colors.black38,
+              blurRadius: 25.0, // soften the shadow
+              spreadRadius: 3.0, //extend the shadow
+              offset: Offset(
+                5.0, // Move to right 10  horizontally
+                5.0, // Move to bottom 10 Vertically
+              ),
+            )
+          ],
+          gradient: LinearGradient(
+            colors: _colors,
+
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            //stops: _stops
+          ),
+          color: Colors.orange,
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.only(
+            bottomRight: Radius.circular(30.0),
+            bottomLeft: Radius.circular(30.0),
+          )),
+      padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+      height: height,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 15.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Topbar(
+                title: "Notifoo",
+                onClicked: widget.onClicked,
+              ),
+              Container(
+                height: 148,
+                color: Colors.transparent,
+                // padding: EdgeInsets.only(
+                //   left: 15,
+                //   right: 15,
+                //   bottom: 20,
+                // ),
+                child: Center(
+                  child: _getReadNotifications(nCount),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 15.0),
+                margin: EdgeInsets.only(top: 20.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    _getbox1,
+                    _getbox1,
+                    _getbox1,
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _getbox1 = Container(
@@ -412,12 +415,12 @@ class _BannerState extends State<BannerWidget> {
   );
 }
 
-// Future<String> getTotalNotifications() async {
-//   var getNotifications = await DatabaseHelper.instance.getNotifications();
-//   return getNotifications.length.toString();
-// }
-
-Stream<String> getTotalNotifications = (() async* {
+Future<String> getTotalNotifications() async {
   var getNotifications = await DatabaseHelper.instance.getNotifications(0);
-  yield getNotifications.length.toString();
-})();
+  return getNotifications.length.toString();
+}
+
+// Stream<String> getTotalNotifications = (() async* {
+//   var getNotifications = await DatabaseHelper.instance.getNotifications(0);
+//   yield getNotifications.length.toString();
+// })();
