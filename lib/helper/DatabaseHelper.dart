@@ -83,12 +83,14 @@ class DatabaseHelper {
     return res;
   }
 
-  Future<List<Notifications>> getNotifications() async {
+  Future<List<Notifications>> getNotifications(int selectedDay) async {
     final db = await database;
+    var yesterday = DateTime.now().subtract(Duration(days: 1));
+    var now = selectedDay == 0 ? DateTime.now() : yesterday;
 
-    var now = DateTime.now();
     var lastMidnight =
         DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+
     //var today = new DateTime.now().millisecondsSinceEpoch;
     //print('Date from Db: $lastMidnight');
 

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:isolate';
 import 'dart:ui';
 import 'dart:async';
-import 'package:clear_all_notifications/clear_all_notifications.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
@@ -11,7 +10,6 @@ import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:notifoo/model/apps.dart';
 import 'package:notifoo/widgets/Notifications/list_category.dart';
 import 'package:notifoo/widgets/buttons/appActionButton.dart';
-import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:notifoo/model/Notifications.dart';
 
@@ -304,143 +302,143 @@ class _NotificationsListerState extends State<NotificationsLister> {
   }
 
   Future<void> initClearNotificationsState() async {
-    ClearAllNotifications.clear();
+    //ClearAllNotifications.clear();
   }
 
-  getNotificationListBody() {
-    return FutureBuilder<List<Notifications>>(
-      future: DatabaseHelper.instance.getNotifications(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          //var packageName = (Notifications element) => element.packageName;
-          // DateTime expiryAsDateTime = DateTime.parse(snapshot.data[]);
-          // var snapshotelement = snapshot.data;
-          // print("Snapshot data: $snapshot.data");
-          return StickyGroupedListView<Notifications, String>(
-            //padding: EdgeInsets.only(bottom: 80),
-            //itemScrollController: x ,
-            physics: BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics(),
-            ),
-            elements: snapshot.data,
-            order: StickyGroupedListOrder.DESC,
-            groupBy: (Notifications element) => element.packageName,
-            groupComparator: (String value1, String value2) =>
-                value2.compareTo(value1),
-            itemComparator: (Notifications element1, Notifications element2) =>
-                element1.packageName.compareTo(element2.packageName),
-            floatingHeader: true,
-            groupSeparatorBuilder: (Notifications element) => Container(
-              height: 50,
-              child: Align(
-                alignment: Alignment.center,
-                child: Container(
-                  width: 120,
-                  decoration: BoxDecoration(
-                    color: Colors.black87,
-                    border: Border.all(
-                      color: Color(0xff94bbe9),
-                    ),
-                    borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      //'${getCurrentApp(element.packageName).appName}',
-                      '${element.appTitle}',
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            itemBuilder: (_, Notifications element) {
-              if (element != null) {
-                getCurrentApp(element.packageName);
+  // getNotificationListBody() {
+  //   return FutureBuilder<List<Notifications>>(
+  //     future: DatabaseHelper.instance.getNotifications(0),
+  //     builder: (context, snapshot) {
+  //       if (snapshot.hasData) {
+  //         //var packageName = (Notifications element) => element.packageName;
+  //         // DateTime expiryAsDateTime = DateTime.parse(snapshot.data[]);
+  //         // var snapshotelement = snapshot.data;
+  //         // print("Snapshot data: $snapshot.data");
+  //         return StickyGroupedListView<Notifications, String>(
+  //           //padding: EdgeInsets.only(bottom: 80),
+  //           //itemScrollController: x ,
+  //           physics: BouncingScrollPhysics(
+  //             parent: AlwaysScrollableScrollPhysics(),
+  //           ),
+  //           elements: snapshot.data,
+  //           order: StickyGroupedListOrder.DESC,
+  //           groupBy: (Notifications element) => element.packageName,
+  //           groupComparator: (String value1, String value2) =>
+  //               value2.compareTo(value1),
+  //           itemComparator: (Notifications element1, Notifications element2) =>
+  //               element1.packageName.compareTo(element2.packageName),
+  //           floatingHeader: true,
+  //           groupSeparatorBuilder: (Notifications element) => Container(
+  //             height: 50,
+  //             child: Align(
+  //               alignment: Alignment.center,
+  //               child: Container(
+  //                 width: 120,
+  //                 decoration: BoxDecoration(
+  //                   color: Colors.black87,
+  //                   border: Border.all(
+  //                     color: Color(0xff94bbe9),
+  //                   ),
+  //                   borderRadius: BorderRadius.all(Radius.circular(20.0)),
+  //                 ),
+  //                 child: Padding(
+  //                   padding: const EdgeInsets.all(8.0),
+  //                   child: Text(
+  //                     //'${getCurrentApp(element.packageName).appName}',
+  //                     '${element.appTitle}',
+  //                     textAlign: TextAlign.center,
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //           itemBuilder: (_, Notifications element) {
+  //             if (element != null) {
+  //               getCurrentApp(element.packageName);
 
-                //print('Current App: ' +
-                // getCurrentApp(element.packageName).appName);
+  //               //print('Current App: ' +
+  //               // getCurrentApp(element.packageName).appName);
 
-                return Card(
-                  // key: ObjectKey(snapshot
-                  //     .data), // this is a new change, might break the app!!!!!
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6.0),
-                  ),
-                  elevation: 8.0,
-                  margin:
-                      new EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                  child: Container(
-                    child: ListTile(
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+  //               return Card(
+  //                 // key: ObjectKey(snapshot
+  //                 //     .data), // this is a new change, might break the app!!!!!
+  //                 shape: RoundedRectangleBorder(
+  //                   borderRadius: BorderRadius.circular(6.0),
+  //                 ),
+  //                 elevation: 8.0,
+  //                 margin:
+  //                     new EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+  //                 child: Container(
+  //                   child: ListTile(
+  //                     contentPadding:
+  //                         EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
 
-                      leading: _currentApp is ApplicationWithIcon
-                          ?
-                          // Image.memory(
-                          //     _currentApp.icon,
-                          //     gaplessPlayback: true,
-                          //     fit: BoxFit.cover,
-                          //     scale: 2,
-                          //   )
-                          null
-                          : null,
-                      title: Container(
-                        alignment: Alignment.topLeft,
-                        //padding: EdgeInsets.a,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
-                              child: Text(
-                                element.title ?? packageName,
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 2),
-                              child: Text(element.text.toString()),
-                            )
-                          ],
-                        ),
-                      ),
-                      subtitle: Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 7, 0, 0),
-                        child: Text(
-                          DateTime.fromMillisecondsSinceEpoch(
-                                  (element.timestamp))
-                              .toString()
-                              .substring(0, 16),
-                          style: TextStyle(color: Colors.white54, fontSize: 12),
-                        ),
-                      ),
+  //                     leading: _currentApp is ApplicationWithIcon
+  //                         ?
+  //                         // Image.memory(
+  //                         //     _currentApp.icon,
+  //                         //     gaplessPlayback: true,
+  //                         //     fit: BoxFit.cover,
+  //                         //     scale: 2,
+  //                         //   )
+  //                         null
+  //                         : null,
+  //                     title: Container(
+  //                       alignment: Alignment.topLeft,
+  //                       //padding: EdgeInsets.a,
+  //                       child: Column(
+  //                         crossAxisAlignment: CrossAxisAlignment.start,
+  //                         children: [
+  //                           Padding(
+  //                             padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
+  //                             child: Text(
+  //                               element.title ?? packageName,
+  //                               style: TextStyle(fontWeight: FontWeight.bold),
+  //                             ),
+  //                           ),
+  //                           Padding(
+  //                             padding: const EdgeInsets.fromLTRB(0, 0, 0, 2),
+  //                             child: Text(element.text.toString()),
+  //                           )
+  //                         ],
+  //                       ),
+  //                     ),
+  //                     subtitle: Padding(
+  //                       padding: const EdgeInsets.fromLTRB(0, 7, 0, 0),
+  //                       child: Text(
+  //                         DateTime.fromMillisecondsSinceEpoch(
+  //                                 (element.timestamp))
+  //                             .toString()
+  //                             .substring(0, 16),
+  //                         style: TextStyle(color: Colors.white54, fontSize: 12),
+  //                       ),
+  //                     ),
 
-                      isThreeLine: true,
-                      //trailing: Text(element.text.toString()),
-                      trailing:
-                          //  Text(entry.packageName.toString().split('.').last),
-                          Icon(Icons.keyboard_arrow_right),
-                      // onTap: () => onAppClicked(
-                      //     context, getCurrentApp(element.packageName),
-                      //     ),
-                    ),
-                  ),
-                );
-              } else {
-                return Center(child: Text('Nothing to Display!'));
-              }
-              // getCurrentApp(element.packageName);
-            },
-          );
-        } else if (snapshot.hasError) {
-          //return Center(child: Text("Oops!"));
-          return Center(child: CircularProgressIndicator());
-        }
-        return Center(child: CircularProgressIndicator());
-      },
-    );
-  }
+  //                     isThreeLine: true,
+  //                     //trailing: Text(element.text.toString()),
+  //                     trailing:
+  //                         //  Text(entry.packageName.toString().split('.').last),
+  //                         Icon(Icons.keyboard_arrow_right),
+  //                     // onTap: () => onAppClicked(
+  //                     //     context, getCurrentApp(element.packageName),
+  //                     //     ),
+  //                   ),
+  //                 ),
+  //               );
+  //             } else {
+  //               return Center(child: Text('Nothing to Display!'));
+  //             }
+  //             // getCurrentApp(element.packageName);
+  //           },
+  //         );
+  //       } else if (snapshot.hasError) {
+  //         //return Center(child: Text("Oops!"));
+  //         return Center(child: CircularProgressIndicator());
+  //       }
+  //       return Center(child: CircularProgressIndicator());
+  //     },
+  //   );
+  // }
 
   onAppClicked(BuildContext context, Application app) {
     // final appName = SnackBar(content: Text(app.appName));

@@ -71,7 +71,8 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
   }
 
   Future<List<NotificationModel>> getNotificationList() async {
-    var getNotificationModel = await DatabaseHelper.instance.getNotifications();
+    var getNotificationModel =
+        await DatabaseHelper.instance.getNotifications(0);
 
     List<NotificationModel> notificationList = [];
 

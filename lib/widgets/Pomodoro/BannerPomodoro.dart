@@ -393,6 +393,6 @@ class _PomodoroBannerW extends State<PomodoroBannerW> {
 }
 
 Future<String> getTotalNotifications() async {
-  var getNotifications = await DatabaseHelper.instance.getNotifications();
+  var getNotifications = await DatabaseHelper.instance.getNotifications(0);
   return getNotifications.length.toString();
 }

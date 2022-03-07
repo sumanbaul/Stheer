@@ -1,12 +1,12 @@
 import 'package:collection/collection.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:notifoo/helper/AppListHelper.dart';
+//import 'package:flutter/rendering.dart';
+//import 'package:notifoo/helper/AppListHelper.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:notifoo/helper/datetime_ago.dart';
 import 'package:notifoo/model/Notifications.dart';
-import 'package:notifoo/model/apps.dart';
+//import 'package:notifoo/model/apps.dart';
 import 'package:notifoo/model/notificationCategory.dart';
 import 'package:notifoo/widgets/Notifications/list_detail.dart';
 
@@ -35,7 +35,7 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
   void initState() {
     DatabaseHelper.instance.initializeDatabase();
     //getAppsData();
-    getCategoryList();
+    //getCategoryList(0);
     super.initState();
   }
 
@@ -80,8 +80,9 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
     );
   }
 
-  Future<List<NotificationCategory>> getCategoryList() async {
-    var getNotifications = await DatabaseHelper.instance.getNotifications();
+  Future<List<NotificationCategory>> getCategoryList(int selectedDay) async {
+    var getNotifications =
+        await DatabaseHelper.instance.getNotifications(selectedDay);
 
     final listByPackageName = groupBy(getNotifications, (Notifications n) {
       return n.packageName;
@@ -145,8 +146,13 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
     notificationsByCategory.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     _nc = notificationsByCategory;
 
-    return notificationsByCategory;
     //print(listByPackageName);
+
+    // setState(() {
+    //   _nc = notificationsByCategory;
+    // });
+
+    return notificationsByCategory;
   }
 
   getNotificationListBody() {
@@ -170,7 +176,7 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
                     )),
-                onPressed: () {},
+                onPressed: () => getCategoryList(0),
                 child: Text('Today'),
               ),
               ElevatedButton(
@@ -182,7 +188,7 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
                     )),
-                onPressed: () {},
+                onPressed: () => getCategoryList(1),
                 child: Text('Yesterday'),
               ),
               ElevatedButton(
@@ -204,7 +210,7 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
           child: Container(
             margin: EdgeInsets.only(top: 0.0),
             child: StreamBuilder<List<NotificationCategory>>(
-                stream: Stream.fromFuture(getCategoryList()),
+                stream: Stream.fromFuture(getCategoryList(0)),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return ListView.builder(

@@ -10,7 +10,7 @@ class NotificationsList {
 
   static getNotificationsList() {
     final notificationsView = FutureBuilder<List<Notifications>>(
-      future: DatabaseHelper.instance.getNotifications(),
+      future: DatabaseHelper.instance.getNotifications(0),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           //var packageName = (Notifications element) => element.packageName;

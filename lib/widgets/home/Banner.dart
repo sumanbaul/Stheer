@@ -418,6 +418,6 @@ class _BannerState extends State<BannerWidget> {
 // }
 
 Stream<String> getTotalNotifications = (() async* {
-  var getNotifications = await DatabaseHelper.instance.getNotifications();
+  var getNotifications = await DatabaseHelper.instance.getNotifications(0);
   yield getNotifications.length.toString();
 })();
