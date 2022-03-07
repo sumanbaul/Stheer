@@ -1,10 +1,10 @@
 class PomodoroTimer {
-  final int id;
-  final String taskName;
-  final String duration;
-  final int isCompleted;
-  final String createdDate;
-  final int isDeleted;
+  final int? id;
+  final String? taskName;
+  final String? duration;
+  final int? isCompleted;
+  final String? createdDate;
+  final int? isDeleted;
 
   static const String TABLENAME = "tblpomodorolog";
 

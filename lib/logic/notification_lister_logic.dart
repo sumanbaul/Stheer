@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:isolate';
 import 'dart:ui';
@@ -14,7 +15,7 @@ class NotificationListerPageLogic {
   final NotificationListerModel _model;
   NotificationListerPageLogic(this._model);
 
-  String flagEntry;
+  String? flagEntry;
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
@@ -31,7 +32,7 @@ class NotificationListerPageLogic {
     // don't use the default receivePort
     // NotificationsListener.receivePort.listen((evt) => onData(evt));
 
-    var isR = await NotificationsListener.isRunning;
+    var isR = await (NotificationsListener.isRunning as Future<bool>);
     print("""Service is ${!isR ? "not " : ""}aleary running""");
 
     // setState(() {
@@ -49,7 +50,7 @@ class NotificationListerPageLogic {
     // print(
     //   "send evt to ui: $evt",
     // );
-    final SendPort send =
+    final SendPort? send =
         IsolateNameServer.lookupPortByName("_notifoolistener_");
     if (send == null) print("can't find the sender");
     send?.send(evt);
@@ -60,16 +61,16 @@ class NotificationListerPageLogic {
     print(event);
 
     //packageName = event.packageName.toString().split('.').last.capitalizeFirstofEach;
-    if (event.packageName.contains("skydrive") ||
-        (event.packageName.contains("service")) ||
+    if (event.packageName!.contains("skydrive") ||
+        (event.packageName!.contains("service")) ||
         // (event.packageName.contains("android")) ||
-        (event.packageName.contains("notifoo")) ||
-        (event.packageName.contains("screenshot")) ||
-        (event.title.contains("WhatsApp")) ||
-        (event.packageName.contains("deskclock")) ||
-        (event.packageName.contains("wellbeing")) ||
-        (event.packageName.contains("weather2")) ||
-        (event.packageName.contains("gallery"))) {
+        (event.packageName!.contains("notifoo")) ||
+        (event.packageName!.contains("screenshot")) ||
+        (event.title!.contains("WhatsApp")) ||
+        (event.packageName!.contains("deskclock")) ||
+        (event.packageName!.contains("wellbeing")) ||
+        (event.packageName!.contains("weather2")) ||
+        (event.packageName!.contains("gallery"))) {
       //print(event.packageName);
     } else {
       // var xyz = currentApp as Application;
@@ -83,13 +84,13 @@ class NotificationListerPageLogic {
 
       //var jsonData = json.decoder.convert(event.toString());
       _model.log.add(event);
-      var createatday = event.createAt.day;
+      var createatday = event.createAt!.day;
       print("Create AT Day: $createatday");
       var today = new DateTime.now().day;
       print('today: $today');
       //var xx = jsonresponse.containsKey('summaryText');
       if (!jsonresponse.containsKey('summaryText') &&
-          event.createAt.day >= today) {
+          event.createAt!.day >= today) {
         //check
         bool redundancy;
         // redundantNotificationCheck(event).then((bool value) {
@@ -108,7 +109,7 @@ class NotificationListerPageLogic {
               message: event.message,
               packageName: event.packageName,
               timestamp: event.timestamp,
-              createAt: event.createAt.millisecondsSinceEpoch.toString(),
+              createAt: event.createAt!.millisecondsSinceEpoch.toString(),
               eventJson: event.toString(),
               createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
               isDeleted: 0,
@@ -123,7 +124,7 @@ class NotificationListerPageLogic {
 
         DatabaseHelper.instance.insertNotification(
           Notifications(
-              title: jsonresponse["textLines"] as String,
+              title: jsonresponse["textLines"] as String?,
               text: event.text,
               message: event.message,
               packageName: event.packageName,
@@ -137,15 +138,16 @@ class NotificationListerPageLogic {
     // print("Print Notification: $event");
   }
 
-  Future<bool> redundantNotificationCheck(NotificationEvent event) async {
+  Future<bool>? redundantNotificationCheck(NotificationEvent event) async {
     var getNotificationModel = await DatabaseHelper.instance
         .getNotificationsByPackageToday(event.packageName);
 
-    Future<bool> entryFlag;
+    Future<bool>? entryFlag;
 
     getNotificationModel.forEach((key) {
-      if (key.packageName.contains(event.packageName)) {
-        if (key.title.contains(event.title) && key.text.contains(event.text)) {
+      if (key.packageName!.contains(event.packageName!)) {
+        if (key.title!.contains(event.title!) &&
+            key.text!.contains(event.text!)) {
           entryFlag = Future<bool>.value(true);
           //return Future<bool>.value(true);
         } else {
@@ -154,7 +156,7 @@ class NotificationListerPageLogic {
       }
     });
 
-    return entryFlag;
+    return entryFlag!;
   }
 
   // Apps getCurrentApp(String packageName) {
@@ -178,14 +180,15 @@ class NotificationListerPageLogic {
   void startListening() async {
     print("start listening");
 
-    var hasPermission = await NotificationsListener.hasPermission;
+    var hasPermission =
+        await (NotificationsListener.hasPermission as Future<bool>);
     if (!hasPermission) {
       print("no permission, so open settings");
       NotificationsListener.openPermissionSettings();
       return;
     }
 
-    var isR = await NotificationsListener.isRunning;
+    var isR = await (NotificationsListener.isRunning as Future<bool>);
 
     if (!isR) {
       await NotificationsListener.startService(

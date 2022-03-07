@@ -5,7 +5,7 @@ import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:notifoo/model/pomodoro_timer.dart';
 
 class PomodoroSavedListW extends StatefulWidget {
-  PomodoroSavedListW({Key key, this.screenheight}) : super(key: key);
+  PomodoroSavedListW({Key? key, this.screenheight}) : super(key: key);
 
   final screenheight;
   @override
@@ -56,9 +56,9 @@ Future<List<PomodoroTimer>> getCategoryList() async {
   return await DatabaseHelper.instance.getPomodoroTimer();
 }
 
-Widget buildPomodoroCard(BuildContext context, int index) {
-  // return ;
-}
+// Widget buildPomodoroCard(BuildContext context, int index) {
+//    return null;
+// }
 
 class _PomodoroSavedListWState extends State<PomodoroSavedListW> {
   @override
@@ -114,7 +114,7 @@ class _PomodoroSavedListWState extends State<PomodoroSavedListW> {
               if (snapshot.hasData) {
                 return new ListView.builder(
                   controller: controller,
-                  itemCount: snapshot.data.length,
+                  itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) => Container(
                     margin: EdgeInsets.only(bottom: 15),
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
@@ -184,7 +184,7 @@ class _PomodoroSavedListWState extends State<PomodoroSavedListW> {
                                               width: 8,
                                             ),
                                             Text(
-                                              snapshot.data[index].taskName,
+                                              snapshot.data![index].taskName!,
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 18.0),
@@ -202,7 +202,7 @@ class _PomodoroSavedListWState extends State<PomodoroSavedListW> {
                                           padding:
                                               const EdgeInsets.only(top: 5.0),
                                           child: Text(
-                                            snapshot.data[index].taskName,
+                                            snapshot.data![index].taskName!,
                                             style: TextStyle(
                                               fontSize: 13.0,
                                             ),
@@ -212,7 +212,7 @@ class _PomodoroSavedListWState extends State<PomodoroSavedListW> {
                                           padding:
                                               const EdgeInsets.only(top: 5.0),
                                           child: Text(
-                                            snapshot.data[index].createdDate,
+                                            snapshot.data![index].createdDate!,
                                             style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 13),

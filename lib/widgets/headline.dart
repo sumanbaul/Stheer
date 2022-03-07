@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Headline extends StatelessWidget {
-  const Headline({Key key, this.title}) : super(key: key);
+  const Headline({Key? key, this.title}) : super(key: key);
 
-  final String title;
+  final String? title;
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +12,7 @@ class Headline extends StatelessWidget {
       width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.only(left: 30),
       height: 30,
-      child: Text(title,
+      child: Text(title!,
           textAlign: TextAlign.left,
           style: GoogleFonts.barlowSemiCondensed(
             textStyle: TextStyle(

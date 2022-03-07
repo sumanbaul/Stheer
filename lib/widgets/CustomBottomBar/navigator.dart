@@ -65,7 +65,7 @@ class AppState extends State<App> {
     if (index == currentTab) {
       // pop to first route
       // if the user taps on the active tab
-      tabs[index].key.currentState.popUntil((route) => route.isFirst);
+      tabs[index].key.currentState!.popUntil((route) => route.isFirst);
     } else {
       // update the state
       // in order to repaint
@@ -79,7 +79,7 @@ class AppState extends State<App> {
     return WillPopScope(
       onWillPop: () async {
         final isFirstRouteInCurrentTab =
-            !await tabs[currentTab].key.currentState.maybePop();
+            !await tabs[currentTab].key.currentState!.maybePop();
         if (isFirstRouteInCurrentTab) {
           // if not on the 'main' tab
           if (currentTab != 0) {

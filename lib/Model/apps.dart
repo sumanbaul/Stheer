@@ -1,14 +1,14 @@
 class Apps {
-  final String appName;
-  final String apkFilePath;
-  final String packageName;
-  final String versionName;
-  final String versionCode;
-  final String dataDir;
-  final int systemApp;
-  final int installTimeMillis;
-  final String category;
-  final int enabled;
+  final String? appName;
+  final String? apkFilePath;
+  final String? packageName;
+  final String? versionName;
+  final String? versionCode;
+  final String? dataDir;
+  final int? systemApp;
+  final int? installTimeMillis;
+  final String? category;
+  final int? enabled;
 
   static const String TABLENAME = "deviceapps";
 

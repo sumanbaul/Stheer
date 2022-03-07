@@ -7,9 +7,9 @@ import 'package:notifoo/widgets/headline.dart';
 import 'package:notifoo/widgets/home/Banner.dart';
 
 class PomodoroHome extends StatefulWidget {
-  PomodoroHome({Key key, this.title}) : super(key: key);
+  PomodoroHome({Key? key, this.title}) : super(key: key);
 
-  final String title;
+  final String? title;
 
   @override
   _PomodoroHomeState createState() => _PomodoroHomeState();

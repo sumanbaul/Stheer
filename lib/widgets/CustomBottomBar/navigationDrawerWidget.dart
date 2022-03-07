@@ -8,11 +8,11 @@ class NavigationDrawerWidget extends StatelessWidget {
   final user = FirebaseAuth.instance.currentUser;
   @override
   Widget build(BuildContext context) {
-    final name = user != null ? user.displayName : '';
-    final email = user != null ? user.email : '';
+    final name = user != null ? user!.displayName : '';
+    final email = user != null ? user!.email : '';
     final backupImg =
         'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80';
-    final urlImage = user != null ? user.photoURL : backupImg;
+    final urlImage = user != null ? user!.photoURL : backupImg;
     //'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80';
 
     return Drawer(
@@ -83,10 +83,10 @@ class NavigationDrawerWidget extends StatelessWidget {
   }
 
   Widget buildHeader({
-    String urlImage,
-    String name,
-    String email,
-    VoidCallback onClicked,
+    String? urlImage,
+    String? name,
+    String? email,
+    VoidCallback? onClicked,
   }) {
     var _padding = EdgeInsets.symmetric(vertical: 40);
     if (user == null) {
@@ -110,7 +110,7 @@ class NavigationDrawerWidget extends StatelessWidget {
           padding: padding.add(EdgeInsets.symmetric(vertical: 40)),
           child: Row(
             children: [
-              CircleAvatar(radius: 30, backgroundImage: NetworkImage(urlImage)),
+              CircleAvatar(radius: 30, backgroundImage: NetworkImage(urlImage!)),
               SizedBox(width: 10),
               Container(
                 width: 140,
@@ -118,12 +118,12 @@ class NavigationDrawerWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      name,
+                      name!,
                       style: TextStyle(fontSize: 20, color: Colors.white),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      email,
+                      email!,
                       style: TextStyle(fontSize: 14, color: Colors.white),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -168,9 +168,9 @@ class NavigationDrawerWidget extends StatelessWidget {
   }
 
   Widget buildMenuItem({
-    String text,
-    IconData icon,
-    VoidCallback onClicked,
+    required String text,
+    IconData? icon,
+    VoidCallback? onClicked,
   }) {
     final color = Colors.white;
     final hoverColor = Colors.white70;

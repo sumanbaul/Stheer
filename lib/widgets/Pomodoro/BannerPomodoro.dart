@@ -5,7 +5,7 @@ import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:notifoo/widgets/Topbar.dart';
 
 class PomodoroBannerW extends StatefulWidget {
-  PomodoroBannerW({Key key}) : super(key: key);
+  PomodoroBannerW({Key? key}) : super(key: key);
 
   @override
   _PomodoroBannerW createState() => _PomodoroBannerW();
@@ -25,7 +25,7 @@ List<double> _stopsCircle = [0.0, 0.7];
 class _PomodoroBannerW extends State<PomodoroBannerW> {
   Color gradientStart = Colors.transparent;
   Color gradientEnd = Colors.black;
-  String _totalNotifications;
+  String? _totalNotifications;
 
   @override
   void initState() {

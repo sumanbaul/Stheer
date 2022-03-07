@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:notifoo/helper/InstalledAppsHelper.dart';
 import 'package:notifoo/model/Notifications.dart';
-import 'package:sticky_grouped_list/sticky_grouped_list.dart';
+#import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 
 class NotificationsList {
   //static ApplicationWithIcon currentApp;

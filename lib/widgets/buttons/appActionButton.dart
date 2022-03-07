@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AppButtonAction extends StatelessWidget {
-  final String label;
-  final VoidCallback onPressed;
+  final String? label;
+  final VoidCallback? onPressed;
 
   AppButtonAction({this.label, this.onPressed});
 
@@ -13,7 +13,7 @@ class AppButtonAction extends StatelessWidget {
         onPressed?.call();
         Navigator.of(context).maybePop();
       },
-      child: Text(label),
+      child: Text(label!),
     );
   }
 }

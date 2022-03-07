@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
@@ -5,7 +6,7 @@ import 'package:flutter_notification_listener/flutter_notification_listener.dart
 class NotificationsHelper {
   static bool started = false;
   static ReceivePort port = ReceivePort();
-  static List<NotificationEvent> notificationEvent;
+  static List<NotificationEvent?>? notificationEvent;
 
   static Future<void> initPlatformState() async {
     NotificationsListener.initialize(callbackHandle: _callback);
@@ -19,7 +20,7 @@ class NotificationsHelper {
     // don't use the default receivePort
     // NotificationsListener.receivePort.listen((evt) => onData(evt));
 
-    var isR = await NotificationsListener.isRunning;
+    var isR = await (NotificationsListener.isRunning as Future<bool>);
     print("""Service is ${!isR ? "not " : ""}aleary running""");
     //getListOfApps();
     // setState(() {
@@ -32,14 +33,14 @@ class NotificationsHelper {
     print(
       "send evt to ui: $evt",
     );
-    final SendPort send = IsolateNameServer.lookupPortByName("_listener_");
+    final SendPort? send = IsolateNameServer.lookupPortByName("_listener_");
     if (send == null) print("can't find the sender");
     send?.send(evt);
   }
 
-  static List<NotificationEvent> onData(NotificationEvent event) {
+  static List<NotificationEvent?>? onData(NotificationEvent? event) {
     print("Print Notification: $event");
-    notificationEvent.add(event);
+    notificationEvent!.add(event);
     return notificationEvent;
   }
 }

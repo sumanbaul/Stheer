@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class TaskWidget extends StatefulWidget {
-  TaskWidget({Key key}) : super(key: key);
+  TaskWidget({Key? key}) : super(key: key);
 
   @override
   _TaskWidgetState createState() => _TaskWidgetState();

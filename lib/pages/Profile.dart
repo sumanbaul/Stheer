@@ -12,8 +12,8 @@ import 'package:notifoo/widgets/LoggedInWidget.dart';
 // }
 
 class Profile extends StatefulWidget {
-  Profile({Key key, this.title}) : super(key: key);
-  final String title;
+  Profile({Key? key, this.title}) : super(key: key);
+  final String? title;
   @override
   _ProfileState createState() => _ProfileState();
 }

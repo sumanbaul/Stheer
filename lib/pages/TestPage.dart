@@ -3,16 +3,16 @@ import 'package:notifoo/widgets/Notifications/list_category.dart';
 import 'package:notifoo/widgets/Topbar.dart';
 
 class TestPage extends StatefulWidget {
-  TestPage({Key key, this.title}) : super(key: key);
+  TestPage({Key? key, this.title}) : super(key: key);
 
-  final String title;
+  final String? title;
 
   @override
   _ListPageState createState() => _ListPageState();
 }
 
 class _ListPageState extends State<TestPage> {
-  List notifications;
+  List? notifications;
 
   @override
   void initState() {

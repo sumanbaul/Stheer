@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
@@ -11,10 +13,10 @@ import 'package:notifoo/model/notificationCategory.dart';
 import 'package:notifoo/widgets/Notifications/list_detail.dart';
 
 class NotificationCatgoryList extends StatefulWidget {
-  NotificationCatgoryList({Key key, this.title}) : super(key: key);
+  NotificationCatgoryList({Key? key, this.title}) : super(key: key);
   // final AppListHelper appsListHelper = new AppListHelper();
 
-  final String title;
+  final String? title;
   @override
   _NotificationCatgoryListState createState() =>
       _NotificationCatgoryListState();
@@ -44,11 +46,11 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
   //   _apps = AppListHelper().appListData;
   // }
 
-  Future<Application> getCurrentApp(String packageName) async {
-    Application app;
+  Future<Application?> getCurrentApp(String? packageName) async {
+    Application? app;
 
     if (packageName != "") {
-      app = await DeviceApps.getApp(packageName, true);
+      app = await DeviceApps.getApp(packageName!, true);
       //_currentApp = app;
     }
     return app;
@@ -120,11 +122,11 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
 
       listByPackageName.forEach((key, value) async {
         // print(value[value.length - 1].createdDate);
-        var _app = await getCurrentApp(value[0].packageName);
+        var _app = await (getCurrentApp(value[0].packageName));
 
         var nc = NotificationCategory(
-            packageName: _app.packageName,
-            appTitle: _app.appName,
+            packageName: _app?.packageName,
+            appTitle: _app?.appName,
             appIcon: _app is ApplicationWithIcon
                 ? Image.memory(
                     _app.icon,
@@ -143,7 +145,8 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
       });
     }
 
-    notificationsByCategory.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    notificationsByCategory
+        .sort((a, b) => b.timestamp!.compareTo(a.timestamp!));
     _nc = notificationsByCategory;
 
     //print(listByPackageName);
@@ -214,7 +217,7 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return ListView.builder(
-                      itemCount: snapshot.data.length,
+                      itemCount: snapshot.data!.length,
                       itemBuilder: (context, index) {
                         return NotificationsCard(
                             notificationsCategoryList: _nc, index: index);
@@ -237,10 +240,11 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
 }
 
 class NotificationsCard extends StatelessWidget {
-  const NotificationsCard({Key key, this.index, this.notificationsCategoryList})
+  const NotificationsCard(
+      {Key? key, this.index, this.notificationsCategoryList})
       : super(key: key);
-  final int index;
-  final List<NotificationCategory> notificationsCategoryList;
+  final int? index;
+  final List<NotificationCategory>? notificationsCategoryList;
 
   buildNotificationCard(BuildContext context, int index) {
     return Container(
@@ -297,7 +301,7 @@ class NotificationsCard extends StatelessWidget {
                                 child: CircleAvatar(
                                     backgroundColor: Colors.transparent,
                                     //clipBehavior: Clip.hardEdge,
-                                    child: notificationsCategoryList[index]
+                                    child: notificationsCategoryList![index]
                                         .appIcon),
                                 // backgroundImage:
                                 //     notificationsCategoryList[index]
@@ -330,7 +334,7 @@ class NotificationsCard extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    notificationsCategoryList[index].appTitle,
+                                    notificationsCategoryList![index].appTitle!,
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18.0),
@@ -357,7 +361,7 @@ class NotificationsCard extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
-                              notificationsCategoryList[index].message,
+                              notificationsCategoryList![index].message!,
                               style: TextStyle(
                                 fontSize: 13.0,
                               ),
@@ -367,7 +371,7 @@ class NotificationsCard extends StatelessWidget {
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
                               readTimestamp(
-                                  (notificationsCategoryList[index].timestamp)),
+                                  notificationsCategoryList![index].timestamp!),
                               style: TextStyle(
                                   color: Colors.white54, fontSize: 13),
                             ),
@@ -393,10 +397,11 @@ class NotificationsCard extends StatelessWidget {
                         MaterialPageRoute(
                           builder: (context) => NotificationDetailList(
                             packageName:
-                                notificationsCategoryList[index].packageName,
-                            title: notificationsCategoryList[index].appTitle,
-                            appIcon: notificationsCategoryList[index].appIcon,
-                            appTitle: notificationsCategoryList[index].appTitle,
+                                notificationsCategoryList![index].packageName,
+                            title: notificationsCategoryList![index].appTitle,
+                            appIcon: notificationsCategoryList![index].appIcon,
+                            appTitle:
+                                notificationsCategoryList![index].appTitle,
                           ),
                         ),
                       ),
@@ -409,6 +414,6 @@ class NotificationsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return buildNotificationCard(context, this.index);
+    return buildNotificationCard(context, this.index!);
   }
 }

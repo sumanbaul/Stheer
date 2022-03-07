@@ -5,9 +5,9 @@ import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:notifoo/widgets/Topbar.dart';
 
 class BannerWidget extends StatefulWidget {
-  BannerWidget({Key key, this.title, this.onClicked}) : super(key: key);
-  final String title;
-  final VoidCallback onClicked;
+  BannerWidget({Key? key, this.title, this.onClicked}) : super(key: key);
+  final String? title;
+  final VoidCallback? onClicked;
   @override
   _BannerState createState() => _BannerState();
 }
@@ -20,9 +20,9 @@ List<Color> _colors = [Color(0xffeeaeca), Color(0xff94bbe9)];
 List<double> _stopsCircle = [0.0, 0.7];
 
 class _BannerState extends State<BannerWidget> {
-  Color gradientStart = Colors.transparent;
-  Color gradientEnd = Colors.black;
-  String _totalNotifications;
+  Color? gradientStart = Colors.transparent;
+  Color? gradientEnd = Colors.black;
+  String? _totalNotifications;
 
   @override
   void initState() {

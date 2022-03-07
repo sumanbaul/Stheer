@@ -7,9 +7,9 @@ import 'package:notifoo/widgets/Topbar.dart';
 import 'package:notifoo/widgets/button_widget.dart';
 
 class Pomodoro extends StatefulWidget {
-  Pomodoro({Key key, this.title}) : super(key: key);
+  Pomodoro({Key? key, this.title}) : super(key: key);
 
-  final String title;
+  final String? title;
 
   @override
   _PomodoroState createState() => _PomodoroState();
@@ -22,7 +22,7 @@ class _PomodoroState extends State<Pomodoro> {
   Duration duration = Duration(seconds: maxSeconds);
 
   int seconds = maxSeconds;
-  Timer timer;
+  Timer? timer;
 
   @override
   void initState() {
@@ -59,7 +59,7 @@ class _PomodoroState extends State<Pomodoro> {
       saveData(pomodoroTimer);
     }
     setState(() {
-      timer.cancel();
+      timer!.cancel();
 
       //saveData(pomodoroTimer);
     });
@@ -133,12 +133,12 @@ class _PomodoroState extends State<Pomodoro> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return new ListView.builder(
-                  itemCount: snapshot.data.length,
+                  itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) => ListTile(
                     leading: Icon(Icons.ac_unit_outlined),
-                    title: Text(snapshot.data[index].taskName),
-                    subtitle: Text(snapshot.data[index].duration),
-                    trailing: Text(snapshot.data[index].createdDate),
+                    title: Text(snapshot.data![index].taskName!),
+                    subtitle: Text(snapshot.data![index].duration!),
+                    trailing: Text(snapshot.data![index].createdDate!),
                   ),
                   physics: BouncingScrollPhysics(
                     parent: AlwaysScrollableScrollPhysics(),
@@ -157,7 +157,7 @@ class _PomodoroState extends State<Pomodoro> {
   }
 
   Widget buildButtons() {
-    final isRunning = timer == null ? false : timer.isActive;
+    final isRunning = timer == null ? false : timer!.isActive;
     final isCompleted =
         duration.inSeconds == maxSeconds || duration.inSeconds == 0;
 
@@ -266,7 +266,7 @@ class _PomodoroState extends State<Pomodoro> {
     );
   }
 
-  Widget buildTimeCard({String time, String header, TextAlign textAlign}) =>
+  Widget buildTimeCard({required String time, required String header, TextAlign? textAlign}) =>
       Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

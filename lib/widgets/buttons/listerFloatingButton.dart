@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class ListerFloatingButton extends StatelessWidget {
-  const ListerFloatingButton({Key key, this.onClicked, this.floaterIcon})
+  const ListerFloatingButton({Key? key, this.onClicked, this.floaterIcon})
       : super(key: key);
-  final VoidCallback onClicked;
-  final Icon floaterIcon;
+  final VoidCallback? onClicked;
+  final Icon? floaterIcon;
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(

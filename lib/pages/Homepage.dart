@@ -10,9 +10,9 @@ import 'package:notifoo/widgets/home/Banner.dart';
 import '../widgets/Notifications/NotificationsLister.dart';
 
 class Homepage extends StatefulWidget {
-  Homepage({Key key, this.title}) : super(key: key);
+  Homepage({Key? key, this.title}) : super(key: key);
 
-  final String title;
+  final String? title;
   @override
   _HomepageState createState() => _HomepageState();
 }

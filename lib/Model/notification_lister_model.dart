@@ -4,14 +4,14 @@ import 'package:flutter_notification_listener/flutter_notification_listener.dart
 import 'package:notifoo/logic/notification_lister_logic.dart';
 
 class NotificationListerModel extends ChangeNotifier {
-  NotificationListerPageLogic logic;
-  BuildContext context;
+  late NotificationListerPageLogic logic;
+  BuildContext? context;
 
-  bool started;
-  bool loading;
-  String packageName;
+  bool? started;
+  bool? loading;
+  String? packageName;
   List<NotificationEvent> log = [];
-  Application app;
+  Application? app;
 
   NotificationListerModel() {
     logic = NotificationListerPageLogic(this);

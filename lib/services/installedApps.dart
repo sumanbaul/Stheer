@@ -4,8 +4,8 @@ import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:notifoo/model/apps.dart';
 
 class InstalledApps {
-  List<Apps> listOfApps;
-  List<Application> scannedListOfApplication;
+  late List<Apps> listOfApps;
+  late List<Application> scannedListOfApplication;
   final AppListHelper appListHelper = new AppListHelper();
 
   Future<void> getAppsList() async {

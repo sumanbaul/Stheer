@@ -1,5 +1,4 @@
-import 'package:notifoo/widgets/CustomBottomBar/TabItem.dart';
-
+import 'TabItem.dart';
 import 'navigator.dart';
 import 'package:flutter/material.dart';
 
@@ -8,15 +7,15 @@ class BottomNavigation extends StatelessWidget {
     this.onSelectTab,
     this.tabs,
   });
-  final ValueChanged<int> onSelectTab;
-  final List<TabItem> tabs;
+  final ValueChanged<int>? onSelectTab;
+  final List<TabItem>? tabs;
 
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       backgroundColor: Colors.black87,
       type: BottomNavigationBarType.fixed,
-      items: tabs
+      items: tabs!
           .map(
             (e) => _buildItem(
               index: e.getIndex(),
@@ -25,14 +24,14 @@ class BottomNavigation extends StatelessWidget {
             ),
           )
           .toList(),
-      onTap: (index) => onSelectTab(
+      onTap: (index) => onSelectTab!(
         index,
       ),
     );
   }
 
   BottomNavigationBarItem _buildItem(
-      {int index, IconData icon, String tabName}) {
+      {int? index, IconData? icon, String? tabName}) {
     return BottomNavigationBarItem(
         icon: Icon(
           icon,
@@ -43,7 +42,7 @@ class BottomNavigation extends StatelessWidget {
         tooltip: tabName);
   }
 
-  Color _tabColor({int index}) {
+  Color _tabColor({int? index}) {
     return AppState.currentTab == index ? Colors.cyan : Colors.grey;
   }
 }

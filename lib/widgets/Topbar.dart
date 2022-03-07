@@ -3,9 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 //import 'package:notifoo/widgets/navigation/nav_drawer.dart';
 
 class Topbar extends StatefulWidget {
-  Topbar({Key key, this.title, this.onClicked}) : super(key: key);
-  final String title;
-  final VoidCallback onClicked;
+  Topbar({Key? key, this.title, this.onClicked}) : super(key: key);
+  final String? title;
+  final VoidCallback? onClicked;
   @override
   _TopbarState createState() => new _TopbarState();
 }
@@ -37,7 +37,7 @@ class _TopbarState extends State<Topbar> {
             ),
           ),
           Text(
-            widget.title,
+            widget.title!,
             style: GoogleFonts.barlowSemiCondensed(
               fontSize: 26,
               letterSpacing: 1.5,

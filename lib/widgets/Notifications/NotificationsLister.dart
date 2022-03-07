@@ -18,7 +18,7 @@ import 'package:notifoo/model/Notifications.dart';
 //final AppListHelper appsListHelper = new AppListHelper();
 
 class NotificationsLister extends StatefulWidget {
-  NotificationsLister({Key key}) : super(key: key);
+  NotificationsLister({Key? key}) : super(key: key);
 
   @override
   _NotificationsListerState createState() => _NotificationsListerState();
@@ -29,17 +29,17 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
   //List<Apps> _apps = AppListHelper().appListData;
 
-  Application _currentApp;
-  Image _icon;
+  Application? _currentApp;
+  Image? _icon;
 
   bool appsLoaded = false;
 
-  String
+  String?
       flagEntry; //this variable need to check later, after notfications logic is cleaned
 
   bool started = false;
   bool _loading = false;
-  String packageName = "";
+  String? packageName = "";
 
   ReceivePort port = ReceivePort();
 
@@ -56,7 +56,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
     // print(
     //   "send evt to ui: $evt",
     // );
-    final SendPort send =
+    final SendPort? send =
         IsolateNameServer.lookupPortByName("_notifoolistener_");
     if (send == null) print("can't find the sender");
     send?.send(evt);
@@ -100,17 +100,17 @@ class _NotificationsListerState extends State<NotificationsLister> {
     // don't use the default receivePort
     // NotificationsListener.receivePort.listen((evt) => onData(evt));
 
-    var isServiceRunning = await NotificationsListener.isRunning;
-    print("""Service is ${!isServiceRunning ? "not " : ""}aleary running""");
+    var isServiceRunning = await (NotificationsListener.isRunning);
+    print("""Service is ${!isServiceRunning! ? "not " : ""}aleary running""");
 
     setState(() {
       started = isServiceRunning;
     });
   }
 
-  Apps getCurrentApp(String packageName) {
+  Apps? getCurrentApp(String packageName) {
     //Apps app;
-    Apps app;
+    Apps? app;
     if (packageName != "") {
       // getCurrentAppWithIcon(packageName);
       // app = await DeviceApps.getApp('com.frandroid.app');
@@ -131,7 +131,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
     return app; // as Application;
   }
 
-  Future<Application> getCurrentAppWithIcon(String packageName) async {
+  Future<Application?> getCurrentAppWithIcon(String packageName) async {
     _currentApp = await DeviceApps.getApp(packageName);
     return _currentApp;
   }
@@ -139,20 +139,20 @@ class _NotificationsListerState extends State<NotificationsLister> {
 //critical function below
 //This function is triggered on receiving of data from port
   void onData(NotificationEvent event) async {
-    var eventAppWithIcon = await getCurrentAppWithIcon(event.packageName);
+    var eventAppWithIcon = await (getCurrentAppWithIcon(event.packageName!));
     print(event); // this is needed for later
 
-    if (!eventAppWithIcon.systemApp) {
-      if (event.packageName.contains("skydrive") ||
-          (event.packageName.contains("service")) ||
+    if (!eventAppWithIcon!.systemApp) {
+      if (event.packageName!.contains("skydrive") ||
+          (event.packageName!.contains("service")) ||
           // (event.packageName.contains("android")) ||
-          (event.packageName.contains("notifoo")) ||
-          (event.packageName.contains("screenshot")) ||
-          (event.title.contains("WhatsApp")) ||
-          (event.packageName.contains("deskclock")) ||
-          (event.packageName.contains("wellbeing")) ||
-          (event.packageName.contains("weather2")) ||
-          (event.packageName.contains("gallery"))) {
+          (event.packageName!.contains("notifoo")) ||
+          (event.packageName!.contains("screenshot")) ||
+          (event.title!.contains("WhatsApp")) ||
+          (event.packageName!.contains("deskclock")) ||
+          (event.packageName!.contains("wellbeing")) ||
+          (event.packageName!.contains("weather2")) ||
+          (event.packageName!.contains("gallery"))) {
         //print(event.packageName);
       } else {
         //_currentApp = app as Application;
@@ -162,16 +162,16 @@ class _NotificationsListerState extends State<NotificationsLister> {
         Map<String, dynamic> jsonresponse = json.decode(event.toString());
 
         _log.add(event);
-        var createatday = event.createAt.day;
+        var createatday = event.createAt!.day;
         print("Create AT Day: $createatday");
         var today = new DateTime.now().day;
         print('today: $today');
         //var xx = jsonresponse.containsKey('summaryText');
         if (!jsonresponse.containsKey('summaryText') &&
-            event.createAt.day >= today) {
+            event.createAt!.day >= today) {
           //check
           bool redundancy;
-          redundantNotificationCheck(event).then((bool value) {
+          redundantNotificationCheck(event)!.then((bool value) {
             redundancy = value;
           });
 
@@ -179,7 +179,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
             DatabaseHelper.instance.insertNotification(
               Notifications(
                   title: event.title,
-                  appTitle: _currentApp.appName,
+                  appTitle: _currentApp!.appName,
                   // appIcon: _currentApp is ApplicationWithIcon
                   //     ? Image.memory(_currentApp.icon)
                   //     : null,
@@ -187,7 +187,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
                   message: event.message,
                   packageName: event.packageName,
                   timestamp: event.timestamp,
-                  createAt: event.createAt.millisecondsSinceEpoch.toString(),
+                  createAt: event.createAt!.millisecondsSinceEpoch.toString(),
                   eventJson: event.toString(),
                   createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
                   isDeleted: 0
@@ -212,7 +212,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
           DatabaseHelper.instance.insertNotification(
             Notifications(
                 title: jsonresponse["textLines"] ??
-                    jsonresponse["textLines"] as String,
+                    jsonresponse["textLines"] as String?,
                 text: event.text,
                 message: event.message,
                 packageName: event.packageName,
@@ -243,41 +243,40 @@ class _NotificationsListerState extends State<NotificationsLister> {
     // print("Print Notification: $event");
   }
 
-  Future<bool> redundantNotificationCheck(NotificationEvent event) async {
+  Future<bool>? redundantNotificationCheck(NotificationEvent event) async {
     var getNotificationModel = await DatabaseHelper.instance
         .getNotificationsByPackageToday(event.packageName);
 
-    Future<bool> entryFlag;
+    Future<bool>? entryFlag;
 
-    getNotificationModel ??
-        getNotificationModel.forEach((key) {
-          if (key.packageName.contains(event.packageName)) {
-            if (key.title.contains(event.title) &&
-                key.text.contains(event.text)) {
-              entryFlag = Future<bool>.value(true);
-              //return Future<bool>.value(true);
-            } else {
-              entryFlag = Future<bool>.value(false);
-            }
-          }
-        });
+    getNotificationModel.forEach((key) {
+      if (key.packageName!.contains(event.packageName!)) {
+        if (key.title!.contains(event.title!) &&
+            key.text!.contains(event.text!)) {
+          entryFlag = Future<bool>.value(true);
+          //return Future<bool>.value(true);
+        } else {
+          entryFlag = Future<bool>.value(false);
+        }
+      }
+    });
 
-    return entryFlag;
+    return entryFlag!;
   }
 
   void startListening() async {
     print("start listening");
 
-    var hasPermission = await NotificationsListener.hasPermission;
-    if (!hasPermission) {
+    var hasPermission = await (NotificationsListener.hasPermission);
+    if (!hasPermission!) {
       print("no permission, so open settings");
       NotificationsListener.openPermissionSettings();
       return;
     }
 
-    var isR = await NotificationsListener.isRunning;
+    var isR = await (NotificationsListener.isRunning);
 
-    if (!isR) {
+    if (!isR!) {
       await NotificationsListener.startService(
         title: "Notifoo listening",
         description: "Let's scrape the notifactions...",

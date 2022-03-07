@@ -8,7 +8,7 @@ import 'dart:async';
 import 'package:notifoo/model/apps.dart';
 import 'package:notifoo/services/installedApps.dart';
 
-Future<List<Application>> apps;
+Future<List<Application>>? apps;
 List<Application> _apps = [];
 List<Apps> _appsListNew = [];
 

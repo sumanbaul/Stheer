@@ -4,17 +4,18 @@ import 'navigator.dart';
 class TabItem {
   // you can customize what kind of information is needed
   // for each tab
-  final String tabName;
-  final IconData icon;
+  final String? tabName;
+  final IconData? icon;
+  //final Widget? page;
   final GlobalKey<NavigatorState> key = GlobalKey<NavigatorState>();
   int _index = 0;
-  Widget _page;
+  Widget? _page;
   TabItem({
     @required this.tabName,
     @required this.icon,
-    @required Widget page,
+    @required Widget? page,
   }) {
-    _page = page;
+    _page = page!;
   }
 
   // I was getting a weird warning when using getters and setters for _index
@@ -42,7 +43,7 @@ class TabItem {
         key: key,
         onGenerateRoute: (routeSettings) {
           return MaterialPageRoute(
-            builder: (_) => _page,
+            builder: (_) => _page!,
           );
         },
       ),

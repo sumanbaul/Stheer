@@ -10,7 +10,7 @@ import 'package:notifoo/widgets/Topbar.dart';
 class NotificationDetailList extends StatefulWidget {
   // In the constructor, require a Todo.
   NotificationDetailList({
-    Key key,
+    Key? key,
     this.packageName,
     this.title,
     this.appIcon,
@@ -19,10 +19,10 @@ class NotificationDetailList extends StatefulWidget {
   //NotificationCatgoryList({Key key, this.title}) : super(key: key);
   //final AppListHelper appsListHelper = new AppListHelper();
 
-  final String title;
-  final String packageName;
-  final Image appIcon;
-  final String appTitle;
+  final String? title;
+  final String? packageName;
+  final Image? appIcon;
+  final String? appTitle;
 
   @override
   _NotificationCatgoryListState createState() =>
@@ -77,7 +77,7 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
     List<NotificationModel> notificationList = [];
 
     getNotificationModel.forEach((key) {
-      if (key.packageName.contains(widget.packageName)) {
+      if (key.packageName!.contains(widget.packageName!)) {
         // print(key.text);
         // print(key.title);
         var _notification = NotificationModel(
@@ -133,7 +133,7 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return new ListView.builder(
-              itemCount: snapshot.data.length,
+              itemCount: snapshot.data!.length,
               itemBuilder: buildNotificationCard,
               physics: BouncingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics(),
@@ -248,7 +248,7 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
                               Container(
                                 width: size.width - 130,
                                 child: new Text(
-                                  item.title ?? item.appTitle,
+                                  item.title ?? item.appTitle!,
                                   //overflow: TextOverflow.clip,
                                   maxLines: 1,
                                   style: TextStyle(
@@ -264,7 +264,7 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
                                 child: item.createdDate != null
                                     ? Text(
                                         readTimestamp(
-                                          int.parse(item.createdDate),
+                                          int.parse(item.createdDate!),
                                         ),
                                         style: TextStyle(
                                             color: Color.fromRGBO(

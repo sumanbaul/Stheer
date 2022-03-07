@@ -41,7 +41,7 @@ class LoggedInWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              user.displayName,
+              user!.displayName!,
               style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,
@@ -50,13 +50,13 @@ class LoggedInWidget extends StatelessWidget {
             SizedBox(height: 22),
             CircleAvatar(
               radius: 40,
-              backgroundImage: NetworkImage(user.photoURL),
+              backgroundImage: NetworkImage(user!.photoURL!),
             ),
             SizedBox(height: 10),
-            Text(user.email),
+            Text(user!.email!),
             SizedBox(height: 10),
             //Text(user.metadata.lastSignInTime.day.toString())
-            Text(user.phoneNumber.toString()),
+            Text(user!.phoneNumber.toString()),
           ],
         ),
       ),

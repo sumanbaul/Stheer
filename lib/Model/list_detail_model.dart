@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 
 class NotificationModel {
-  final int id;
-  final String appTitle;
-  final Image appIcon;
-  final String title;
-  final String text;
-  final String message;
-  final String packageName;
-  final int timestamp;
-  final String createAt;
-  final String eventJson;
-  final String summaryText;
-  final List<String> textLines;
-  final String createdDate;
-  final int isDeleted;
+  final int? id;
+  final String? appTitle;
+  final Image? appIcon;
+  final String? title;
+  final String? text;
+  final String? message;
+  final String? packageName;
+  final int? timestamp;
+  final String? createAt;
+  final String? eventJson;
+  final String? summaryText;
+  final List<String>? textLines;
+  final String? createdDate;
+  final int? isDeleted;
   //final String signature;
 
   //static const String TABLENAME = "notifications";

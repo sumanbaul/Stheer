@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class ButtonWidget extends StatelessWidget {
-  final IconData icon;
-  final String text;
-  final VoidCallback onClicked;
+  final IconData? icon;
+  final String? text;
+  final VoidCallback? onClicked;
 
   const ButtonWidget({
-    Key key,
+    Key? key,
     this.icon,
     this.text,
     this.onClicked,
@@ -27,7 +27,7 @@ class ButtonWidget extends StatelessWidget {
           Icon(icon, size: 28),
           SizedBox(width: 16),
           Text(
-            text,
+            text!,
             style: TextStyle(fontSize: 22, color: Colors.white),
           ),
         ],
