@@ -2,6 +2,8 @@
 //  Generated file. Do not edit.
 //
 
+// clang-format off
+
 #import "GeneratedPluginRegistrant.h"
 
 #if __has_include(<android_notification_listener2/AndroidNotificationListener2Plugin.h>)
