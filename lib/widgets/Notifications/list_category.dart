@@ -24,11 +24,12 @@ class NotificationCatgoryList extends StatefulWidget {
 
 class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
   //List<Notifications> _notifications = [];
+  Future<List<NotificationCategory>>? notificationCategoryFuture;
   List<Color> _colors = [Color.fromRGBO(94, 109, 145, 1.0), Colors.transparent];
   //List<Color> _colors = [Color(0xff635eff), Color(0xffffb861)];
   //List<Color> _colors = [Color(0xff635eff), Color(0xff5fd5ff)];
 
-  bool isToday = false;
+  bool isToday = true;
 
   List<NotificationCategory> _nc = [];
 
@@ -41,6 +42,8 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
     //getAppsData();
     //getCategoryList(0);
     super.initState();
+    notificationCategoryFuture =
+        isToday ? getCategoryList(0) : getCategoryList(1);
   }
 
   /////unused method
@@ -147,10 +150,11 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
                       borderRadius: BorderRadius.all(Radius.circular(20)),
                     )),
                 onPressed: () async {
-                  await getCategoryList(0);
-                  setState(() {
-                    isToday = true;
-                  });
+                  //  await getCategoryList(0);
+                  isToday = true;
+                  notificationCategoryFuture =
+                      isToday ? getCategoryList(0) : getCategoryList(1);
+                  setState(() {});
                 },
                 child: Text('Today'),
               ),
@@ -164,10 +168,11 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
                       borderRadius: BorderRadius.all(Radius.circular(20)),
                     )),
                 onPressed: () async {
-                  await getCategoryList(1);
-                  setState(() {
-                    isToday = false;
-                  });
+                  //  await getCategoryList(1);
+                  isToday = false;
+                  notificationCategoryFuture =
+                      isToday ? getCategoryList(0) : getCategoryList(1);
+                  setState(() {});
                 },
                 child: Text('Yesterday'),
               ),
@@ -195,23 +200,31 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
             // decoration: BoxDecoration(color: Colors.brown),
             margin: EdgeInsets.only(top: 0.0),
             child: FutureBuilder<List<NotificationCategory>>(
-                future: isToday ? getCategoryList(0) : getCategoryList(1),
+                future: notificationCategoryFuture,
                 builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return ListView.builder(
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (context, index) {
-                        return NotificationsCard(
-                            notificationsCategoryList: _nc, index: index);
-                      },
-                      physics: BouncingScrollPhysics(
-                        parent: AlwaysScrollableScrollPhysics(),
-                      ),
-                    );
-                  } else {
-                    return Container(
-                      child: CircularProgressIndicator(),
-                    );
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                      return Text('none');
+                    case ConnectionState.active:
+                    case ConnectionState.waiting:
+                      return CircularProgressIndicator();
+                    case ConnectionState.done:
+                      if (snapshot.hasData) {
+                        return ListView.builder(
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index) {
+                            return NotificationsCard(
+                                notificationsCategoryList: _nc, index: index);
+                          },
+                          physics: BouncingScrollPhysics(
+                            parent: AlwaysScrollableScrollPhysics(),
+                          ),
+                        );
+                      } else {
+                        return Text('Nothing to display');
+                      }
+                    default:
+                      return Text('default');
                   }
                 }),
           ),
