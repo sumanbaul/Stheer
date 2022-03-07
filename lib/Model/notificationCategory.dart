@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class NotificationCategory {
-  final int id;
-  final String appTitle;
-  final Image appIcon;
-  final Image tempIcon;
-  final String message;
-  final String packageName;
-  final int timestamp;
-  final int notificationCount;
+  final int? id;
+  final String? appTitle;
+  final Image? appIcon;
+  final Image? tempIcon;
+  final String? message;
+  final String? packageName;
+  final int? timestamp;
+  final int? notificationCount;
 
   NotificationCategory(
       {this.id,

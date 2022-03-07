@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class ButtonWidget extends StatelessWidget {
-  final String text;
-  final VoidCallback onClicked;
+  final String? text;
+  final VoidCallback? onClicked;
   final Color color;
   final Color backgroundColor;
 
   const ButtonWidget({
-    Key key,
+    Key? key,
     this.text,
     this.onClicked,
     this.color = Colors.white,
@@ -27,7 +26,7 @@ class ButtonWidget extends StatelessWidget {
           shape: StadiumBorder(),
         ),
         child: Text(
-          text,
+          text!,
           style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
         ),
         onPressed: onClicked,

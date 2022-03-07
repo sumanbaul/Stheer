@@ -1,10 +1,10 @@
 class NEvent {
-  DateTime createAt;
-  int timestamp;
-  String packageName;
-  String title;
-  String text;
-  String message;
+  DateTime? createAt;
+  int? timestamp;
+  String? packageName;
+  String? title;
+  String? text;
+  String? message;
 
   // dynamic _data;
 

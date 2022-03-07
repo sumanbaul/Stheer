@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:notifoo/helper/InstalledAppsHelper.dart';
 import 'package:notifoo/model/Notifications.dart';
-import 'package:sticky_grouped_list/sticky_grouped_list.dart';
+#import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 
 class NotificationsList {
   //static ApplicationWithIcon currentApp;
 
   static getNotificationsList() {
     final notificationsView = FutureBuilder<List<Notifications>>(
-      future: DatabaseHelper.instance.getNotifications(),
+      future: DatabaseHelper.instance.getNotifications(0),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           //var packageName = (Notifications element) => element.packageName;

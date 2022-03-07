@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:notifoo/helper/provider/google_sign_in.dart';
-import 'package:notifoo/widgets/BottomBar.dart';
 import 'package:notifoo/widgets/Topbar.dart';
 import 'package:provider/provider.dart';
 
@@ -15,7 +14,7 @@ class SignIn extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-      appBar: Topbar.getTopbar('Sign In'),
+      //appBar: Topbar.getTopbar('Sign In'),
       //bottomNavigationBar: BottomBar.getBottomBar(context),
       body: Padding(
         padding: EdgeInsets.all(32),

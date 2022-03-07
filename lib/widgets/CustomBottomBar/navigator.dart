@@ -3,7 +3,9 @@ import 'package:notifoo/pages/Homepage.dart';
 import 'package:notifoo/pages/Pomodoro.dart';
 import 'package:notifoo/pages/Profile.dart';
 import 'package:notifoo/pages/TestPage.dart';
+import 'package:notifoo/pages/pomodoro_home.dart';
 import 'package:notifoo/widgets/CustomBottomBar/BottomNavigation.dart';
+import 'package:notifoo/widgets/navigation/nav_drawer.dart';
 
 import 'TabItem.dart';
 
@@ -36,8 +38,15 @@ class AppState extends State<App> {
     TabItem(
       tabName: "Settings",
       icon: Icons.settings,
-      page: TestPage(
-        title: 'TestPage',
+      page: Profile(
+        title: 'Profile',
+      ),
+    ),
+    TabItem(
+      tabName: "Pomodoro Home",
+      icon: Icons.settings,
+      page: PomodoroHome(
+        title: 'Pomodoro Home',
       ),
     ),
   ];
@@ -56,7 +65,7 @@ class AppState extends State<App> {
     if (index == currentTab) {
       // pop to first route
       // if the user taps on the active tab
-      tabs[index].key.currentState.popUntil((route) => route.isFirst);
+      tabs[index].key.currentState!.popUntil((route) => route.isFirst);
     } else {
       // update the state
       // in order to repaint
@@ -70,7 +79,7 @@ class AppState extends State<App> {
     return WillPopScope(
       onWillPop: () async {
         final isFirstRouteInCurrentTab =
-            !await tabs[currentTab].key.currentState.maybePop();
+            !await tabs[currentTab].key.currentState!.maybePop();
         if (isFirstRouteInCurrentTab) {
           // if not on the 'main' tab
           if (currentTab != 0) {
@@ -90,6 +99,35 @@ class AppState extends State<App> {
       child: Scaffold(
         //xtendBody: true,
         // indexed stack shows only one child
+        // drawer: Drawer(
+        //   child: ListView(
+        //     // Important: Remove any padding from the ListView.
+        //     padding: EdgeInsets.zero,
+        //     children: [
+        //       const DrawerHeader(
+        //         decoration: BoxDecoration(
+        //           color: Colors.blue,
+        //         ),
+        //         child: Text('Drawer Header'),
+        //       ),
+        //       ListTile(
+        //         title: const Text('Item 1'),
+        //         onTap: () {
+        //           // Update the state of the app.
+        //           // ...
+        //         },
+        //       ),
+        //       ListTile(
+        //         title: const Text('Item 2 test'),
+        //         onTap: () {
+        //           // Update the state of the app.
+        //           // ...
+        //         },
+        //       ),
+        //     ],
+        //   ), // Populate the Drawer in the next step.
+        // ), //NavDrawer(),
+        //drawer: NavigationDrawerWidget(),
         body: IndexedStack(
           index: currentTab,
           children: tabs.map((e) => e.page).toList(),

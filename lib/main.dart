@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:notifoo/helper/AppListHelper.dart';
 import 'package:notifoo/helper/provider/google_sign_in.dart';
 import 'package:notifoo/pages/Homepage.dart';
 import 'package:notifoo/pages/Profile.dart';
@@ -7,7 +9,9 @@ import 'package:notifoo/pages/SignIn.dart';
 import 'package:notifoo/pages/SplashScreen.dart';
 import 'package:notifoo/pages/TestPage.dart';
 import 'package:notifoo/widgets/CustomBottomBar/navigator.dart';
-import 'pages/NotificationsLister.dart';
+import 'helper/DatabaseHelper.dart';
+//import 'model/apps.dart';
+import 'widgets/Notifications/NotificationsLister.dart';
 import 'package:provider/provider.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -15,7 +19,9 @@ import 'package:firebase_core/firebase_core.dart';
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
+  //DatabaseHelper.instance.initializeDatabase();
+  //await AppListHelper.getApps();
+  debugPaintSizeEnabled = false;
   runApp(MyApp());
 }
 
@@ -60,7 +66,7 @@ class _MyAppState extends State<MyApp> {
           initialRoute: '/splash',
           routes: {
             // When navigating to the "/" route, build the FirstScreen widget.
-            '/': (context) => NotificationsLister(title: "Notifoo"),
+            '/': (context) => NotificationsLister(),
             // When navigating to the "/splash" route, build the SecondScreen widget.
             '/home': (context) => Homepage(title: "Home"),
             '/second': (context) => TestPage(title: "Test"),

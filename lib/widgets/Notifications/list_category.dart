@@ -1,18 +1,22 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:notifoo/helper/AppListHelper.dart';
+//import 'package:flutter/rendering.dart';
+//import 'package:notifoo/helper/AppListHelper.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
+import 'package:notifoo/helper/datetime_ago.dart';
 import 'package:notifoo/model/Notifications.dart';
+//import 'package:notifoo/model/apps.dart';
 import 'package:notifoo/model/notificationCategory.dart';
 import 'package:notifoo/widgets/Notifications/list_detail.dart';
 
 class NotificationCatgoryList extends StatefulWidget {
-  NotificationCatgoryList({Key key, this.title}) : super(key: key);
-  final AppListHelper appsListHelper = new AppListHelper();
+  NotificationCatgoryList({Key? key, this.title}) : super(key: key);
+  // final AppListHelper appsListHelper = new AppListHelper();
 
-  final String title;
+  final String? title;
   @override
   _NotificationCatgoryListState createState() =>
       _NotificationCatgoryListState();
@@ -20,44 +24,69 @@ class NotificationCatgoryList extends StatefulWidget {
 
 class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
   //List<Notifications> _notifications = [];
-  List<Color> _colors = [Color(0xffff6198), Color(0xffffb861)];
+  List<Color> _colors = [Color.fromRGBO(94, 109, 145, 1.0), Colors.transparent];
   //List<Color> _colors = [Color(0xff635eff), Color(0xffffb861)];
   //List<Color> _colors = [Color(0xff635eff), Color(0xff5fd5ff)];
 
+  bool isToday = false;
+
   List<NotificationCategory> _nc = [];
-  final List<Application> _apps = AppListHelper().appListData;
-  ApplicationWithIcon _currentApp;
+
+  //List<Apps> _apps;
+  //ApplicationWithIcon _currentApp;
 
   @override
   void initState() {
     DatabaseHelper.instance.initializeDatabase();
-
+    //getAppsData();
+    //getCategoryList(0);
     super.initState();
-
-    getCategoryList();
   }
 
-  Application getCurrentApp(String packageName) {
-    if (_currentApp == null) {}
-    // getListOfApps().whenComplete(() => _apps);
-    for (var app in _apps) {
-      if (app.packageName == packageName) {
-        _currentApp = app;
-      }
+  /////unused method
+  // void getAppsData() async {
+  //   _apps = AppListHelper().appListData;
+  // }
+
+  Future<Application?> getCurrentApp(String? packageName) async {
+    Application? app;
+
+    if (packageName != "") {
+      app = await DeviceApps.getApp(packageName!, true);
+      //_currentApp = app;
     }
-    return _currentApp;
+    return app;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // backgroundColor: Colors.transparent,
-      body: getNotificationListBody(),
+    // setState(() {
+    //   //this line is responsible for updating the view instantaneously
+    // });
+
+    return Container(
+      height: 600,
+      padding: EdgeInsets.only(top: 15.0),
+      decoration: BoxDecoration(
+        shape: BoxShape.rectangle,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30.0),
+          topRight: Radius.circular(30.0),
+        ),
+        gradient: LinearGradient(
+          colors: _colors,
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          //stops: _stops
+        ),
+      ),
+      child: getNotificationListBody(),
     );
   }
 
-  Future<List<NotificationCategory>> getCategoryList() async {
-    var getNotifications = await DatabaseHelper.instance.getNotifications();
+  Future<List<NotificationCategory>> getCategoryList(int selectedDay) async {
+    var getNotifications =
+        await DatabaseHelper.instance.getNotifications(selectedDay);
 
     final listByPackageName = groupBy(getNotifications, (Notifications n) {
       return n.packageName;
@@ -65,183 +94,308 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
 
     List<NotificationCategory> notificationsByCategory = [];
 
-    listByPackageName.forEach((key, value) {
-      var nc = NotificationCategory(
-          packageName: key,
-          appTitle: getCurrentApp(key).appName,
-          appIcon: _currentApp is ApplicationWithIcon
-              ? Image.memory(
-                  _currentApp.icon,
-                  //height: 30.0,
-                  fit: BoxFit.cover,
-                  gaplessPlayback: true,
-                )
-              : null,
-          tempIcon: Image.memory(_currentApp.icon),
-          message:
-              "You have " + value.length.toString() + " Unread notifications",
-          notificationCount: value.length);
+    if (listByPackageName.length > 0) {
+      listByPackageName.forEach((key, value) async {
+        // print(value[value.length - 1].createdDate);
+        var _app = await (getCurrentApp(value[0].packageName));
 
-      notificationsByCategory.add(nc);
-    });
+        var nc = NotificationCategory(
+            packageName: _app?.packageName,
+            appTitle: _app?.appName,
+            appIcon: _app is ApplicationWithIcon
+                ? Image.memory(
+                    _app.icon,
+                    //height: 30.0,
+                    fit: BoxFit.cover,
+                    gaplessPlayback: true,
+                  )
+                : null,
+            //tempIcon: Image.memory(_currentApp.icon),
+            timestamp: value[0].timestamp,
+            message:
+                "You have " + value.length.toString() + " Unread notifications",
+            notificationCount: value.length);
 
-    notificationsByCategory.sort(
-        (a, b) => a.appTitle.toLowerCase().compareTo(b.appTitle.toLowerCase()));
+        notificationsByCategory.add(nc);
+      });
+    }
+
+    notificationsByCategory
+        .sort((a, b) => b.timestamp!.compareTo(a.timestamp!));
     _nc = notificationsByCategory;
-    setState(
-        () {}); //this line is responsible for updating the view instantaneously
-
     return notificationsByCategory;
-    //print(listByPackageName);
   }
 
-  getNotificationListBody() {
-    //debugPaintSizeEnabled = true;
-    return FutureBuilder<List<NotificationCategory>>(
-        future: getCategoryList(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return new ListView.builder(
-              itemCount: snapshot.data.length,
-              itemBuilder: buildNotificationCard,
-              physics: BouncingScrollPhysics(
-                parent: AlwaysScrollableScrollPhysics(),
+  Widget getNotificationListBody() {
+    return Column(
+      children: [
+        Container(
+          height: 30,
+          margin: EdgeInsets.only(bottom: 10.0),
+          padding: EdgeInsets.symmetric(horizontal: 30.0),
+          //color: Colors.blueAccent,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    onPrimary: isToday ? Colors.black87 : Colors.white24,
+                    primary: isToday ? Colors.grey[300] : Colors.grey[600],
+                    minimumSize: Size(88, 36),
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                    )),
+                onPressed: () async {
+                  await getCategoryList(0);
+                  setState(() {
+                    isToday = true;
+                  });
+                },
+                child: Text('Today'),
               ),
-            );
-          } else {
-            return Container();
-          }
-        });
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    onPrimary: isToday ? Colors.white24 : Colors.black87,
+                    primary: isToday ? Colors.grey[600] : Colors.grey[300],
+                    minimumSize: Size(88, 36),
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                    )),
+                onPressed: () async {
+                  await getCategoryList(1);
+                  setState(() {
+                    isToday = false;
+                  });
+                },
+                child: Text('Yesterday'),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    onPrimary: Colors.white24,
+                    primary: Colors.grey[600],
+                    minimumSize: Size(88, 36),
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                    )),
+                onPressed: () {},
+                child: Text('History'),
+              )
+            ],
+          ),
+        ),
+        Flexible(
+          flex: 1,
+          fit: FlexFit.tight,
+          child: Container(
+            padding: EdgeInsets.only(top: 0),
+            //height: 200,
+            // decoration: BoxDecoration(color: Colors.brown),
+            margin: EdgeInsets.only(top: 0.0),
+            child: FutureBuilder<List<NotificationCategory>>(
+                future: isToday ? getCategoryList(0) : getCategoryList(1),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        return NotificationsCard(
+                            notificationsCategoryList: _nc, index: index);
+                      },
+                      physics: BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics(),
+                      ),
+                    );
+                  } else {
+                    return Container(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                }),
+          ),
+        ),
+      ],
+    );
   }
+}
 
-  Widget buildNotificationCard(BuildContext context, int index) {
-    return Card(
-      elevation: 0.0,
-      color: Colors.transparent,
-      child: Stack(children: [
-        Column(
-          // crossAxisAlignment: CrossAxisAlignment.stretch,
-          // mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              height: 100,
-              padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 12.0),
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Color.fromRGBO(59, 66, 84, 1),
-                      Color.fromRGBO(41, 47, 61, 1)
-                    ],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                  //color: Color.fromRGBO(40, 48, 59, 1),
-                  // color: Color.fromRGBO(58, 66, 86, 1.0),
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Color.fromRGBO(84, 98, 117, 1),
-                        blurRadius: 8,
-                        spreadRadius: 2,
-                        offset: Offset(-4, -4)),
-                    BoxShadow(
-                        color: Color.fromRGBO(40, 48, 59, 1),
-                        blurRadius: 8,
-                        spreadRadius: 2,
-                        offset: Offset(4, 4)),
-                  ]),
-              child: Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 25.0,
-                              //backgroundImage: _nc[index].appIcon,
-                              child: _nc[index].appIcon,
-                              // child: ClipRRect(
-                              //   child: _nc[index].appIcon,
-                              //   borderRadius: BorderRadius.circular(100.0),
-                              // ),
-                              backgroundColor: Colors.white10,
-                            ),
-                            SizedBox(
-                              width: 8,
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  _nc[index].appTitle,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18.0),
-                                ),
-                                SizedBox(
-                                  height: 3.0,
-                                ),
-                                Text(
-                                  'Tap to view details',
-                                  style: TextStyle(
-                                      color: Color.fromRGBO(196, 196, 196, 1)),
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
-                        Icon(Icons.keyboard_arrow_right)
+class NotificationsCard extends StatelessWidget {
+  const NotificationsCard(
+      {Key? key, this.index, this.notificationsCategoryList})
+      : super(key: key);
+  final int? index;
+  final List<NotificationCategory>? notificationsCategoryList;
+
+  buildNotificationCard(BuildContext context, int index) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 15),
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+      child: Card(
+        elevation: 0.0,
+        margin: EdgeInsets.only(top: 0.0),
+        color: Colors.transparent,
+        child: Stack(children: [
+          Column(
+            // crossAxisAlignment: CrossAxisAlignment.stretch,
+            // mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                //  margin: EdgeInsets.only(bottom: 10),
+                height: 100,
+                padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 12.0),
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color.fromRGBO(59, 66, 84, 1),
+                        Color.fromRGBO(41, 47, 61, 1)
                       ],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10.0),
-                          child: Text(_nc[index].message),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10.0),
-                          child: Text(
-                            '2 minutes ago',
-                            style: TextStyle(
-                              color: Color.fromRGBO(196, 196, 196, 1),
-                              fontWeight: FontWeight.bold,
+                    //color: Color.fromRGBO(40, 48, 59, 1),
+                    // color: Color.fromRGBO(58, 66, 86, 1.0),
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Color.fromRGBO(84, 98, 117, 1),
+                          blurRadius: 8,
+                          spreadRadius: 2,
+                          offset: Offset(-3, -3)),
+                      BoxShadow(
+                          color: Color.fromRGBO(40, 48, 59, 1),
+                          blurRadius: 8,
+                          spreadRadius: 2,
+                          offset: Offset(3, 3)),
+                    ]),
+                child: Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 25.0,
+                                child: CircleAvatar(
+                                    backgroundColor: Colors.transparent,
+                                    //clipBehavior: Clip.hardEdge,
+                                    child: notificationsCategoryList![index]
+                                        .appIcon),
+                                // backgroundImage:
+                                //     notificationsCategoryList[index]
+                                //         .appIcon
+                                //         .image,
+                                //backgroundImage: _nc[index].appIcon,
+                                //child: _nc[index].appIcon,
+                                // child: ClipRRect(
+                                //   child: _nc[index].appIcon,
+                                //   borderRadius: BorderRadius.circular(100.0),
+                                // ),
+                                backgroundColor: Colors.black12,
+                              ),
+                              // ClipOval(
+                              //   child: Image(
+                              //     image: _nc[index].appIcon.image,
+                              //     fit: BoxFit.cover,
+                              //     width: 50.0,
+                              //     height: 50.0,
+                              //     gaplessPlayback: true,
+                              //     alignment: Alignment.center,
+                              //   ),
+                              // ),
+                              SizedBox(
+                                width: 8,
+                              ),
+                              Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    notificationsCategoryList![index].appTitle!,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18.0),
+                                  ),
+                                  SizedBox(
+                                    height: 3.0,
+                                  ),
+                                  Text(
+                                    'Tap to view details',
+                                    style: TextStyle(
+                                        color:
+                                            Color.fromRGBO(196, 196, 196, 1)),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                          Icon(Icons.keyboard_arrow_right)
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              notificationsCategoryList![index].message!,
+                              style: TextStyle(
+                                fontSize: 13.0,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    )
-                  ],
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              readTimestamp(
+                                  notificationsCategoryList![index].timestamp!),
+                              style: TextStyle(
+                                  color: Colors.white54, fontSize: 13),
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-        new Positioned.fill(
-            child: new Material(
-                type: MaterialType.transparency,
-                borderRadius: BorderRadius.circular(20),
-                color: Colors.transparent,
-                child: new InkWell(
-                  onTap: () => {
-                    print('tapped'),
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => NotificationDetailList(
-                          packageName: _nc[index].packageName,
-                          title: _nc[index].appTitle,
+            ],
+          ),
+          new Positioned.fill(
+              child: new Material(
+                  type: MaterialType.transparency,
+                  color: Colors.transparent,
+                  child: new InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: () => {
+                      print('tapped'),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NotificationDetailList(
+                            packageName:
+                                notificationsCategoryList![index].packageName,
+                            title: notificationsCategoryList![index].appTitle,
+                            appIcon: notificationsCategoryList![index].appIcon,
+                            appTitle:
+                                notificationsCategoryList![index].appTitle,
+                          ),
                         ),
                       ),
-                    ),
-                  },
-                )))
-      ]),
+                    },
+                  )))
+        ]),
+      ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return buildNotificationCard(context, this.index!);
   }
 }

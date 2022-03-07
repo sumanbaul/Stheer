@@ -6,8 +6,8 @@ class InstalledAppsHelper {
   // InstalledAppsHelper() {
   //   getListOfApps();
   // }
-  static ApplicationWithIcon _currentApp;
-  static List<Application> _apps;
+  static ApplicationWithIcon? _currentApp;
+  static late List<Application> _apps;
 
   static Future<List<Application>> getListOfApps() async {
     return await DeviceApps.getInstalledApplications(
@@ -17,21 +17,21 @@ class InstalledAppsHelper {
     //print(_apps);
   }
 
-  static Application getCurrentApp(String packageName) {
+  static Application? getCurrentApp(String packageName) {
     getListOfApps();
     for (var app in _apps) {
       if (app.packageName == packageName) {
-        _currentApp = app;
+        _currentApp = app as ApplicationWithIcon?;
       }
     }
     return _currentApp;
   }
 
-  static ApplicationWithIcon getCurrentAppWithIcon(String packageName) {
+  static ApplicationWithIcon? getCurrentAppWithIcon(String packageName) {
     getListOfApps();
     for (var app in _apps) {
       if (app.packageName == packageName) {
-        _currentApp = app;
+        _currentApp = app as ApplicationWithIcon?;
       }
     }
     return _currentApp;

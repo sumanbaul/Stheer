@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:notifoo/widgets/CustomBottomBar/navigationDrawerWidget.dart';
 import 'package:notifoo/widgets/Topbar.dart';
+import 'package:notifoo/widgets/buttons/button_widget.dart';
+import 'package:notifoo/widgets/headers/subHeader.dart';
 import 'package:notifoo/widgets/home/Banner.dart';
-import 'package:path/path.dart';
-
-import 'NotificationsLister.dart';
+//import 'package:notifoo/widgets/navigation/nav_drawer.dart';
+import '../widgets/Notifications/NotificationsLister.dart';
 
 class Homepage extends StatefulWidget {
-  Homepage({Key key, this.title}) : super(key: key);
+  Homepage({Key? key, this.title}) : super(key: key);
 
-  final String title;
+  final String? title;
   @override
   _HomepageState createState() => _HomepageState();
 }
@@ -25,64 +28,31 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-    // final padding = MediaQuery.of(context).viewPadding;
-    // print(padding);
     return Scaffold(
         backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-        //appBar: Topbar.getTopbar(widget.title),
-        body: SafeArea(
-          maintainBottomViewPadding: true,
-          top: false,
-          child: Container(
-            //padding: EdgeInsets.only(top: 20.0),
-            child: Column(
-              children: [
-                BannerWidget(),
-                Container(
-                  padding: EdgeInsets.fromLTRB(15, 0, 15, 10),
-                  decoration: BoxDecoration(
-                    // color: Colors.amber,
-
-                    //color: Colors.orange,
-                    shape: BoxShape.rectangle,
+        drawer: NavigationDrawerWidget(),
+        body: Builder(
+          builder: (context) => SafeArea(
+            maintainBottomViewPadding: true,
+            top: false,
+            child: Container(
+              child: Column(
+                children: [
+                  BannerWidget(
+                    onClicked: () => Scaffold.of(context).openDrawer(),
                   ),
-                  child: Center(
-                    child: Text(
-                      'Todays Notifications',
-                      style: GoogleFonts.barlowSemiCondensed(
-                        textStyle: TextStyle(
-                          letterSpacing: 1.2,
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          // shadows: [
-                          //   Shadow(
-                          //     blurRadius: 1.0,
-                          //     color: Color(0xffe2adc4),
-                          //     offset: Offset(-1.0, 1.0),
-                          //   ),
-                          // ],
-                        ),
-                      ),
+                  SubHeader(title: "Today's Notifications"),
+                  Container(
+                    child: Expanded(
+                      child: NotificationsLister(),
                     ),
-                  ),
-                ),
-                Expanded(
-                    child: Container(
-                        padding: EdgeInsets.fromLTRB(10, 0, 10, 10),
-                        child: NotificationsLister()))
-              ],
+                  )
+                ],
+              ),
             ),
           ),
         )
         // NotificationsLister(),
         );
   }
-
-  // Widget homeWidget = Container(
-  //   padding: const EdgeInsets.all(32),
-  //   child: Column(
-  //     children: [BannerWidget(), NotificationsLister()],
-  //   ),
-  // );
 }

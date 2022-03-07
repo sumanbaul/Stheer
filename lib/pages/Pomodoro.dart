@@ -1,14 +1,15 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:notifoo/helper/DatabaseHelper.dart';
+import 'package:notifoo/model/pomodoro_timer.dart';
 import 'package:notifoo/widgets/Topbar.dart';
 import 'package:notifoo/widgets/button_widget.dart';
 
 class Pomodoro extends StatefulWidget {
-  Pomodoro({Key key, this.title}) : super(key: key);
+  Pomodoro({Key? key, this.title}) : super(key: key);
 
-  final String title;
+  final String? title;
 
   @override
   _PomodoroState createState() => _PomodoroState();
@@ -16,11 +17,18 @@ class Pomodoro extends StatefulWidget {
 
 class _PomodoroState extends State<Pomodoro> {
   static const maxSeconds = 60 * 25;
-
+  static var now =
+      DateTime.now().hour.toString() + DateTime.now().minute.toString();
   Duration duration = Duration(seconds: maxSeconds);
 
   int seconds = maxSeconds;
-  Timer timer;
+  Timer? timer;
+
+  @override
+  void initState() {
+    DatabaseHelper.instance.initializeDatabase();
+    super.initState();
+  }
 
   void resetTimer() {
     setState(() {
@@ -29,12 +37,31 @@ class _PomodoroState extends State<Pomodoro> {
     });
   }
 
+  String secondsToMinutes(int seconds) {
+    int minutes = (seconds / 60).truncate();
+    String minutesStr = (minutes % 60).toString().padLeft(2, '0');
+
+    return minutesStr;
+  }
+
   void stopTimer({bool reset = true}) {
     if (reset) {
       resetTimer();
+
+      var timeCompleted = Duration(seconds: seconds).inSeconds;
+      print(timeCompleted.toString());
+      PomodoroTimer pomodoroTimer = new PomodoroTimer(
+        duration: secondsToMinutes(timeCompleted),
+        taskName: "A new task " + now,
+        isCompleted: 0,
+      );
+
+      saveData(pomodoroTimer);
     }
     setState(() {
-      timer.cancel();
+      timer!.cancel();
+
+      //saveData(pomodoroTimer);
     });
   }
 
@@ -58,38 +85,79 @@ class _PomodoroState extends State<Pomodoro> {
     });
   }
 
-  void addTime() {
-    final addSeconds = 1;
-
-    setState(() {
-      final seconds = duration.inSeconds - addSeconds;
-
-      duration = Duration(seconds: seconds);
-    });
+  void saveData(PomodoroTimer pomodoroObj) {
+    DatabaseHelper.instance.insertPomodoroTimer(PomodoroTimer(
+      taskName: pomodoroObj.taskName,
+      duration: pomodoroObj.duration,
+      createdDate: DateTime.now().toString(),
+      isCompleted: pomodoroObj.isCompleted,
+      isDeleted: pomodoroObj.isDeleted,
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-      appBar: Topbar.getTopbar(widget.title),
-      body: Container(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              buildTimer(),
-              buildButtons(),
-            ],
+      backgroundColor: Color(0xff624072), //Color.fromRGBO(58, 66, 86, 1.0),
+      //appBar: Topbar.getTopbar(widget.title),
+      body: SafeArea(
+        maintainBottomViewPadding: true,
+        top: false,
+        child: Container(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Topbar(
+                  title: widget.title,
+                ),
+                buildTimer(),
+                buildButtons(),
+                buildCounterList(),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
+  Widget buildCounterList() {
+    //return ListView()
+
+    return Expanded(
+      child: Container(
+        child: FutureBuilder<List<PomodoroTimer>>(
+            future: getCategoryList(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return new ListView.builder(
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) => ListTile(
+                    leading: Icon(Icons.ac_unit_outlined),
+                    title: Text(snapshot.data![index].taskName!),
+                    subtitle: Text(snapshot.data![index].duration!),
+                    trailing: Text(snapshot.data![index].createdDate!),
+                  ),
+                  physics: BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
+                  ),
+                );
+              } else {
+                return Container();
+              }
+            }),
+      ),
+    );
+  }
+
+  Future<List<PomodoroTimer>> getCategoryList() async {
+    return await DatabaseHelper.instance.getPomodoroTimer();
+  }
+
   Widget buildButtons() {
-    final isRunning = timer == null ? false : timer.isActive;
+    final isRunning = timer == null ? false : timer!.isActive;
     final isCompleted =
         duration.inSeconds == maxSeconds || duration.inSeconds == 0;
 
@@ -187,7 +255,7 @@ class _PomodoroState extends State<Pomodoro> {
           ],
         ),
         buildTimeCard(
-            time: seconds, header: 'MINUTES', textAlign: TextAlign.right),
+            time: seconds, header: 'SECONDS', textAlign: TextAlign.right),
         // Text(
         //   //'$f',
         //   '$minutes:$seconds',
@@ -198,7 +266,7 @@ class _PomodoroState extends State<Pomodoro> {
     );
   }
 
-  Widget buildTimeCard({String time, String header, TextAlign textAlign}) =>
+  Widget buildTimeCard({required String time, required String header, TextAlign? textAlign}) =>
       Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

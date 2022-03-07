@@ -1,17 +1,18 @@
 name: notifoo
-description: Demonstrates how to use the flutter_notification_listener plugin.
+description: Stheer - An app to correct phone addiction and converting a person into a better focussed human individual.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
 
+<<<<<<< HEAD
   flutter_notification_listener: ^1.0.7
 
   android_notification_listener2: ^2.0.1
@@ -20,6 +21,38 @@ dependencies:
 
   sqflite: ^2.0.0+4
   path: ^1.8.0
+=======
+  intl: ^0.17.0
+
+  # Database
+  sqflite: ^2.0.2
+  path: ^1.8.0
+
+  # Google Sign in
+  firebase_auth: ^3.3.9
+  google_sign_in: ^5.2.4
+
+    #Notifications
+  flutter_notification_listener: ^1.0.7
+  #sticky_grouped_list: ^1.3.0
+  collection: ^1.15.0
+  device_apps: ^2.1.1
+ #clear_all_notifications: ^0.0.2
+
+  #fonts
+  google_fonts: ^2.3.1
+
+  # Google Icons
+  font_awesome_flutter: ^9.2.0
+
+  # State Management
+  provider: ^6.0.2
+
+ 
+
+
+
+>>>>>>> temp
     # When depending on this package from a real application you should use:
     #   flutter_notification_listener: ^x.y.z
     # See https://dart.dev/tools/pub/dependencies#version-constraints
@@ -29,7 +62,11 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
+<<<<<<< HEAD
   cupertino_icons: ^1.0.2
+=======
+  cupertino_icons: ^1.0.4
+>>>>>>> temp
 
 dev_dependencies:
   flutter_test:
@@ -37,6 +74,17 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+
+ #splash screen package and configuration
+  flutter_native_splash: ^2.1.0
+
+flutter_native_splash:
+  background_image: "assets/images/splash_image.png"
+  android: true
+  ios: false
+  android_gravity: center
+  #ios_content_mode: center
+  fullscreen: true
 
 # The following section is specific to Flutter.
 flutter:
