@@ -194,10 +194,8 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
             //height: 200,
             // decoration: BoxDecoration(color: Colors.brown),
             margin: EdgeInsets.only(top: 0.0),
-            child: StreamBuilder<List<NotificationCategory>>(
-                stream: isToday
-                    ? Stream.fromFuture(getCategoryList(0))
-                    : Stream.fromFuture(getCategoryList(1)),
+            child: FutureBuilder<List<NotificationCategory>>(
+                future: isToday ? getCategoryList(0) : getCategoryList(1),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return ListView.builder(
