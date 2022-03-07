@@ -6,12 +6,9 @@
 
 #import "GeneratedPluginRegistrant.h"
 
-#if __has_include(<android_notification_listener2/AndroidNotificationListener2Plugin.h>)
-#import <android_notification_listener2/AndroidNotificationListener2Plugin.h>
+#if __has_include(<firebase_auth/FLTFirebaseAuthPlugin.h>)
+#import <firebase_auth/FLTFirebaseAuthPlugin.h>
 #else
-<<<<<<< HEAD
-@import android_notification_listener2;
-=======
 @import firebase_auth;
 #endif
 
@@ -37,7 +34,6 @@
 #import <path_provider_ios/FLTPathProviderPlugin.h>
 #else
 @import path_provider_ios;
->>>>>>> temp
 #endif
 
 #if __has_include(<sqflite/SqflitePlugin.h>)
@@ -49,15 +45,11 @@
 @implementation GeneratedPluginRegistrant
 
 + (void)registerWithRegistry:(NSObject<FlutterPluginRegistry>*)registry {
-<<<<<<< HEAD
-  [AndroidNotificationListener2Plugin registerWithRegistrar:[registry registrarForPlugin:@"AndroidNotificationListener2Plugin"]];
-=======
   [FLTFirebaseAuthPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTFirebaseAuthPlugin"]];
   [FLTFirebaseCorePlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTFirebaseCorePlugin"]];
   [FlutterNativeSplashPlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterNativeSplashPlugin"]];
   [FLTGoogleSignInPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTGoogleSignInPlugin"]];
   [FLTPathProviderPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTPathProviderPlugin"]];
->>>>>>> temp
   [SqflitePlugin registerWithRegistrar:[registry registrarForPlugin:@"SqflitePlugin"]];
 }
 
