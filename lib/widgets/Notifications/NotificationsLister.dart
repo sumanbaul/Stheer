@@ -9,6 +9,7 @@ import 'package:notifoo/helper/AppListHelper.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:notifoo/model/apps.dart';
 import 'package:notifoo/widgets/Notifications/list_category.dart';
+import 'package:notifoo/widgets/Notifications/notification_category.dart';
 import 'package:notifoo/widgets/buttons/appActionButton.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:notifoo/model/Notifications.dart';
@@ -71,7 +72,11 @@ class _NotificationsListerState extends State<NotificationsLister> {
       body: Container(
         height: 800,
         padding: EdgeInsets.zero,
-        child: NotificationCatgoryList(), //getNotificationListBody(),
+        // child: NotificationCatgoryList(
+        //   key: UniqueKey(),
+        // ), //getNotificationListBody(),
+
+        child: NotificationsCategoryWidget(title: 'Stheer'),
       ),
       floatingActionButton: FloatingActionButton(
         //backgroundColor: Color(0xffeeaeca),
@@ -171,9 +176,9 @@ class _NotificationsListerState extends State<NotificationsLister> {
             event.createAt!.day >= today) {
           //check
           bool redundancy;
-          redundantNotificationCheck(event)!.then((bool value) {
-            redundancy = value;
-          });
+          // redundantNotificationCheck(event)!.then((bool value) {
+          //   redundancy = value;
+          // });
 
           if ((event.text != flagEntry) && event.text != null) {
             DatabaseHelper.instance.insertNotification(
@@ -200,47 +205,51 @@ class _NotificationsListerState extends State<NotificationsLister> {
                   // summaryText: jsonData["summaryText"] ?? ""
                   ),
             );
+
+            //initClearNotificationsState();
+            flagEntry = event.text;
+          } else {
+            // # TODO fix here
+
+            // var titleLength = jsonresponse["textLines"].length;
+
+            DatabaseHelper.instance.insertNotification(
+              Notifications(
+                  title: jsonresponse["textLines"] ??
+                      jsonresponse["textLines"] as String?,
+                  text: event.text,
+                  message: event.message,
+                  packageName: event.packageName,
+                  timestamp: event.timestamp,
+                  createAt: event.createAt!.millisecondsSinceEpoch.toString(),
+                  eventJson: event.toString(),
+                  createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
+                  isDeleted: 0
+                  // infoText: jsonData["text"],
+                  // showWhen: 1,
+                  // subText: jsonData["text"],
+                  // timestamp: event.timestamp.toString(),
+                  // packageName: jsonData["packageName"],
+                  // text: jsonData["text"],
+                  // summaryText: jsonData["summaryText"] ?? ""
+                  ),
+            );
+
+            //initClearNotificationsState();
           }
-
-          initClearNotificationsState();
-          flagEntry = event.text;
-        } else {
-          // # TODO fix here
-
-          // var titleLength = jsonresponse["textLines"].length;
-
-          DatabaseHelper.instance.insertNotification(
-            Notifications(
-                title: jsonresponse["textLines"] ??
-                    jsonresponse["textLines"] as String?,
-                text: event.text,
-                message: event.message,
-                packageName: event.packageName,
-                timestamp: event.timestamp,
-                createAt: event.createAt.toString(),
-                eventJson: event.toString()
-                // infoText: jsonData["text"],
-                // showWhen: 1,
-                // subText: jsonData["text"],
-                // timestamp: event.timestamp.toString(),
-                // packageName: jsonData["packageName"],
-                // text: jsonData["text"],
-                // summaryText: jsonData["summaryText"] ?? ""
-                ),
-          );
         }
       }
-    }
 
-    setState(() {});
-    // if (!event.packageName.contains("example") ||
-    //     !event.packageName.contains("skydrive") ||
-    //     !event.packageName.contains("skydrive") ||
-    //     !event.packageName.contains("xiaomi")) {
-    //   // TODO: fix bug
-    //   // NotificationsListener.promoteToForeground("");
-    // }
-    // print("Print Notification: $event");
+      setState(() {});
+      // if (!event.packageName.contains("example") ||
+      //     !event.packageName.contains("skydrive") ||
+      //     !event.packageName.contains("skydrive") ||
+      //     !event.packageName.contains("xiaomi")) {
+      //   // TODO: fix bug
+      //   // NotificationsListener.promoteToForeground("");
+      // }
+      // print("Print Notification: $event");
+    }
   }
 
   Future<bool>? redundantNotificationCheck(NotificationEvent event) async {

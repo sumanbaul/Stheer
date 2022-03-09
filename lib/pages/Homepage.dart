@@ -35,10 +35,12 @@ class _HomepageState extends State<Homepage> {
           builder: (context) => SafeArea(
             maintainBottomViewPadding: true,
             top: false,
+            bottom: false,
             child: Container(
               child: Column(
                 children: [
                   BannerWidget(
+                    key: UniqueKey(),
                     onClicked: () => Scaffold.of(context).openDrawer(),
                   ),
                   SubHeader(title: "Today's Notifications"),

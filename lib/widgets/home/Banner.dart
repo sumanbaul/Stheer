@@ -22,9 +22,9 @@ List<double> _stopsCircle = [0.0, 0.7];
 class _BannerState extends State<BannerWidget> {
   Color? gradientStart = Colors.transparent;
   Color? gradientEnd = Colors.black;
-  String? _totalNotifications;
 
   Future<String>? totalNotifications;
+  Stream<String>? totalNotificationsStream;
 
   @override
   void initState() {
@@ -32,7 +32,7 @@ class _BannerState extends State<BannerWidget> {
 
     super.initState();
 
-    totalNotifications = getTotalNotifications();
+    totalNotificationsStream = getTotalNotifications();
     // getTotalNotifications().then((String result) {
     //   setState(() {
     //     _totalNotifications = result;
@@ -46,9 +46,9 @@ class _BannerState extends State<BannerWidget> {
   }
 
   @override
-  void didUpdateWidget(BannerWidget oldWidget) {
+  void didUpdateWidget(BannerWidget oldWidget) async {
     super.didUpdateWidget(oldWidget);
-
+    totalNotificationsStream = getTotalNotifications();
     setState(() {});
   }
 
@@ -61,9 +61,9 @@ class _BannerState extends State<BannerWidget> {
     //double _width = MediaQuery.of(context).size.width * 0.55;
     double _height = 320; //MediaQuery.of(context).size.height * 0.40;
 
-    return FutureBuilder<String>(
+    return StreamBuilder<String>(
         initialData: "0",
-        future: totalNotifications,
+        stream: totalNotificationsStream!,
         builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
@@ -415,12 +415,12 @@ class _BannerState extends State<BannerWidget> {
   );
 }
 
-Future<String> getTotalNotifications() async {
-  var getNotifications = await DatabaseHelper.instance.getNotifications(0);
-  return getNotifications.length.toString();
-}
-
-// Stream<String> getTotalNotifications = (() async* {
+// Future<String> getTotalNotifications() async {
 //   var getNotifications = await DatabaseHelper.instance.getNotifications(0);
-//   yield getNotifications.length.toString();
-// })();
+//   return getNotifications.length.toString();
+// }
+
+Stream<String> getTotalNotifications() async* {
+  var getNotifications = await DatabaseHelper.instance.getNotifications(0);
+  yield getNotifications.length.toString();
+}

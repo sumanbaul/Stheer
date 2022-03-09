@@ -25,6 +25,7 @@ class NotificationCatgoryList extends StatefulWidget {
 class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
   //List<Notifications> _notifications = [];
   Future<List<NotificationCategory>>? notificationCategoryFuture;
+  Stream<List<NotificationCategory>>? notificationCategoryStream;
   List<Color> _colors = [Color.fromRGBO(94, 109, 145, 1.0), Colors.transparent];
   //List<Color> _colors = [Color(0xff635eff), Color(0xffffb861)];
   //List<Color> _colors = [Color(0xff635eff), Color(0xff5fd5ff)];
@@ -42,8 +43,9 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
     //getAppsData();
     //getCategoryList(0);
     super.initState();
-    notificationCategoryFuture =
-        isToday ? getCategoryList(0) : getCategoryList(1);
+    // notificationCategoryFuture = isToday ? getCategoryList(0) : getCategoryList(1);
+    notificationCategoryStream =
+        isToday ? getCategoryListStream(0) : getCategoryListStream(1);
   }
 
   /////unused method
@@ -66,7 +68,8 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
     // setState(() {
     //   //this line is responsible for updating the view instantaneously
     // });
-
+    notificationCategoryStream =
+        isToday ? getCategoryListStream(0) : getCategoryListStream(1);
     return Container(
       height: 600,
       padding: EdgeInsets.only(top: 15.0),
@@ -87,7 +90,8 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
     );
   }
 
-  Future<List<NotificationCategory>> getCategoryList(int selectedDay) async {
+  Future<List<NotificationCategory>> getCategoryListFuture(
+      int selectedDay) async {
     var getNotifications =
         await DatabaseHelper.instance.getNotifications(selectedDay);
 
@@ -129,6 +133,49 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
     return notificationsByCategory;
   }
 
+  Stream<List<NotificationCategory>> getCategoryListStream(
+      int selectedDay) async* {
+    var getNotifications =
+        await DatabaseHelper.instance.getNotifications(selectedDay);
+
+    final listByPackageName = groupBy(getNotifications, (Notifications n) {
+      return n.packageName;
+    });
+
+    List<NotificationCategory> notificationsByCategory = [];
+
+    if (listByPackageName.length > 0) {
+      listByPackageName.forEach((key, value) async {
+        // print(value[value.length - 1].createdDate);
+        var _app = await (getCurrentApp(value[0].packageName));
+
+        var nc = NotificationCategory(
+            packageName: _app?.packageName,
+            appTitle: _app?.appName,
+            appIcon: _app is ApplicationWithIcon
+                ? Image.memory(
+                    _app.icon,
+                    //height: 30.0,
+                    fit: BoxFit.cover,
+                    gaplessPlayback: true,
+                  )
+                : null,
+            //tempIcon: Image.memory(_currentApp.icon),
+            timestamp: value[0].timestamp,
+            message:
+                "You have " + value.length.toString() + " Unread notifications",
+            notificationCount: value.length);
+
+        notificationsByCategory.add(nc);
+      });
+    }
+
+    notificationsByCategory
+        .sort((a, b) => b.timestamp!.compareTo(a.timestamp!));
+    _nc = notificationsByCategory;
+    yield notificationsByCategory;
+  }
+
   Widget getNotificationListBody() {
     return Column(
       children: [
@@ -151,10 +198,13 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
                     )),
                 onPressed: () async {
                   //  await getCategoryList(0);
-                  isToday = true;
-                  notificationCategoryFuture =
-                      isToday ? getCategoryList(0) : getCategoryList(1);
-                  setState(() {});
+
+                  setState(() {
+                    isToday = true;
+                  });
+                  notificationCategoryStream = isToday
+                      ? getCategoryListStream(0)
+                      : getCategoryListStream(1);
                 },
                 child: Text('Today'),
               ),
@@ -169,10 +219,13 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
                     )),
                 onPressed: () async {
                   //  await getCategoryList(1);
-                  isToday = false;
-                  notificationCategoryFuture =
-                      isToday ? getCategoryList(0) : getCategoryList(1);
-                  setState(() {});
+
+                  setState(() {
+                    isToday = false;
+                  });
+                  notificationCategoryStream = isToday
+                      ? getCategoryListStream(0)
+                      : getCategoryListStream(1);
                 },
                 child: Text('Yesterday'),
               ),
@@ -195,29 +248,36 @@ class _NotificationCatgoryListState extends State<NotificationCatgoryList> {
           flex: 1,
           fit: FlexFit.tight,
           child: Container(
-            padding: EdgeInsets.only(top: 0),
             //height: 200,
             // decoration: BoxDecoration(color: Colors.brown),
             margin: EdgeInsets.only(top: 0.0),
-            child: FutureBuilder<List<NotificationCategory>>(
-                future: notificationCategoryFuture,
+            child: StreamBuilder<List<NotificationCategory>>(
+                stream: notificationCategoryStream!,
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.none:
                       return Text('none');
                     case ConnectionState.active:
+                      return Text('active');
                     case ConnectionState.waiting:
                       return CircularProgressIndicator();
                     case ConnectionState.done:
                       if (snapshot.hasData) {
-                        return ListView.builder(
-                          itemCount: snapshot.data!.length,
-                          itemBuilder: (context, index) {
-                            return NotificationsCard(
-                                notificationsCategoryList: _nc, index: index);
-                          },
-                          physics: BouncingScrollPhysics(
-                            parent: AlwaysScrollableScrollPhysics(),
+                        return MediaQuery.removePadding(
+                          context: context,
+                          removeTop: true,
+                          child: ListView.builder(
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              return NotificationsCard(
+                                notificationsCategoryList: _nc,
+                                index: index,
+                                key: UniqueKey(), //widget.key,
+                              );
+                            },
+                            physics: BouncingScrollPhysics(
+                              parent: AlwaysScrollableScrollPhysics(),
+                            ),
                           ),
                         );
                       } else {
