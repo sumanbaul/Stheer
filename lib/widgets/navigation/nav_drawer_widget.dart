@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:notifoo/pages/Pomodoro.dart';
 import 'package:notifoo/pages/TestPage.dart';
+import 'package:notifoo/pages/habit_hub_page.dart';
 
 class NavigationDrawerWidget extends StatelessWidget {
   final padding = EdgeInsets.symmetric(horizontal: 20);
@@ -37,8 +38,8 @@ class NavigationDrawerWidget extends StatelessWidget {
                   buildSearchField(),
                   const SizedBox(height: 24),
                   buildMenuItem(
-                    text: 'People',
-                    icon: Icons.people,
+                    text: 'Habits',
+                    icon: Icons.add_task_rounded,
                     onClicked: () => selectedItem(context, 0),
                   ),
                   const SizedBox(height: 16),
@@ -110,7 +111,8 @@ class NavigationDrawerWidget extends StatelessWidget {
           padding: padding.add(EdgeInsets.symmetric(vertical: 40)),
           child: Row(
             children: [
-              CircleAvatar(radius: 30, backgroundImage: NetworkImage(urlImage!)),
+              CircleAvatar(
+                  radius: 30, backgroundImage: NetworkImage(urlImage!)),
               SizedBox(width: 10),
               Container(
                 width: 140,
@@ -189,7 +191,9 @@ class NavigationDrawerWidget extends StatelessWidget {
     switch (index) {
       case 0:
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => TestPage(),
+          builder: (context) => HabitHubPage(
+            title: 'Habits',
+          ),
         ));
         break;
       case 1:

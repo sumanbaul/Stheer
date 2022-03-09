@@ -4,7 +4,7 @@ import 'package:notifoo/widgets/Pomodoro/PomodoroTaskWidget.dart';
 import 'package:notifoo/widgets/Pomodoro/pomodoroSavedListW.dart';
 import 'package:notifoo/widgets/Topbar.dart';
 import 'package:notifoo/widgets/headline.dart';
-import 'package:notifoo/widgets/home/Banner.dart';
+import 'package:notifoo/widgets/home/home_banner_widget.dart';
 
 class PomodoroHome extends StatefulWidget {
   PomodoroHome({Key? key, this.title}) : super(key: key);

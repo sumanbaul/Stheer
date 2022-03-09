@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:notifoo/widgets/CustomBottomBar/navigationDrawerWidget.dart';
+import 'package:notifoo/widgets/navigation/nav_drawer_widget.dart';
 import 'package:notifoo/widgets/Topbar.dart';
 import 'package:notifoo/widgets/buttons/button_widget.dart';
 import 'package:notifoo/widgets/headers/subHeader.dart';
-import 'package:notifoo/widgets/home/Banner.dart';
+import 'package:notifoo/widgets/home/home_banner_widget.dart';
 //import 'package:notifoo/widgets/navigation/nav_drawer.dart';
 import '../widgets/Notifications/NotificationsLister.dart';
 
@@ -39,7 +39,7 @@ class _HomepageState extends State<Homepage> {
             child: Container(
               child: Column(
                 children: [
-                  BannerWidget(
+                  HomeBannerWidget(
                     key: UniqueKey(),
                     onClicked: () => Scaffold.of(context).openDrawer(),
                   ),

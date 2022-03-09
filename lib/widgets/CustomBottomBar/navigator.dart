@@ -5,7 +5,7 @@ import 'package:notifoo/pages/Profile.dart';
 import 'package:notifoo/pages/TestPage.dart';
 import 'package:notifoo/pages/pomodoro_home.dart';
 import 'package:notifoo/widgets/CustomBottomBar/BottomNavigation.dart';
-import 'package:notifoo/widgets/navigation/nav_drawer.dart';
+import 'package:notifoo/widgets/navigation/nav_drawer_widget.dart';
 
 import 'TabItem.dart';
 
@@ -97,7 +97,8 @@ class AppState extends State<App> {
       // with multiple appbars on one screen
       // eventually breaking the app
       child: Scaffold(
-        //xtendBody: true,
+        drawer: NavigationDrawerWidget(),
+        //extendBody: true,
         // indexed stack shows only one child
         // drawer: Drawer(
         //   child: ListView(

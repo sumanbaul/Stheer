@@ -4,8 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:notifoo/widgets/Topbar.dart';
 
-class BannerWidget extends StatefulWidget {
-  BannerWidget({Key? key, this.title, this.onClicked}) : super(key: key);
+class HomeBannerWidget extends StatefulWidget {
+  HomeBannerWidget({Key? key, this.title, this.onClicked}) : super(key: key);
   final String? title;
   final VoidCallback? onClicked;
   @override
@@ -19,7 +19,7 @@ List<Color> _colors = [Color(0xffeeaeca), Color(0xff94bbe9)];
 //List<double> _startCircle = [-1.0, 0.7];
 List<double> _stopsCircle = [0.0, 0.7];
 
-class _BannerState extends State<BannerWidget> {
+class _BannerState extends State<HomeBannerWidget> {
   Color? gradientStart = Colors.transparent;
   Color? gradientEnd = Colors.black;
 
@@ -46,7 +46,7 @@ class _BannerState extends State<BannerWidget> {
   }
 
   @override
-  void didUpdateWidget(BannerWidget oldWidget) async {
+  void didUpdateWidget(HomeBannerWidget oldWidget) async {
     super.didUpdateWidget(oldWidget);
     totalNotificationsStream = getTotalNotifications();
     setState(() {});
