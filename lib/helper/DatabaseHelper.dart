@@ -22,9 +22,14 @@ class DatabaseHelper {
   String _notificationsLogTable =
       '''CREATE TABLE notifications (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, appTitle TEXT, text TEXT, message TEXT, packageName TEXT, timestamp INTEGER, createAt TEXT, eventJson TEXT, createdDate TEXT, isDeleted INTEGER, UNIQUE(title , text))''';
 
+  String _habitsTable =
+      "Create table tblhabitslog (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, habitTitle TEXT, isCompleted INTEGER, habitType TEXT, color TEXT, createdDate INTEGER)";
+
   //V3 Alter table
   String _deviceAppsAlterTableV3 =
       "ALTER TABLE deviceapps ADD COLUMN apkFilePath TEXT, packageName TEXT, versionCode TEXT";
+
+  //String _deviceAppsAlterTableV4 = "";
 
   Future<Database?> get database async {
     if (_database == null) {
@@ -69,6 +74,8 @@ class DatabaseHelper {
     await db.execute(_notificationsLogTable);
 
     await db.execute(_deviceAppsTable);
+
+    await db.execute(_habitsTable);
   }
 
   Future close() async {

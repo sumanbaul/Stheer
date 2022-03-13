@@ -113,7 +113,6 @@ class _BannerState extends State<HomeBannerWidget> {
             bottomRight: Radius.circular(30.0),
             bottomLeft: Radius.circular(30.0),
           )),
-      padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
       height: height,
       child: SafeArea(
         child: Padding(
