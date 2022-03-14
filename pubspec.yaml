@@ -81,10 +81,24 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-assets:
-      - assets/fonts/Raleway-Regular.ttf
-      - assets/fonts/Raleway-Thin.ttf
-      #style: normal
+  assets:
+   - assets/images/welcome-one.png
+  #- images/
+      # - assets/fonts/Raleway-Regular.ttf
+      # - assets/fonts/Raleway-Thin.ttf
+     
+  #  - assets/images/
+  #  - assets/images/welcome-three.png
+  #  - assets/images/splash_image.png
+
+
+fonts:
+  - family: Raleway-Regular
+    fonts:
+      - asset: fonts/Raleway-Regular.ttf
+      - asset: fonts/Raleway-Thin.ttf
+        style: normal
+    
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
