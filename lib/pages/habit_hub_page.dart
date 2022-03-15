@@ -8,12 +8,6 @@ import 'package:notifoo/widgets/headers/subHeader.dart';
 
 import '../widgets/navigation/nav_drawer_widget.dart';
 
-List<Color> _colors = [
-  // Color(0xffD8E0BB),
-  Color(0xff7268A6),
-  Color(0xff86A3C3),
-  //Color(0xffB6CEC7),
-];
 List<double> _stopsCircle = [0.0, 0.7];
 
 class HabitHubPage extends StatelessWidget {
@@ -22,6 +16,20 @@ class HabitHubPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<Color> _colors = [
+      // Color(0xffD8E0BB),
+      Color(0xff7268A6),
+      Color(0xff86A3C3),
+      //Color(0xffB6CEC7),
+    ];
+
+    List<Color> _pageColors = [
+      // Color(0xffD8E0BB),
+      Color.fromARGB(255, 236, 236, 236),
+      Color.fromARGB(255, 235, 235, 235),
+      //Color(0xffB6CEC7),
+    ];
+
     return Scaffold(
         drawer: NavigationDrawerWidget(),
         body: Builder(
@@ -29,15 +37,17 @@ class HabitHubPage extends StatelessWidget {
             //color: Color.fromARGB(255, 61, 58, 59),
             decoration: BoxDecoration(
               //border: Border.all(width: 3),
-              color: Color.fromRGBO(58, 66, 86, 1.0),
-              image: DecorationImage(
-                  image: AssetImage("assets/images/welcome-one.png"),
-                  fit: BoxFit.cover,
-                  alignment: Alignment.bottomCenter),
+              color: Color(0xFFEFEEEE),
+              // image: DecorationImage(
+              //     image: AssetImage("assets/images/welcome-one.png"),
+              //     fit: BoxFit.cover,
+              //     alignment: Alignment.bottomCenter),
               // gradient: LinearGradient(
               //   //begin: Alignment.topLeft,
-              //   colors: _colors,
-              //   stops: _stopsCircle,
+              //   colors: _pageColors,
+              //   begin: Alignment.topLeft,
+              //   end: Alignment.bottomRight,
+              //   //stops: _stopsCircle,
               // ),
               //shape: BoxShape.circle,
             ),
@@ -49,8 +59,8 @@ class HabitHubPage extends StatelessWidget {
                   padding: EdgeInsets.only(top: 15),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(20),
-                        bottomRight: Radius.circular(20)),
+                        bottomLeft: Radius.circular(25),
+                        bottomRight: Radius.circular(25)),
                     gradient: LinearGradient(
                       colors: _colors,
 
@@ -61,7 +71,7 @@ class HabitHubPage extends StatelessWidget {
                     boxShadow: [
                       //color: Colors.white, //background color of box
                       BoxShadow(
-                        color: Colors.black38,
+                        color: Color.fromARGB(255, 190, 190, 190),
                         blurRadius: 25.0, // soften the shadow
                         spreadRadius: 3.0, //extend the shadow
                         offset: Offset(
@@ -74,16 +84,20 @@ class HabitHubPage extends StatelessWidget {
                   child: SafeArea(
                     child: Column(
                       children: [
-                        Topbar(
-                          title: this.title!,
-                          onClicked: () => Scaffold.of(context).openDrawer(),
-                        ),
+                        // Topbar(
+                        //   title: this.title!,
+                        //   onClicked: () => Scaffold.of(context).openDrawer(),
+                        // ),
                         bottomHeader(context),
                       ],
                     ),
                   ),
                 ),
-                //   HabitListerWidget(),
+                SizedBox(
+                  height: 20.0,
+                ),
+                SubHeader(title: "Today's Notifications"),
+                HabitListerWidget(),
               ],
             ),
           ),
@@ -110,7 +124,7 @@ class HabitHubPage extends StatelessWidget {
                   style: GoogleFonts.comfortaa(
                     textStyle: TextStyle(
                       letterSpacing: 0.5,
-                      fontSize: 42.0,
+                      fontSize: 32.0,
                       wordSpacing: 8.0,
                       fontWeight: FontWeight.w200,
                       color: Color.fromRGBO(223, 223, 223, 1),
@@ -129,7 +143,7 @@ class HabitHubPage extends StatelessWidget {
                   style: GoogleFonts.comfortaa(
                     textStyle: TextStyle(
                       letterSpacing: 0.5,
-                      fontSize: 42.0,
+                      fontSize: 32.0,
                       fontWeight: FontWeight.normal,
                       color: Colors.white,
                       shadows: [

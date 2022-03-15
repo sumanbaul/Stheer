@@ -190,15 +190,20 @@ class NavigationDrawerWidget extends StatelessWidget {
 
     switch (index) {
       case 0:
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => HabitHubPage(
-            title: 'Habits',
-          ),
-        ));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HabitHubPage(
+                title: 'Habits',
+              ),
+            ));
+
         break;
       case 1:
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => Pomodoro(),
+          builder: (context) => Pomodoro(
+            title: 'Pomodoro',
+          ),
         ));
         break;
     }
