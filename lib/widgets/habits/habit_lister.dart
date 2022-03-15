@@ -1,9 +1,13 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
+import 'package:notifoo/model/habits_model.dart';
 
 class HabitListerWidget extends StatefulWidget {
-  HabitListerWidget({Key? key}) : super(key: key);
+  HabitListerWidget({Key? key, @required this.onShowForm}) : super(key: key);
+
+  // final VoidCallback? onCreatePressed;
+  final Function(int)? onShowForm;
 
   @override
   State<HabitListerWidget> createState() => _HabitListerWidgetState();
@@ -15,15 +19,18 @@ class _HabitListerWidgetState extends State<HabitListerWidget> {
     Color.fromARGB(255, 233, 233, 233)
   ];
 
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+
   // All journals
-  List<Map<String, dynamic>> _journals = [];
+  List<HabitsModel> _habits = [];
 
   bool _isLoading = true;
   // This function is used to fetch all data from the database
-  void _refreshJournals() async {
+  void _refreshHabits() async {
     final data = await DatabaseHelper.instance.getHabits();
     setState(() {
-      _journals = data;
+      _habits = data;
       _isLoading = false;
     });
   }
@@ -31,38 +38,50 @@ class _HabitListerWidgetState extends State<HabitListerWidget> {
   @override
   void initState() {
     super.initState();
-    // _refreshJournals(); // Loading the diary when the app starts
+    _refreshHabits(); // Loading the diary when the app starts
   }
 
   @override
   Widget build(BuildContext context) {
     return Flexible(
-      child: Container(
-          // height: 600,
-          width: MediaQuery.of(context).size.width,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(25), topRight: Radius.circular(25)),
-              boxShadow: [
-                //color: Colors.white, //background color of box
-                BoxShadow(
-                  color: Color.fromARGB(255, 190, 190, 190),
-                  blurRadius: 25.0, // soften the shadow
-                  spreadRadius: 3.0, //extend the shadow
-                  offset: Offset(
-                    5.0, // Move to right 10  horizontally
-                    5.0, // Move to bottom 10 Vertically
-                  ),
-                )
-              ],
-              color: Color(0xFFEFEEEE)),
-          child: ListView.builder(
-            itemBuilder: _buildHabitItem,
-            itemCount: 20,
-            physics: BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics(),
+      child: Column(
+        children: [
+          Container(
+            height: 50.0,
+            child: ElevatedButton(
+              onPressed: () => _showForm(null),
+              child: Text('Click to add habit'),
             ),
-          )),
+          ),
+          Container(
+              height: 480,
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(25),
+                      topRight: Radius.circular(25)),
+                  boxShadow: [
+                    //color: Colors.white, //background color of box
+                    BoxShadow(
+                      color: Color.fromARGB(255, 190, 190, 190),
+                      blurRadius: 25.0, // soften the shadow
+                      spreadRadius: 3.0, //extend the shadow
+                      offset: Offset(
+                        5.0, // Move to right 10  horizontally
+                        5.0, // Move to bottom 10 Vertically
+                      ),
+                    )
+                  ],
+                  color: Color(0xFFEFEEEE)),
+              child: ListView.builder(
+                itemBuilder: _buildHabitItem,
+                itemCount: 20,
+                physics: BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics(),
+                ),
+              )),
+        ],
+      ),
     );
   }
 
@@ -196,18 +215,21 @@ class _HabitListerWidgetState extends State<HabitListerWidget> {
     );
   }
 
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
+  onShowForm(int val) {
+    _showForm(val);
+  }
+
   // This function will be triggered when the floating button is pressed
   // It will also be triggered when you want to update an item
   void _showForm(int? id) async {
     if (id != null) {
       // id == null -> create new item
       // id != null -> update an existing item
-      final existingJournal =
-          _journals.firstWhere((element) => element['id'] == id);
-      _titleController.text = existingJournal['title'];
-      _descriptionController.text = existingJournal['description'];
+
+      // final existingJournal =
+      //     _habits.firstWhere((element) => element['id'] == id);
+      // _titleController.text = existingJournal['title'];
+      //_descriptionController.text = existingJournal['description'];
     }
 
     showModalBottomSheet(
@@ -276,7 +298,7 @@ class _HabitListerWidgetState extends State<HabitListerWidget> {
   Future<void> _updateItem(int id) async {
     await DatabaseHelper.instance.updateHabitItem(
         id, _titleController.text, _descriptionController.text);
-    _refreshJournals();
+    _refreshHabits();
   }
 
   // Delete an item
@@ -285,6 +307,6 @@ class _HabitListerWidgetState extends State<HabitListerWidget> {
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
       content: Text('Successfully deleted a journal!'),
     ));
-    _refreshJournals();
+    _refreshHabits();
   }
 }

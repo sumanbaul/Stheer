@@ -30,6 +30,8 @@ class HabitHubPage extends StatelessWidget {
       //Color(0xffB6CEC7),
     ];
 
+    final VoidCallback showform;
+
     return Scaffold(
         drawer: NavigationDrawerWidget(),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -65,7 +67,7 @@ class HabitHubPage extends StatelessWidget {
               children: [
                 Container(
                   //header
-
+                  height: 200,
                   padding: EdgeInsets.only(top: 15),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.only(

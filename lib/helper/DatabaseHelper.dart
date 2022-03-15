@@ -268,9 +268,19 @@ class DatabaseHelper {
   }
 
   // Read all items (habits)
-  Future<List<Map<String, dynamic>>> getHabits() async {
+  Future<List<HabitsModel>> getHabits() async {
     final db = await (database);
-    return db!.query('tblhabits', orderBy: "id");
+    final List<Map<String, dynamic>> maps =
+        await db!.query(HabitsModel.TABLENAME, orderBy: "id");
+
+    return List.generate(maps.length, (i) {
+      return HabitsModel(
+        habitTitle: maps[i]['habitTitle'],
+        color: maps[i]['color'],
+        habitType: maps[i]['habitType'],
+        isCompleted: maps[i]['isCompleted'],
+      );
+    });
   }
 
   // Read a single item by id
