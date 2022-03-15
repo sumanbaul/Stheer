@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:notifoo/model/apps.dart';
+import 'package:notifoo/model/habits_model.dart';
 import 'package:notifoo/model/pomodoro_timer.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -22,8 +24,14 @@ class DatabaseHelper {
   String _notificationsLogTable =
       '''CREATE TABLE notifications (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, appTitle TEXT, text TEXT, message TEXT, packageName TEXT, timestamp INTEGER, createAt TEXT, eventJson TEXT, createdDate TEXT, isDeleted INTEGER, UNIQUE(title , text))''';
 
-  String _habitsTable =
-      "Create table tblhabitslog (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, habitTitle TEXT, isCompleted INTEGER, habitType TEXT, color TEXT, createdDate INTEGER)";
+  String _habitsTable = """Create table tblhabits (
+        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+        habitTitle TEXT, 
+        isCompleted INTEGER, 
+        habitType TEXT, 
+        color TEXT, 
+        createdAt TIMESTAMP NOT NULL DEFAYLT CURRENT_TIMESTAMP
+        )""";
 
   //V3 Alter table
   String _deviceAppsAlterTableV3 =
@@ -49,9 +57,10 @@ class DatabaseHelper {
 
     return await openDatabase(
       join(await getDatabasesPath(), databaseName),
-      version: 4,
+      version: 5,
       onCreate: _onCreate,
       onUpgrade: (db, oldVersion, newVersion) => {
+        //BELOW CODE IS CURRENTLY NOT IN USE
         if (oldVersion == 2)
           {
             // db.execute(_deviceAppsTable),
@@ -64,11 +73,6 @@ class DatabaseHelper {
   }
 
   Future _onCreate(Database db, int version) async {
-    //print(db.setVersion(2));
-    //String _version = _database.getVersion().toString();
-    // print("DB Version: $_version");
-
-    //await db.setVersion(4);
     await db.execute(_pomodoroLogTable);
 
     await db.execute(_notificationsLogTable);
@@ -253,5 +257,51 @@ class DatabaseHelper {
         enabled: maps[i]['enabled'],
       );
     });
+  }
+
+  // Create new Habit
+  Future<int> createHabit(HabitsModel habitsItem) async {
+    final db = await (database);
+    final id = await db?.insert(HabitsModel.TABLENAME, habitsItem.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.ignore);
+    return id!;
+  }
+
+  // Read all items (habits)
+  Future<List<Map<String, dynamic>>> getHabits() async {
+    final db = await (database);
+    return db!.query('tblhabits', orderBy: "id");
+  }
+
+  // Read a single item by id
+  // Currently this is not in use, but put here for referrence
+  Future<List<Map<String, dynamic>>> getItem(int id) async {
+    final db = await (database);
+    return db!.query('tblhabits', where: "id = ?", whereArgs: [id], limit: 1);
+  }
+
+  // Update an item by id(need to update)
+  Future<int> updateHabitItem(int id, String title, String? descrption) async {
+    final db = await (database);
+
+    final data = {
+      'title': title,
+      'description': descrption,
+      'createdAt': DateTime.now().toString()
+    };
+
+    final result =
+        await db?.update('tblhabits', data, where: "id = ?", whereArgs: [id]);
+    return result!;
+  }
+
+  // Delete(will need to update)
+  Future<void> deleteHabitItem(int id) async {
+    final db = await (database);
+    try {
+      await db?.delete("items", where: "id = ?", whereArgs: [id]);
+    } catch (err) {
+      debugPrint("Something went wrong when deleting an item: $err");
+    }
   }
 }
