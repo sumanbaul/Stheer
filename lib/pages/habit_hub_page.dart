@@ -32,6 +32,16 @@ class HabitHubPage extends StatelessWidget {
 
     return Scaffold(
         drawer: NavigationDrawerWidget(),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          child: Icon(
+            Icons.add,
+            color: Colors.white70,
+          ),
+          splashColor: Colors.blueGrey,
+          backgroundColor: Colors.blueAccent,
+        ),
         body: Builder(
           builder: (context) => Container(
             //color: Color.fromARGB(255, 61, 58, 59),
@@ -91,6 +101,7 @@ class HabitHubPage extends StatelessWidget {
                         bottomHeader(context),
                       ],
                     ),
+                    // bottom: false,
                   ),
                 ),
                 SizedBox(

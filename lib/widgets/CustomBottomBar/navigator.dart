@@ -7,6 +7,7 @@ import 'package:notifoo/pages/pomodoro_home.dart';
 import 'package:notifoo/widgets/CustomBottomBar/BottomNavigation.dart';
 import 'package:notifoo/widgets/navigation/nav_drawer_widget.dart';
 
+import '../../pages/habit_hub_page.dart';
 import 'TabItem.dart';
 
 class App extends StatefulWidget {
@@ -36,9 +37,9 @@ class AppState extends State<App> {
       ),
     ),
     TabItem(
-      tabName: "Settings",
-      icon: Icons.settings,
-      page: Profile(
+      tabName: "Habits",
+      icon: Icons.add_task_rounded,
+      page: HabitHubPage(
         title: 'Profile',
       ),
     ),
@@ -98,36 +99,13 @@ class AppState extends State<App> {
       // eventually breaking the app
       child: Scaffold(
         drawer: NavigationDrawerWidget(),
-        //extendBody: true,
-        // indexed stack shows only one child
-        // drawer: Drawer(
-        //   child: ListView(
-        //     // Important: Remove any padding from the ListView.
-        //     padding: EdgeInsets.zero,
-        //     children: [
-        //       const DrawerHeader(
-        //         decoration: BoxDecoration(
-        //           color: Colors.blue,
-        //         ),
-        //         child: Text('Drawer Header'),
-        //       ),
-        //       ListTile(
-        //         title: const Text('Item 1'),
-        //         onTap: () {
-        //           // Update the state of the app.
-        //           // ...
-        //         },
-        //       ),
-        //       ListTile(
-        //         title: const Text('Item 2 test'),
-        //         onTap: () {
-        //           // Update the state of the app.
-        //           // ...
-        //         },
-        //       ),
-        //     ],
-        //   ), // Populate the Drawer in the next step.
-        // ), //NavDrawer(),
+        // floatingActionButtonLocation:
+        //     FloatingActionButtonLocation.miniCenterDocked,
+
+        // floatingActionButton: FloatingActionButton(
+        //   onPressed: () {},
+        //   backgroundColor: Colors.blueAccent,
+        // ),
         //drawer: NavigationDrawerWidget(),
         body: IndexedStack(
           index: currentTab,
