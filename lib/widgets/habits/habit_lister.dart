@@ -52,7 +52,7 @@ class _HabitListerWidgetState extends State<HabitListerWidget> {
       color: Colors.transparent,
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Container(
-        height: 100,
+        height: 115,
         width: MediaQuery.of(context).size.width * 0.9,
         clipBehavior: Clip.antiAliasWithSaveLayer,
         // padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 12.0),
@@ -136,7 +136,19 @@ class _HabitListerWidgetState extends State<HabitListerWidget> {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  ElevatedButton(
+                      onPressed: () {},
+                      child: Text('🔥 Mark Complete'),
+                      style: ButtonStyle(
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18.0),
+                          side: BorderSide(color: Colors.red),
+                        )),
+                      )),
                   Expanded(
                     flex: 1,
                     child: new SingleChildScrollView(
