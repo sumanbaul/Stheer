@@ -270,6 +270,25 @@ class _HabitHubPage extends State<HabitHubPage> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+            Center(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Add New Habit',
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    '🔥',
+                    style: TextStyle(fontSize: 20),
+                  )
+                ],
+              ),
+            ),
             TextField(
               controller: _titleController,
               decoration: const InputDecoration(hintText: 'Title'),
