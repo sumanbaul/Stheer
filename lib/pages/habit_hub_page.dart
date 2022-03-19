@@ -283,7 +283,7 @@ class _HabitHubPage extends State<HabitHubPage> {
                     ),
                   ),
                   Text(
-                    '🔥',
+                    '🔥😎',
                     style: TextStyle(fontSize: 20),
                   )
                 ],
