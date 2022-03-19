@@ -1,6 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:notifoo/model/habits_model.dart';
+import 'package:notifoo/widgets/habits/data/habit_card_menu_items.dart';
+import 'package:notifoo/widgets/habits/habit_card_menu_item.dart';
 
 class HabitListerWidget extends StatelessWidget {
   HabitListerWidget({Key? key, this.listOfHabits}) : super(key: key);
@@ -60,7 +62,7 @@ class HabitListerWidget extends StatelessWidget {
       color: Colors.transparent,
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Container(
-        height: 110,
+        height: 130,
         width: MediaQuery.of(context).size.width * 0.9,
         clipBehavior: Clip.antiAliasWithSaveLayer,
         // padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 12.0),
@@ -134,8 +136,14 @@ class HabitListerWidget extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Icon(
-                      Icons.more_vert,
+                    IconButton(
+                      icon: Icon(Icons.more_vert),
+                      onPressed: () => PopupMenuButton<HabitCardMenuItem>(
+                          itemBuilder: (context) => [
+                                ...HabitCardMenuItems.habitMenu
+                                    .map(buildHabitMenuItem)
+                                    .toList(),
+                              ]),
                       color: Colors.black45,
                     ),
                   ],
@@ -190,4 +198,9 @@ class HabitListerWidget extends StatelessWidget {
       ),
     );
   }
+
+  PopupMenuItem<HabitCardMenuItem> buildHabitMenuItem(HabitCardMenuItem item) =>
+      PopupMenuItem(
+        child: Text(item.text),
+      );
 }
