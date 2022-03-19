@@ -65,7 +65,8 @@ class _MyAppState extends State<MyApp> {
             debugShowCheckedModeBanner: false,
             theme: ThemeData.dark().copyWith(
               primaryColor: Colors.transparent, //Color(0xff0A0E21),
-              scaffoldBackgroundColor: Color.fromARGB(235, 34, 32, 48),
+              scaffoldBackgroundColor:
+                  Colors.transparent, // Color.fromARGB(235, 34, 32, 48),
               brightness: Brightness.dark,
               textTheme: TextTheme(
                 bodyText2: getBarlowFont(),

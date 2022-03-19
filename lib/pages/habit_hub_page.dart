@@ -139,7 +139,7 @@ class _HabitHubPage extends State<HabitHubPage> {
                 SizedBox(
                   height: 20.0,
                 ),
-                SubHeader(title: "Today's Notifications"),
+                SubHeader(title: "Today's Habits"),
                 HabitListerWidget(listOfHabits: _habits),
               ],
             ),
@@ -250,9 +250,15 @@ class _HabitHubPage extends State<HabitHubPage> {
 
     showModalBottomSheet(
       context: context,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
       elevation: 5,
       isScrollControlled: true,
       builder: (_) => Container(
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(25), topRight: Radius.circular(25)),
+            color: Color.fromARGB(235, 34, 32, 48)),
         padding: EdgeInsets.only(
           top: 15,
           left: 15,
