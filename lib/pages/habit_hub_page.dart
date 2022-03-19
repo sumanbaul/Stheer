@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:notifoo/widgets/Topbar.dart';
 import 'package:notifoo/widgets/habits/habit_lister.dart';
+import 'package:notifoo/widgets/habits/show_form.dart';
 import 'package:notifoo/widgets/headers/subHeader.dart';
 
 import '../helper/DatabaseHelper.dart';
@@ -66,7 +67,17 @@ class _HabitHubPage extends State<HabitHubPage> {
         drawer: NavigationDrawerWidget(),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         floatingActionButton: FloatingActionButton(
-          onPressed: () => _showForm(null),
+          onPressed: () => ShowForm(
+                  habits: _habits,
+                  context: context,
+                  // onEditCallback: _addItem,
+                  onCreate: (String title, String type) => {
+                        _titleController.text = title,
+                        _descriptionController.text = type,
+                        _addItem(),
+                      },
+                  id: null)
+              .showForm(null), //_showForm(null),
           child: Icon(
             Icons.add,
             color: Colors.white70,
@@ -237,97 +248,96 @@ class _HabitHubPage extends State<HabitHubPage> {
 
   // This function will be triggered when the floating button is pressed
   // It will also be triggered when you want to update an item
-  void _showForm(int? id) async {
-    if (id != null) {
-      // id == null -> create new item
-      // id != null -> update an existing item
+  // void _showForm(int? id) async {
+  //   if (id != null) {
+  //     // id == null -> create new item
+  //     // id != null -> update an existing item
 
-      // final existingJournal =
-      //     _habits.firstWhere((element) => element['id'] == id);
-      // _titleController.text = existingJournal['title'];
-      //_descriptionController.text = existingJournal['description'];
-    }
+  //     final existingHabit = _habits.firstWhere((element) => element.id == id);
+  //     _titleController.text = existingHabit.habitTitle!;
+  //     _descriptionController.text = existingHabit.habitType!;
+  //   }
 
-    showModalBottomSheet(
-      context: context,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
-      elevation: 5,
-      isScrollControlled: true,
-      builder: (_) => Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(25), topRight: Radius.circular(25)),
-            color: Color.fromARGB(235, 34, 32, 48)),
-        padding: EdgeInsets.only(
-          top: 15,
-          left: 15,
-          right: 15,
-          // this will prevent the soft keyboard from covering the text fields
-          bottom: MediaQuery.of(context).viewInsets.bottom + 120,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Center(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Add New Habit',
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    '🔥😎',
-                    style: TextStyle(fontSize: 20),
-                  )
-                ],
-              ),
-            ),
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(hintText: 'Title'),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            TextField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(hintText: 'Description'),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                // Save new journal
-                if (id == null) {
-                  await _addItem();
-                }
+  //   showModalBottomSheet(
+  //     context: context,
+  //     shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
+  //     elevation: 5,
+  //     isScrollControlled: true,
+  //     builder: (_) => Container(
+  //       decoration: BoxDecoration(
+  //           borderRadius: BorderRadius.only(
+  //               topLeft: Radius.circular(25), topRight: Radius.circular(25)),
+  //           color: Color.fromARGB(235, 34, 32, 48)),
+  //       padding: EdgeInsets.only(
+  //         top: 15,
+  //         left: 15,
+  //         right: 15,
+  //         // this will prevent the soft keyboard from covering the text fields
+  //         bottom: MediaQuery.of(context).viewInsets.bottom + 120,
+  //       ),
+  //       child: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         crossAxisAlignment: CrossAxisAlignment.end,
+  //         children: [
+  //           Center(
+  //             child: Row(
+  //               crossAxisAlignment: CrossAxisAlignment.center,
+  //               mainAxisAlignment: MainAxisAlignment.center,
+  //               children: [
+  //                 Text(
+  //                   'Add New Habit',
+  //                   style: TextStyle(
+  //                     fontSize: 20.0,
+  //                     fontWeight: FontWeight.bold,
+  //                   ),
+  //                 ),
+  //                 Text(
+  //                   '🔥😎',
+  //                   style: TextStyle(fontSize: 20),
+  //                 )
+  //               ],
+  //             ),
+  //           ),
+  //           TextField(
+  //             controller: _titleController,
+  //             decoration: const InputDecoration(hintText: 'Title'),
+  //           ),
+  //           const SizedBox(
+  //             height: 10,
+  //           ),
+  //           TextField(
+  //             controller: _descriptionController,
+  //             decoration: const InputDecoration(hintText: 'Description'),
+  //           ),
+  //           const SizedBox(
+  //             height: 20,
+  //           ),
+  //           ElevatedButton(
+  //             onPressed: () async {
+  //               // Save new journal
+  //               if (id == null) {
+  //                 await _addItem();
+  //               }
 
-                if (id != null) {
-                  await _updateItem(id);
-                }
+  //               if (id != null) {
+  //                 await _updateItem(id);
+  //               }
 
-                // Clear the text fields
-                _titleController.text = '';
-                _descriptionController.text = '';
+  //               // Clear the text fields
+  //               _titleController.text = '';
+  //               _descriptionController.text = '';
 
-                // Close the bottom sheet
-                Navigator.of(context).pop();
-              },
-              child: Text(id == null ? 'Create New' : 'Update'),
-            )
-          ],
-        ),
-      ),
-    );
-  }
+  //               // Close the bottom sheet
+  //               Navigator.of(context).pop();
+  //             },
+  //             child: Text(id == null ? 'Create New' : 'Update'),
+  //           )
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   // Insert a new journal to the database
   Future<void> _addItem() async {

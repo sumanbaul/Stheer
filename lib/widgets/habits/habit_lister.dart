@@ -146,6 +146,23 @@ class HabitListerWidget extends StatelessWidget {
                               ]),
                       color: Colors.black45,
                     ),
+                    SizedBox(
+                      width: 100,
+                      child: Row(
+                        children: [
+                          IconButton(
+                              icon: const Icon(Icons.edit),
+                              onPressed: () =>
+                                  {} // _showForm(_journals[index]['id']),
+                              ),
+                          IconButton(
+                              icon: const Icon(Icons.delete),
+                              onPressed: () =>
+                                  {} //_deleteItem(_journals[index]['id']),
+                              ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
