@@ -60,7 +60,7 @@ class HabitListerWidget extends StatelessWidget {
       color: Colors.transparent,
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Container(
-        height: 115,
+        height: 110,
         width: MediaQuery.of(context).size.width * 0.9,
         clipBehavior: Clip.antiAliasWithSaveLayer,
         // padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 12.0),
@@ -121,7 +121,7 @@ class HabitListerWidget extends StatelessWidget {
                                 maxLines: 1,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 18.0,
+                                  fontSize: 20.0,
                                   overflow: TextOverflow.ellipsis,
                                   color: Colors.blue,
                                 ),
@@ -135,18 +135,41 @@ class HabitListerWidget extends StatelessWidget {
                       ],
                     ),
                     Icon(
-                      Icons.keyboard_arrow_right,
+                      Icons.more_vert,
                       color: Colors.black45,
-                    )
+                    ),
                   ],
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    Row(
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              child: new Text(
+                                '${listOfHabits?[index].habitType}',
+                                //overflow: TextOverflow.clip,
+                                maxLines: 1,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 14.0,
+                                  overflow: TextOverflow.ellipsis,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                     ElevatedButton(
                         onPressed: () {},
                         child: Text('🔥 Mark Complete'),
@@ -158,24 +181,6 @@ class HabitListerWidget extends StatelessWidget {
                             side: BorderSide(color: Colors.red),
                           )),
                         )),
-                    Expanded(
-                      flex: 1,
-                      child: new SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        dragStartBehavior: DragStartBehavior.start,
-                        child: Container(
-                          padding: const EdgeInsets.only(top: 10.0),
-                          width: MediaQuery.of(context).size.width * 0.87,
-                          //height: 45.0,
-                          child: Text(
-                            "No text to display",
-                            style: TextStyle(
-                              color: Colors.blue,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
