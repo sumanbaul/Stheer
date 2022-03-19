@@ -18,20 +18,20 @@ class DatabaseHelper {
 
   //Queries
   String _deviceAppsTable =
-      "CREATE TABLE deviceapps (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, appName TEXT, apkFilePath TEXT,packageName TEXT,versionName TEXT, versionCode TEXT,dataDir TEXT, systemApp INTEGER, installTimeMillis INTEGER,  category TEXT,  enabled INTEGER)";
+      '''CREATE TABLE deviceapps (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, appName TEXT, apkFilePath TEXT,packageName TEXT,versionName TEXT, versionCode TEXT,dataDir TEXT, systemApp INTEGER, installTimeMillis INTEGER,  category TEXT,  enabled INTEGER)''';
   String _pomodoroLogTable =
-      "CREATE TABLE tblpomodorolog (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, taskName TEXT, duration TEXT, isCompleted INTEGER, createdDate TEXT, isDeleted INTEGER)";
+      '''CREATE TABLE tblpomodorolog (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, taskName TEXT, duration TEXT, isCompleted INTEGER, createdDate TEXT, isDeleted INTEGER)''';
   String _notificationsLogTable =
       '''CREATE TABLE notifications (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, appTitle TEXT, text TEXT, message TEXT, packageName TEXT, timestamp INTEGER, createAt TEXT, eventJson TEXT, createdDate TEXT, isDeleted INTEGER, UNIQUE(title , text))''';
 
-  String _habitsTable = """Create table tblhabits (
+  String _habitsTable = '''CREATE TABLE IF NOT EXISTS tblhabits (
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
         habitTitle TEXT, 
         isCompleted INTEGER, 
         habitType TEXT, 
         color TEXT, 
-        createdAt TIMESTAMP NOT NULL DEFAYLT CURRENT_TIMESTAMP
-        )""";
+        createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )''';
 
   //V3 Alter table
   String _deviceAppsAlterTableV3 =
@@ -57,7 +57,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       join(await getDatabasesPath(), databaseName),
-      version: 5,
+      version: 6,
       onCreate: _onCreate,
       onUpgrade: (db, oldVersion, newVersion) => {
         //BELOW CODE IS CURRENTLY NOT IN USE
@@ -80,6 +80,7 @@ class DatabaseHelper {
     await db.execute(_deviceAppsTable);
 
     await db.execute(_habitsTable);
+    print(await db.query("tblhabits"));
   }
 
   Future close() async {

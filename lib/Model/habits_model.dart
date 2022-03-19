@@ -4,7 +4,7 @@ class HabitsModel {
   final String? habitType;
   final String? color;
 
-  static const String TABLENAME = "tblhabitslog";
+  static const String TABLENAME = "tblhabits";
 
   HabitsModel({
     this.habitTitle,
