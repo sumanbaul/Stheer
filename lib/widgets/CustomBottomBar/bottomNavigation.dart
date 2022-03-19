@@ -13,7 +13,11 @@ class BottomNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      backgroundColor: Colors.black87,
+      elevation: 0,
+      selectedLabelStyle: TextStyle(color: Color.fromRGBO(0, 117, 212, 1)),
+      unselectedLabelStyle: TextStyle(color: Colors.grey),
+      backgroundColor:
+          Color.fromARGB(235, 34, 32, 48), //Color.fromARGB(255, 33, 31, 46),
       type: BottomNavigationBarType.fixed,
       items: tabs!
           .map(
@@ -43,6 +47,8 @@ class BottomNavigation extends StatelessWidget {
   }
 
   Color _tabColor({int? index}) {
-    return AppState.currentTab == index ? Colors.cyan : Colors.grey;
+    return AppState.currentTab == index
+        ? Color.fromRGBO(0, 117, 212, 1)
+        : Colors.grey;
   }
 }

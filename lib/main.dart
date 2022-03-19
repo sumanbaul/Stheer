@@ -55,7 +55,8 @@ class _MyAppState extends State<MyApp> {
         child: AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle(
             //statusBarColor: Colors.transparent, //i like transaparent :-)
-            systemNavigationBarColor: Colors.black, // navigation bar color
+            systemNavigationBarColor: Color.fromARGB(235, 34, 32,
+                48), //Color.fromARGB(255, 33, 31, 46), // navigation bar color
             statusBarIconBrightness: Brightness.dark, // status bar icons' color
             systemNavigationBarIconBrightness:
                 Brightness.dark, //navigation bar icons' color
@@ -63,8 +64,8 @@ class _MyAppState extends State<MyApp> {
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
             theme: ThemeData.dark().copyWith(
-              primaryColor: Color(0xff0A0E21),
-              scaffoldBackgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
+              primaryColor: Colors.transparent, //Color(0xff0A0E21),
+              scaffoldBackgroundColor: Color.fromARGB(235, 34, 32, 48),
               brightness: Brightness.dark,
               textTheme: TextTheme(
                 bodyText2: getBarlowFont(),
