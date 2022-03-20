@@ -150,8 +150,11 @@ class HabitListerWidget extends StatelessWidget {
                     // ),
 
                     PopupMenuButton<HabitCardMenuItem>(
-                      onSelected: (habititem) => onMenuClick(context,
-                          listOfHabits, index), //onSelected(habititem),
+                      onSelected: (habititem) => onMenuClick(
+                        context,
+                        listOfHabits,
+                        listOfHabits[index].id!,
+                      ), //onSelected(habititem),
                       color: Colors.blueGrey,
                       elevation: 5,
                       icon: Icon(Icons.more, color: Colors.blueGrey),
@@ -196,6 +199,19 @@ class HabitListerWidget extends StatelessWidget {
                         Container(
                           child: new Text(
                             '${listOfHabits[index].habitType}',
+                            //overflow: TextOverflow.clip,
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontWeight: FontWeight.normal,
+                              fontSize: 14.0,
+                              overflow: TextOverflow.ellipsis,
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          child: new Text(
+                            '${listOfHabits[index].id}',
                             //overflow: TextOverflow.clip,
                             maxLines: 1,
                             style: TextStyle(
