@@ -3,12 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:notifoo/model/habits_model.dart';
 import 'package:notifoo/widgets/habits/data/habit_card_menu_items.dart';
 import 'package:notifoo/widgets/habits/habit_card_menu_item.dart';
+import 'package:notifoo/widgets/habits/show_form.dart';
+import 'package:path/path.dart';
 
 class HabitListerWidget extends StatelessWidget {
-  HabitListerWidget({Key? key, this.listOfHabits}) : super(key: key);
+  HabitListerWidget({
+    Key? key,
+    required this.listOfHabits,
+    this.onHabitMenuClick,
+  }) : super(key: key);
 
-  final List<HabitsModel>? listOfHabits;
+  final List<HabitsModel> listOfHabits;
 
+  final Function(int id)? onHabitMenuClick;
   final List<Color> _cardColors = [
     Color.fromARGB(255, 255, 255, 255),
     Color.fromARGB(255, 233, 233, 233)
@@ -38,7 +45,7 @@ class HabitListerWidget extends StatelessWidget {
               color: Color(0xFFEFEEEE)),
           child: ListView.builder(
             itemBuilder: _buildHabitItem,
-            itemCount: listOfHabits?.length,
+            itemCount: listOfHabits.length,
             physics: BouncingScrollPhysics(
               parent: AlwaysScrollableScrollPhysics(),
             ),
@@ -62,7 +69,7 @@ class HabitListerWidget extends StatelessWidget {
       color: Colors.transparent,
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Container(
-        height: 130,
+        //height: 150,
         width: MediaQuery.of(context).size.width * 0.9,
         clipBehavior: Clip.antiAliasWithSaveLayer,
         // padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 12.0),
@@ -118,7 +125,7 @@ class HabitListerWidget extends StatelessWidget {
                           children: [
                             Container(
                               child: new Text(
-                                '${listOfHabits?[index].habitTitle}',
+                                '${listOfHabits[index].habitTitle}',
                                 //overflow: TextOverflow.clip,
                                 maxLines: 1,
                                 style: TextStyle(
@@ -136,33 +143,43 @@ class HabitListerWidget extends StatelessWidget {
                         ),
                       ],
                     ),
-                    IconButton(
-                      icon: Icon(Icons.more_vert),
-                      onPressed: () => PopupMenuButton<HabitCardMenuItem>(
-                          itemBuilder: (context) => [
-                                ...HabitCardMenuItems.habitMenu
-                                    .map(buildHabitMenuItem)
-                                    .toList(),
-                              ]),
-                      color: Colors.black45,
+                    // IconButton(
+                    //   icon: Icon(Icons.more_vert),
+                    //   onPressed: () => onHabitMenuClick(),
+                    //   color: Colors.black45,
+                    // ),
+
+                    PopupMenuButton<HabitCardMenuItem>(
+                      onSelected: (habititem) => onMenuClick(
+                          context, listOfHabits, 2), //onSelected(habititem),
+                      color: Colors.blueGrey,
+                      elevation: 5,
+                      icon: Icon(Icons.more, color: Colors.blueGrey),
+                      tooltip: "More",
+                      itemBuilder: (context) => [
+                        ...HabitCardMenuItems.habitMenu
+                            .map(buildHabitMenuItem)
+                            .toList(),
+                      ],
                     ),
-                    SizedBox(
-                      width: 100,
-                      child: Row(
-                        children: [
-                          IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () =>
-                                  {} // _showForm(_journals[index]['id']),
-                              ),
-                          IconButton(
-                              icon: const Icon(Icons.delete),
-                              onPressed: () =>
-                                  {} //_deleteItem(_journals[index]['id']),
-                              ),
-                        ],
-                      ),
-                    ),
+
+                    // SizedBox(
+                    //   width: 100,
+                    //   child: Row(
+                    //     children: [
+                    //       IconButton(
+                    //           icon: const Icon(Icons.edit),
+                    //           onPressed: () =>
+                    //               {} // _showForm(_journals[index]['id']),
+                    //           ),
+                    //       IconButton(
+                    //           icon: const Icon(Icons.delete),
+                    //           onPressed: () =>
+                    //               {} //_deleteItem(_journals[index]['id']),
+                    //           ),
+                    //     ],
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -172,40 +189,36 @@ class HabitListerWidget extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              child: new Text(
-                                '${listOfHabits?[index].habitType}',
-                                //overflow: TextOverflow.clip,
-                                maxLines: 1,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 14.0,
-                                  overflow: TextOverflow.ellipsis,
-                                  color: Colors.blue,
-                                ),
-                              ),
+                        Container(
+                          child: new Text(
+                            '${listOfHabits[index].habitType}',
+                            //overflow: TextOverflow.clip,
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontWeight: FontWeight.normal,
+                              fontSize: 14.0,
+                              overflow: TextOverflow.ellipsis,
+                              color: Colors.blue,
                             ),
-                          ],
+                          ),
                         ),
+                        ElevatedButton(
+                            onPressed: () {},
+                            child: Text('🔥 Mark Complete'),
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all<
+                                      RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18.0),
+                                side: BorderSide(color: Colors.red),
+                              )),
+                            )),
                       ],
                     ),
-                    ElevatedButton(
-                        onPressed: () {},
-                        child: Text('🔥 Mark Complete'),
-                        style: ButtonStyle(
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                                  RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18.0),
-                            side: BorderSide(color: Colors.red),
-                          )),
-                        )),
                   ],
                 ),
               ),
@@ -216,8 +229,25 @@ class HabitListerWidget extends StatelessWidget {
     );
   }
 
+  void onSelected(BuildContext context, HabitCardMenuItem item) {}
   PopupMenuItem<HabitCardMenuItem> buildHabitMenuItem(HabitCardMenuItem item) =>
-      PopupMenuItem(
-        child: Text(item.text),
+      PopupMenuItem<HabitCardMenuItem>(
+        value: item,
+        child: Row(
+          children: [
+            Icon(item.icon, color: Colors.white, size: 20),
+            const SizedBox(width: 12),
+            Text(item.text),
+          ],
+        ),
       );
+
+  void onMenuClick(BuildContext context, List<HabitsModel> habits, int id) {
+    ShowForm(
+      context: context,
+      habits: habits,
+      id: id,
+      onCreate: (String title, String type) => {},
+    ).showForm(id);
+  }
 }
