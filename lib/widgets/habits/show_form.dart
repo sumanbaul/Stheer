@@ -7,6 +7,8 @@ class ShowForm {
   final BuildContext context;
   final VoidCallback? onEditCallback;
   final Function(String title, String type) onCreate;
+  final Function(String title, String type)? onEdit;
+
   final int? id;
 
   //private variables
@@ -19,6 +21,7 @@ class ShowForm {
     this.onEditCallback,
     required this.id,
     required this.onCreate,
+    this.onEdit,
   });
   // This function will be triggered when the floating button is pressed
   // It will also be triggered when you want to update an item
@@ -26,7 +29,7 @@ class ShowForm {
     if (id != null) {
       // id == null -> create new item
       // id != null -> update an existing item
-
+      //////Here is an issue, that needs to be fixed
       final existingHabit = habits.firstWhere((element) => element.id == id);
       _titleController.text = existingHabit.habitTitle!;
       _descriptionController.text = existingHabit.habitType!;
@@ -99,6 +102,7 @@ class ShowForm {
 
                 if (id != null) {
                   //await _updateItem(id);
+                  onEdit!(_titleController.text, _descriptionController.text);
                 }
 
                 // Clear the text fields

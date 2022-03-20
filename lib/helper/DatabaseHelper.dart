@@ -276,6 +276,7 @@ class DatabaseHelper {
 
     return List.generate(maps.length, (i) {
       return HabitsModel(
+        id: maps[i]['id'],
         habitTitle: maps[i]['habitTitle'],
         color: maps[i]['color'],
         habitType: maps[i]['habitType'],

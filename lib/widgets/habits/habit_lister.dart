@@ -150,8 +150,8 @@ class HabitListerWidget extends StatelessWidget {
                     // ),
 
                     PopupMenuButton<HabitCardMenuItem>(
-                      onSelected: (habititem) => onMenuClick(
-                          context, listOfHabits, 2), //onSelected(habititem),
+                      onSelected: (habititem) => onMenuClick(context,
+                          listOfHabits, index), //onSelected(habititem),
                       color: Colors.blueGrey,
                       elevation: 5,
                       icon: Icon(Icons.more, color: Colors.blueGrey),
@@ -248,6 +248,7 @@ class HabitListerWidget extends StatelessWidget {
       habits: habits,
       id: id,
       onCreate: (String title, String type) => {},
+      onEdit: (String title, String type) => {},
     ).showForm(id);
   }
 }
