@@ -184,8 +184,6 @@ class _HabitHubPage extends State<HabitHubPage> {
   //Responsible for Banner Header bottom part
   Widget bottomHeader(BuildContext context) {
     return Container(
-      // color: Colors.amber,
-
       child: Column(
         children: [
           Container(
