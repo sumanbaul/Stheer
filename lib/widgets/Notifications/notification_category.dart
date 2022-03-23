@@ -13,9 +13,10 @@ class NotificationsCategoryWidget extends StatefulWidget {
   NotificationsCategoryWidget({
     Key? key,
     this.title,
+    required this.todaysNotifications,
   }) : super(key: key);
   final String? title;
-  //final List<Notifications> todaysNotifications;
+  final List<Notifications> todaysNotifications;
   @override
   State<NotificationsCategoryWidget> createState() =>
       _NotificationsCategoryWidgetState();
@@ -61,8 +62,9 @@ class _NotificationsCategoryWidgetState
   }
 
   initializeDatabase(int day) async {
-    var notificationFromDatabase =
-        await DatabaseHelper.instance.getNotifications(day);
+    var notificationFromDatabase = this.widget.todaysNotifications.isEmpty
+        ? await DatabaseHelper.instance.getNotifications(day)
+        : this.widget.todaysNotifications;
     notificationCategoryStream =
         getCategoryListStream(day, notificationFromDatabase);
   }
@@ -112,10 +114,14 @@ class _NotificationsCategoryWidgetState
 
         notificationsByCategory.add(nc);
       });
+
+      setState(() {
+        notificationsByCategory
+            .sort((a, b) => b.timestamp!.compareTo(a.timestamp!));
+        _nc = notificationsByCategory;
+      });
     }
-    notificationsByCategory
-        .sort((a, b) => b.timestamp!.compareTo(a.timestamp!));
-    _nc = notificationsByCategory;
+
     return notificationsByCategory;
   }
 

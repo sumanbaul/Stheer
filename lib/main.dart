@@ -75,14 +75,14 @@ class _MyAppState extends State<MyApp> {
                 subtitle1: getBarlowFont(),
               ),
             ),
-            initialRoute: '/splash',
+            initialRoute: '/app',
             routes: {
               // When navigating to the "/" route, build the FirstScreen widget.
-              '/': (context) => SplashScreen(),
+              //  '/': (context) => SplashScreen(),
               // When navigating to the "/splash" route, build the SecondScreen widget.
               '/home': (context) => Homepage(title: "Home"),
               '/second': (context) => TestPage(title: "Test"),
-              '/splash': (context) => SplashScreen(),
+              //'/splash': (context) => SplashScreen(),
               '/habits': (context) => HabitHubPage(),
               '/signin': (context) => SignIn(),
               '/profile': (context) => Profile(title: "Profile"),

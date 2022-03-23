@@ -70,7 +70,8 @@ class _HomepageState extends State<Homepage> {
                   Container(
                     child: Expanded(
                       child: NotificationsLister(
-                          getNotificationsOfToday: _getNotificationsOfToday),
+                        getNotificationsOfToday: _getNotificationsOfToday,
+                      ),
                     ),
                   )
                 ],

@@ -78,6 +78,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
         padding: EdgeInsets.zero,
         child: NotificationsCategoryWidget(
           title: 'Stheer',
+          todaysNotifications: this.widget.getNotificationsOfToday,
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -118,21 +119,9 @@ class _NotificationsListerState extends State<NotificationsLister> {
     //Apps app;
     Apps? app;
     if (packageName != "") {
-      // getCurrentAppWithIcon(packageName);
-      // app = await DeviceApps.getApp('com.frandroid.app');
-      //_currentApp = await DeviceApps.getApp(packageName);
       _currentApp = (() async {
         await DeviceApps.getApp(packageName);
       })() as Application;
-
-      // AppListHelper().appListData.forEach((element) async {
-      //   if (element.packageName == packageName) {
-      //     _currentApp = await DeviceApps.getApp(packageName);
-      //     // _currentApp = app;
-      //     //_icon = app.icon;
-      //     //Application appxx = app;
-      //   }
-      // });
     }
     return app; // as Application;
   }
@@ -182,74 +171,69 @@ class _NotificationsListerState extends State<NotificationsLister> {
           // });
 
           if ((event.text != flagEntry) && event.text != null) {
-            DatabaseHelper.instance.insertNotification(
-              Notifications(
-                  title: event.title,
-                  appTitle: _currentApp!.appName,
-                  // appIcon: _currentApp is ApplicationWithIcon
-                  //     ? Image.memory(_currentApp.icon)
-                  //     : null,
-                  text: event.text,
-                  message: event.message,
-                  packageName: event.packageName,
-                  timestamp: event.timestamp,
-                  createAt: event.createAt!.millisecondsSinceEpoch.toString(),
-                  eventJson: event.toString(),
-                  createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
-                  isDeleted: 0
-                  // infoText: jsonData["text"],
-                  // showWhen: 1,
-                  // subText: jsonData["text"],
-                  // timestamp: event.timestamp.toString(),
-                  // packageName: jsonData["packageName"],
-                  // text: jsonData["text"],
-                  // summaryText: jsonData["summaryText"] ?? ""
-                  ),
+            var currentNotification = Notifications(
+              title: event.title,
+              appTitle: _currentApp!.appName,
+              text: event.text,
+              message: event.message,
+              packageName: event.packageName,
+              timestamp: event.timestamp,
+              createAt: event.createAt!.millisecondsSinceEpoch.toString(),
+              eventJson: event.toString(),
+              createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
+              isDeleted: 0,
+              // infoText: jsonData["text"],
+              // showWhen: 1,
+              // subText: jsonData["text"],
+              // timestamp: event.timestamp.toString(),
+              // packageName: jsonData["packageName"],
+              // text: jsonData["text"],
+              // summaryText: jsonData["summaryText"] ?? ""
             );
 
+            //add current notification to this Global Variable(getNotificationsOfToday)
+            //inside context
+
+            DatabaseHelper.instance.insertNotification(currentNotification);
+            setState(() {
+              this.widget.getNotificationsOfToday.add(currentNotification);
+            });
             //initClearNotificationsState();
             flagEntry = event.text;
           } else {
             // # TODO fix here
+            var currentNotification = Notifications(
+                title: jsonresponse["textLines"] ??
+                    jsonresponse["textLines"] as String?,
+                text: event.text,
+                message: event.message,
+                packageName: event.packageName,
+                timestamp: event.timestamp,
+                createAt: event.createAt!.millisecondsSinceEpoch.toString(),
+                eventJson: event.toString(),
+                createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
+                isDeleted: 0
+                // infoText: jsonData["text"],
+                // showWhen: 1,
+                // subText: jsonData["text"],
+                // timestamp: event.timestamp.toString(),
+                // packageName: jsonData["packageName"],
+                // text: jsonData["text"],
+                // summaryText: jsonData["summaryText"] ?? ""
+                );
 
-            // var titleLength = jsonresponse["textLines"].length;
+            //add current notification to this Global Variable(getNotificationsOfToday)
+            //inside context
 
-            DatabaseHelper.instance.insertNotification(
-              Notifications(
-                  title: jsonresponse["textLines"] ??
-                      jsonresponse["textLines"] as String?,
-                  text: event.text,
-                  message: event.message,
-                  packageName: event.packageName,
-                  timestamp: event.timestamp,
-                  createAt: event.createAt!.millisecondsSinceEpoch.toString(),
-                  eventJson: event.toString(),
-                  createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
-                  isDeleted: 0
-                  // infoText: jsonData["text"],
-                  // showWhen: 1,
-                  // subText: jsonData["text"],
-                  // timestamp: event.timestamp.toString(),
-                  // packageName: jsonData["packageName"],
-                  // text: jsonData["text"],
-                  // summaryText: jsonData["summaryText"] ?? ""
-                  ),
-            );
-
+            await DatabaseHelper.instance
+                .insertNotification(currentNotification);
             //initClearNotificationsState();
+            setState(() {
+              this.widget.getNotificationsOfToday.add(currentNotification);
+            });
           }
         }
       }
-
-      setState(() {});
-      // if (!event.packageName.contains("example") ||
-      //     !event.packageName.contains("skydrive") ||
-      //     !event.packageName.contains("skydrive") ||
-      //     !event.packageName.contains("xiaomi")) {
-      //   // TODO: fix bug
-      //   // NotificationsListener.promoteToForeground("");
-      // }
-      // print("Print Notification: $event");
     }
   }
 
@@ -308,6 +292,29 @@ class _NotificationsListerState extends State<NotificationsLister> {
       started = false;
       _loading = false;
     });
+  }
+
+  onAppClicked(BuildContext context, Application app) {
+    // final appName = SnackBar(content: Text(app.appName));
+    // ScaffoldMessenger.of(context).showSnackBar(appName);
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(app.appName),
+            actions: <Widget>[
+              AppButtonAction(
+                label: 'Open app',
+                onPressed: () => app.openApp(),
+              ),
+              AppButtonAction(
+                label: 'Open app settings',
+                onPressed: () => app.openSettingsScreen(),
+              ),
+            ],
+          );
+        });
   }
 
   Future<void> initClearNotificationsState() async {
@@ -449,26 +456,4 @@ class _NotificationsListerState extends State<NotificationsLister> {
   //   );
   // }
 
-  onAppClicked(BuildContext context, Application app) {
-    // final appName = SnackBar(content: Text(app.appName));
-    // ScaffoldMessenger.of(context).showSnackBar(appName);
-
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(app.appName),
-            actions: <Widget>[
-              AppButtonAction(
-                label: 'Open app',
-                onPressed: () => app.openApp(),
-              ),
-              AppButtonAction(
-                label: 'Open app settings',
-                onPressed: () => app.openSettingsScreen(),
-              ),
-            ],
-          );
-        });
-  }
 }
