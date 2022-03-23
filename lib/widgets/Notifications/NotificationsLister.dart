@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:isolate';
 import 'dart:ui';
 import 'dart:async';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
@@ -13,6 +14,8 @@ import 'package:notifoo/widgets/Notifications/notification_category.dart';
 import 'package:notifoo/widgets/buttons/appActionButton.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:notifoo/model/Notifications.dart';
+
+import '../../model/notificationCategory.dart';
 
 //Initialize singleton
 //final AppListHelper appsListHelper = new AppListHelper();
@@ -30,12 +33,12 @@ class NotificationsLister extends StatefulWidget {
 }
 
 class _NotificationsListerState extends State<NotificationsLister> {
-  List<NotificationEvent> _log = []; // check what this variable is doing??????
-
-  //List<Apps> _apps = AppListHelper().appListData;
+  bool isToday = true;
+  List<NotificationCategory> _nc =
+      []; // check what this variable is doing??????
+  List<NotificationCategory> notificationCategoryStream = [];
 
   Application? _currentApp;
-  Image? _icon;
 
   bool appsLoaded = false;
 
@@ -50,10 +53,10 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
   @override
   void initState() {
-    initPlatformState();
-    DatabaseHelper.instance.initializeDatabase();
-
     super.initState();
+    initPlatformState();
+    initPopulateData();
+    //DatabaseHelper.instance.initializeDatabase();
   }
 
   // we must use static method, to handle in background
@@ -69,6 +72,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
   @override
   Widget build(BuildContext context) {
+    // initializeNotificationsByCategory(this.isToday ? 0 : 1);
     return Scaffold(
       backgroundColor: Colors.transparent,
       //appBar: Topbar.getTopbar(widget.title),
@@ -77,9 +81,11 @@ class _NotificationsListerState extends State<NotificationsLister> {
         height: 800,
         padding: EdgeInsets.zero,
         child: NotificationsCategoryWidget(
-          title: 'Stheer',
-          todaysNotifications: this.widget.getNotificationsOfToday,
-        ),
+            title: 'Stheer',
+            isToday: isToday,
+            getNotificationsOfToday:
+                initPopulateData() //this.widget.getNotificationsOfToday,
+            ),
       ),
       floatingActionButton: FloatingActionButton(
         //backgroundColor: Color(0xffeeaeca),
@@ -110,6 +116,10 @@ class _NotificationsListerState extends State<NotificationsLister> {
     var isServiceRunning = await (NotificationsListener.isRunning);
     print("""Service is ${!isServiceRunning! ? "not " : ""}aleary running""");
 
+    //for testing
+    //var test = this.widget.getNotificationsOfToday;
+    ///////
+
     setState(() {
       started = isServiceRunning;
     });
@@ -119,15 +129,27 @@ class _NotificationsListerState extends State<NotificationsLister> {
     //Apps app;
     Apps? app;
     if (packageName != "") {
+      // getCurrentAppWithIcon(packageName);
+      // app = await DeviceApps.getApp('com.frandroid.app');
+      //_currentApp = await DeviceApps.getApp(packageName);
       _currentApp = (() async {
         await DeviceApps.getApp(packageName);
       })() as Application;
+
+      // AppListHelper().appListData.forEach((element) async {
+      //   if (element.packageName == packageName) {
+      //     _currentApp = await DeviceApps.getApp(packageName);
+      //     // _currentApp = app;
+      //     //_icon = app.icon;
+      //     //Application appxx = app;
+      //   }
+      // });
     }
     return app; // as Application;
   }
 
   Future<Application?> getCurrentAppWithIcon(String packageName) async {
-    _currentApp = await DeviceApps.getApp(packageName);
+    _currentApp = await DeviceApps.getApp(packageName, true);
     return _currentApp;
   }
 
@@ -148,15 +170,13 @@ class _NotificationsListerState extends State<NotificationsLister> {
           (event.packageName!.contains("wellbeing")) ||
           (event.packageName!.contains("weather2")) ||
           (event.packageName!.contains("gallery"))) {
-        //print(event.packageName);
+        print(event.packageName);
       } else {
-        //_currentApp = app as Application;
         packageName = event.packageName;
         // print("Success Package Found: " + app.packageName);
         //var jsondata2 = json.decode(event.toString());
         Map<String, dynamic> jsonresponse = json.decode(event.toString());
 
-        _log.add(event);
         var createatday = event.createAt!.day;
         print("Create AT Day: $createatday");
         var today = new DateTime.now().day;
@@ -164,47 +184,21 @@ class _NotificationsListerState extends State<NotificationsLister> {
         //var xx = jsonresponse.containsKey('summaryText');
         if (!jsonresponse.containsKey('summaryText') &&
             event.createAt!.day >= today) {
-          //check
-          bool redundancy;
+          //Redundancy check, currently not in use, need to use it to...
+          //filter out redundant notifications
+
+          // bool redundancy;
           // redundantNotificationCheck(event)!.then((bool value) {
           //   redundancy = value;
           // });
 
           if ((event.text != flagEntry) && event.text != null) {
             var currentNotification = Notifications(
-              title: event.title,
-              appTitle: _currentApp!.appName,
-              text: event.text,
-              message: event.message,
-              packageName: event.packageName,
-              timestamp: event.timestamp,
-              createAt: event.createAt!.millisecondsSinceEpoch.toString(),
-              eventJson: event.toString(),
-              createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
-              isDeleted: 0,
-              // infoText: jsonData["text"],
-              // showWhen: 1,
-              // subText: jsonData["text"],
-              // timestamp: event.timestamp.toString(),
-              // packageName: jsonData["packageName"],
-              // text: jsonData["text"],
-              // summaryText: jsonData["summaryText"] ?? ""
-            );
-
-            //add current notification to this Global Variable(getNotificationsOfToday)
-            //inside context
-
-            DatabaseHelper.instance.insertNotification(currentNotification);
-            setState(() {
-              this.widget.getNotificationsOfToday.add(currentNotification);
-            });
-            //initClearNotificationsState();
-            flagEntry = event.text;
-          } else {
-            // # TODO fix here
-            var currentNotification = Notifications(
-                title: jsonresponse["textLines"] ??
-                    jsonresponse["textLines"] as String?,
+                title: event.title,
+                appTitle: _currentApp!.appName,
+                // appIcon: _currentApp is ApplicationWithIcon
+                //     ? Image.memory(_currentApp.icon)
+                //     : null,
                 text: event.text,
                 message: event.message,
                 packageName: event.packageName,
@@ -227,13 +221,55 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
             await DatabaseHelper.instance
                 .insertNotification(currentNotification);
-            //initClearNotificationsState();
-            setState(() {
+            this.setState(() {
               this.widget.getNotificationsOfToday.add(currentNotification);
+              print("Setstate getting hit: $currentNotification");
+            });
+            //initClearNotificationsState();
+            flagEntry = event.text;
+          } else {
+            // # TODO fix here
+
+            // var titleLength = jsonresponse["textLines"].length;
+
+            var currentNotification = Notifications(
+                title: jsonresponse["textLines"] ??
+                    jsonresponse["textLines"] as String?,
+                text: event.text,
+                message: event.message,
+                packageName: event.packageName,
+                timestamp: event.timestamp,
+                createAt: event.createAt!.millisecondsSinceEpoch.toString(),
+                eventJson: event.toString(),
+                createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
+                isDeleted: 0
+                // infoText: jsonData["text"],
+                // showWhen: 1,
+                // subText: jsonData["text"],
+                // timestamp: event.timestamp.toString(),
+                // packageName: jsonData["packageName"],
+                // text: jsonData["text"],
+                // summaryText: jsonData["summaryText"] ?? ""
+                );
+
+            //initClearNotificationsState();
+            this.setState(() {
+              this.widget.getNotificationsOfToday.add(currentNotification);
+              print("Setstate getting hit: $currentNotification");
             });
           }
         }
       }
+
+      setState(() {});
+      // if (!event.packageName.contains("example") ||
+      //     !event.packageName.contains("skydrive") ||
+      //     !event.packageName.contains("skydrive") ||
+      //     !event.packageName.contains("xiaomi")) {
+      //   // TODO: fix bug
+      //   // NotificationsListener.promoteToForeground("");
+      // }
+      // print("Print Notification: $event");
     }
   }
 
@@ -272,11 +308,12 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
     if (!isR!) {
       await NotificationsListener.startService(
-        title: "Notifoo listening",
-        description: "Let's scrape the notifactions...",
-        subTitle: "Service",
-        //foreground: AppButtonAction(),
-      );
+          title: "Stheer listening",
+          description: "Let's scrape the notifactions...",
+          subTitle: "Service",
+          showWhen: true
+          //foreground: AppButtonAction(),
+          );
       setState(() {
         started = true;
         _loading = false;
@@ -294,166 +331,70 @@ class _NotificationsListerState extends State<NotificationsLister> {
     });
   }
 
-  onAppClicked(BuildContext context, Application app) {
-    // final appName = SnackBar(content: Text(app.appName));
-    // ScaffoldMessenger.of(context).showSnackBar(appName);
-
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(app.appName),
-            actions: <Widget>[
-              AppButtonAction(
-                label: 'Open app',
-                onPressed: () => app.openApp(),
-              ),
-              AppButtonAction(
-                label: 'Open app settings',
-                onPressed: () => app.openSettingsScreen(),
-              ),
-            ],
-          );
-        });
-  }
-
   Future<void> initClearNotificationsState() async {
     //ClearAllNotifications.clear();
   }
 
-  // getNotificationListBody() {
-  //   return FutureBuilder<List<Notifications>>(
-  //     future: DatabaseHelper.instance.getNotifications(0),
-  //     builder: (context, snapshot) {
-  //       if (snapshot.hasData) {
-  //         //var packageName = (Notifications element) => element.packageName;
-  //         // DateTime expiryAsDateTime = DateTime.parse(snapshot.data[]);
-  //         // var snapshotelement = snapshot.data;
-  //         // print("Snapshot data: $snapshot.data");
-  //         return StickyGroupedListView<Notifications, String>(
-  //           //padding: EdgeInsets.only(bottom: 80),
-  //           //itemScrollController: x ,
-  //           physics: BouncingScrollPhysics(
-  //             parent: AlwaysScrollableScrollPhysics(),
-  //           ),
-  //           elements: snapshot.data,
-  //           order: StickyGroupedListOrder.DESC,
-  //           groupBy: (Notifications element) => element.packageName,
-  //           groupComparator: (String value1, String value2) =>
-  //               value2.compareTo(value1),
-  //           itemComparator: (Notifications element1, Notifications element2) =>
-  //               element1.packageName.compareTo(element2.packageName),
-  //           floatingHeader: true,
-  //           groupSeparatorBuilder: (Notifications element) => Container(
-  //             height: 50,
-  //             child: Align(
-  //               alignment: Alignment.center,
-  //               child: Container(
-  //                 width: 120,
-  //                 decoration: BoxDecoration(
-  //                   color: Colors.black87,
-  //                   border: Border.all(
-  //                     color: Color(0xff94bbe9),
-  //                   ),
-  //                   borderRadius: BorderRadius.all(Radius.circular(20.0)),
-  //                 ),
-  //                 child: Padding(
-  //                   padding: const EdgeInsets.all(8.0),
-  //                   child: Text(
-  //                     //'${getCurrentApp(element.packageName).appName}',
-  //                     '${element.appTitle}',
-  //                     textAlign: TextAlign.center,
-  //                   ),
-  //                 ),
-  //               ),
-  //             ),
-  //           ),
-  //           itemBuilder: (_, Notifications element) {
-  //             if (element != null) {
-  //               getCurrentApp(element.packageName);
+  //Notifications By Category
 
-  //               //print('Current App: ' +
-  //               // getCurrentApp(element.packageName).appName);
-
-  //               return Card(
-  //                 // key: ObjectKey(snapshot
-  //                 //     .data), // this is a new change, might break the app!!!!!
-  //                 shape: RoundedRectangleBorder(
-  //                   borderRadius: BorderRadius.circular(6.0),
-  //                 ),
-  //                 elevation: 8.0,
-  //                 margin:
-  //                     new EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-  //                 child: Container(
-  //                   child: ListTile(
-  //                     contentPadding:
-  //                         EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-
-  //                     leading: _currentApp is ApplicationWithIcon
-  //                         ?
-  //                         // Image.memory(
-  //                         //     _currentApp.icon,
-  //                         //     gaplessPlayback: true,
-  //                         //     fit: BoxFit.cover,
-  //                         //     scale: 2,
-  //                         //   )
-  //                         null
-  //                         : null,
-  //                     title: Container(
-  //                       alignment: Alignment.topLeft,
-  //                       //padding: EdgeInsets.a,
-  //                       child: Column(
-  //                         crossAxisAlignment: CrossAxisAlignment.start,
-  //                         children: [
-  //                           Padding(
-  //                             padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
-  //                             child: Text(
-  //                               element.title ?? packageName,
-  //                               style: TextStyle(fontWeight: FontWeight.bold),
-  //                             ),
-  //                           ),
-  //                           Padding(
-  //                             padding: const EdgeInsets.fromLTRB(0, 0, 0, 2),
-  //                             child: Text(element.text.toString()),
-  //                           )
-  //                         ],
-  //                       ),
-  //                     ),
-  //                     subtitle: Padding(
-  //                       padding: const EdgeInsets.fromLTRB(0, 7, 0, 0),
-  //                       child: Text(
-  //                         DateTime.fromMillisecondsSinceEpoch(
-  //                                 (element.timestamp))
-  //                             .toString()
-  //                             .substring(0, 16),
-  //                         style: TextStyle(color: Colors.white54, fontSize: 12),
-  //                       ),
-  //                     ),
-
-  //                     isThreeLine: true,
-  //                     //trailing: Text(element.text.toString()),
-  //                     trailing:
-  //                         //  Text(entry.packageName.toString().split('.').last),
-  //                         Icon(Icons.keyboard_arrow_right),
-  //                     // onTap: () => onAppClicked(
-  //                     //     context, getCurrentApp(element.packageName),
-  //                     //     ),
-  //                   ),
-  //                 ),
-  //               );
-  //             } else {
-  //               return Center(child: Text('Nothing to Display!'));
-  //             }
-  //             // getCurrentApp(element.packageName);
-  //           },
-  //         );
-  //       } else if (snapshot.hasError) {
-  //         //return Center(child: Text("Oops!"));
-  //         return Center(child: CircularProgressIndicator());
-  //       }
-  //       return Center(child: CircularProgressIndicator());
-  //     },
-  //   );
+  // initializeNotificationsByCategory(int day) async {
+  //   var notificationFromDatabase = this.widget.getNotificationsOfToday.isEmpty
+  //       ? await DatabaseHelper.instance.getNotifications(day)
+  //       : this.widget.getNotificationsOfToday;
+  //   notificationCategoryStream =
+  //       await getCategoryListFuture(day, notificationFromDatabase);
+  //   setState(() {});
   // }
 
+  Future<List<NotificationCategory>> getCategoryListFuture(
+      int selectedDay, List<Notifications>? notifications) async {
+    var listByPackageName;
+
+    if (notifications != null) {
+      listByPackageName = groupBy(notifications, (Notifications n) {
+        return n.packageName.toString();
+      });
+    }
+    List<NotificationCategory> notificationsByCategory = [];
+
+    if (listByPackageName.length > 0) {
+      listByPackageName.forEach((key, value) async {
+        // print(value[value.length - 1].createdDate);
+        var _app = await (getCurrentAppWithIcon(value[0].packageName));
+
+        var nc = NotificationCategory(
+            packageName: _app?.packageName,
+            appTitle: _app?.appName,
+            appIcon: _app is ApplicationWithIcon
+                ? Image.memory(
+                    _app.icon,
+                    //height: 30.0,
+                    fit: BoxFit.cover,
+                    gaplessPlayback: true,
+                  )
+                : null,
+            //tempIcon: Image.memory(_currentApp.icon),
+            timestamp: value[0].timestamp,
+            message:
+                "You have " + value.length.toString() + " Unread notifications",
+            notificationCount: value.length);
+
+        notificationsByCategory.add(nc);
+      });
+
+      setState(() {
+        notificationsByCategory
+            .sort((a, b) => b.timestamp!.compareTo(a.timestamp!));
+        _nc = notificationsByCategory;
+      });
+    }
+
+    return notificationsByCategory;
+  }
+
+  Future<List<Notifications>> initPopulateData() async {
+    return this.widget.getNotificationsOfToday.isNotEmpty
+        ? await DatabaseHelper.instance.getNotifications(0)
+        : this.widget.getNotificationsOfToday;
+  }
 }

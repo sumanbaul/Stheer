@@ -96,10 +96,6 @@ class _SplashScreenState extends State<SplashScreen> {
     DatabaseHelper.instance.initializeDatabase();
     var notificationFromDatabase =
         await DatabaseHelper.instance.getNotifications(0);
-    Timer(
-        Duration(seconds: 2),
-        () => Navigator.of(context)
-            .pushNamedAndRemoveUntil('/app', (Route<dynamic> route) => false));
     return notificationFromDatabase;
   }
 

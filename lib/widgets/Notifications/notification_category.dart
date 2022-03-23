@@ -13,10 +13,13 @@ class NotificationsCategoryWidget extends StatefulWidget {
   NotificationsCategoryWidget({
     Key? key,
     this.title,
-    required this.todaysNotifications,
+    required this.getNotificationsOfToday,
+    required this.isToday,
   }) : super(key: key);
   final String? title;
-  final List<Notifications> todaysNotifications;
+  final Future<List<Notifications>> getNotificationsOfToday;
+  final bool isToday;
+
   @override
   State<NotificationsCategoryWidget> createState() =>
       _NotificationsCategoryWidgetState();
@@ -24,8 +27,6 @@ class NotificationsCategoryWidget extends StatefulWidget {
 
 class _NotificationsCategoryWidgetState
     extends State<NotificationsCategoryWidget> {
-  Future<List<NotificationCategory>>? notificationCategoryStream;
-
   bool isToday = true;
   List<NotificationCategory> _nc = [];
 
@@ -57,34 +58,27 @@ class _NotificationsCategoryWidgetState
   void initState() {
     //DatabaseHelper.instance.initializeDatabase();
     super.initState();
-
-    isToday ? initializeDatabase(0) : initializeDatabase(1);
+    initializeNotificationsByCategory(this.widget.isToday ? 0 : 1);
   }
 
-  initializeDatabase(int day) async {
-    var notificationFromDatabase = this.widget.todaysNotifications.isEmpty
-        ? await DatabaseHelper.instance.getNotifications(day)
-        : this.widget.todaysNotifications;
-    notificationCategoryStream =
-        getCategoryListStream(day, notificationFromDatabase);
+  Future<Application?> getCurrentAppWithIcon(String packageName) async {
+    return await DeviceApps.getApp(packageName, true);
   }
 
-  Future<Application?> getCurrentApp(String? packageName) async {
-    Application? app;
-
-    if (packageName != "") {
-      app = await DeviceApps.getApp(packageName!, true);
-      //_currentApp = app;
-    }
-    return app;
+  initializeNotificationsByCategory(int day) async {
+    // var notificationFromDatabase = this.widget.getNotificationsOfToday.then((value) => null)
+    //     ? await DatabaseHelper.instance.getNotifications(day)
+    //     : this.widget.getNotificationsOfToday;
+    _nc = await getCategoryListFuture(day, this.widget.getNotificationsOfToday);
+    setState(() {});
   }
 
-  Future<List<NotificationCategory>> getCategoryListStream(
-      int selectedDay, List<Notifications>? notifications) async {
+  Future<List<NotificationCategory>> getCategoryListFuture(
+      int selectedDay, Future<List<Notifications>> notifications) async {
     var listByPackageName;
-
-    if (notifications != null) {
-      listByPackageName = groupBy(notifications, (Notifications n) {
+    var xyz = await notifications;
+    if (xyz.length > 0) {
+      listByPackageName = groupBy(xyz, (Notifications n) {
         return n.packageName.toString();
       });
     }
@@ -93,7 +87,7 @@ class _NotificationsCategoryWidgetState
     if (listByPackageName.length > 0) {
       listByPackageName.forEach((key, value) async {
         // print(value[value.length - 1].createdDate);
-        var _app = await (getCurrentApp(value[0].packageName));
+        var _app = await (getCurrentAppWithIcon(value[0].packageName));
 
         var nc = NotificationCategory(
             packageName: _app?.packageName,
@@ -114,14 +108,10 @@ class _NotificationsCategoryWidgetState
 
         notificationsByCategory.add(nc);
       });
-
-      setState(() {
-        notificationsByCategory
-            .sort((a, b) => b.timestamp!.compareTo(a.timestamp!));
-        _nc = notificationsByCategory;
-      });
     }
-
+    notificationsByCategory
+        .sort((a, b) => b.timestamp!.compareTo(a.timestamp!));
+    _nc = notificationsByCategory;
     return notificationsByCategory;
   }
 
@@ -201,7 +191,8 @@ class _NotificationsCategoryWidgetState
             // decoration: BoxDecoration(color: Colors.brown),
             margin: EdgeInsets.only(top: 0.0),
             child: FutureBuilder<List<NotificationCategory>>(
-                future: notificationCategoryStream,
+                future: getCategoryListFuture(
+                    0, this.widget.getNotificationsOfToday),
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.none:
