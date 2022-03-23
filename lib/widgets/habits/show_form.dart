@@ -7,7 +7,7 @@ class ShowForm {
   final BuildContext context;
   final VoidCallback? onEditCallback;
   final Function(String title, String type) onCreate;
-  final Function(String title, String type)? onEdit;
+  final Function(String title, String type) onEdit;
 
   final int? id;
 
@@ -21,7 +21,7 @@ class ShowForm {
     this.onEditCallback,
     required this.id,
     required this.onCreate,
-    this.onEdit,
+    required this.onEdit,
   });
   // This function will be triggered when the floating button is pressed
   // It will also be triggered when you want to update an item
@@ -102,7 +102,7 @@ class ShowForm {
 
                 if (id != null) {
                   //await _updateItem(id);
-                  onEdit!(_titleController.text, _descriptionController.text);
+                  onEdit(_titleController.text, _descriptionController.text);
                 }
 
                 // Clear the text fields

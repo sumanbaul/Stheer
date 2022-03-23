@@ -10,8 +10,12 @@ import '../../model/Notifications.dart';
 import 'notification_card.dart';
 
 class NotificationsCategoryWidget extends StatefulWidget {
-  NotificationsCategoryWidget({Key? key, this.title}) : super(key: key);
+  NotificationsCategoryWidget({
+    Key? key,
+    this.title,
+  }) : super(key: key);
   final String? title;
+  //final List<Notifications> todaysNotifications;
   @override
   State<NotificationsCategoryWidget> createState() =>
       _NotificationsCategoryWidgetState();
@@ -19,7 +23,7 @@ class NotificationsCategoryWidget extends StatefulWidget {
 
 class _NotificationsCategoryWidgetState
     extends State<NotificationsCategoryWidget> {
-  Stream<List<NotificationCategory>>? notificationCategoryStream;
+  Future<List<NotificationCategory>>? notificationCategoryStream;
 
   bool isToday = true;
   List<NotificationCategory> _nc = [];
@@ -50,11 +54,17 @@ class _NotificationsCategoryWidgetState
 
   @override
   void initState() {
-    DatabaseHelper.instance.initializeDatabase();
+    //DatabaseHelper.instance.initializeDatabase();
     super.initState();
 
+    isToday ? initializeDatabase(0) : initializeDatabase(1);
+  }
+
+  initializeDatabase(int day) async {
+    var notificationFromDatabase =
+        await DatabaseHelper.instance.getNotifications(day);
     notificationCategoryStream =
-        isToday ? getCategoryListStream(0) : getCategoryListStream(1);
+        getCategoryListStream(day, notificationFromDatabase);
   }
 
   Future<Application?> getCurrentApp(String? packageName) async {
@@ -67,15 +77,15 @@ class _NotificationsCategoryWidgetState
     return app;
   }
 
-  Stream<List<NotificationCategory>> getCategoryListStream(
-      int selectedDay) async* {
-    var getNotifications =
-        await DatabaseHelper.instance.getNotifications(selectedDay);
+  Future<List<NotificationCategory>> getCategoryListStream(
+      int selectedDay, List<Notifications>? notifications) async {
+    var listByPackageName;
 
-    final listByPackageName = groupBy(getNotifications, (Notifications n) {
-      return n.packageName;
-    });
-
+    if (notifications != null) {
+      listByPackageName = groupBy(notifications, (Notifications n) {
+        return n.packageName.toString();
+      });
+    }
     List<NotificationCategory> notificationsByCategory = [];
 
     if (listByPackageName.length > 0) {
@@ -103,11 +113,10 @@ class _NotificationsCategoryWidgetState
         notificationsByCategory.add(nc);
       });
     }
-
     notificationsByCategory
         .sort((a, b) => b.timestamp!.compareTo(a.timestamp!));
     _nc = notificationsByCategory;
-    yield notificationsByCategory;
+    return notificationsByCategory;
   }
 
   Widget getNotificationListBody() {
@@ -136,9 +145,9 @@ class _NotificationsCategoryWidgetState
                   setState(() {
                     isToday = true;
                   });
-                  notificationCategoryStream = isToday
-                      ? getCategoryListStream(0)
-                      : getCategoryListStream(1);
+                  // notificationCategoryStream = isToday
+                  //     ? getCategoryListStream(0)
+                  //     : getCategoryListStream(1);
                 },
                 child: Text('Today'),
               ),
@@ -157,9 +166,9 @@ class _NotificationsCategoryWidgetState
                   setState(() {
                     isToday = false;
                   });
-                  notificationCategoryStream = isToday
-                      ? getCategoryListStream(0)
-                      : getCategoryListStream(1);
+                  // notificationCategoryStream = isToday
+                  //     ? getCategoryListStream(0)
+                  //     : getCategoryListStream(1);
                 },
                 child: Text('Yesterday'),
               ),
@@ -185,8 +194,8 @@ class _NotificationsCategoryWidgetState
             //height: 200,
             // decoration: BoxDecoration(color: Colors.brown),
             margin: EdgeInsets.only(top: 0.0),
-            child: StreamBuilder<List<NotificationCategory>>(
-                stream: notificationCategoryStream!,
+            child: FutureBuilder<List<NotificationCategory>>(
+                future: notificationCategoryStream,
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.none:

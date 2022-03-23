@@ -3,14 +3,15 @@ import 'dart:collection';
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
 import 'package:notifoo/helper/AppListHelper.dart';
+import 'package:notifoo/model/Notifications.dart';
 import 'dart:async';
 
 import 'package:notifoo/model/apps.dart';
 import 'package:notifoo/services/installedApps.dart';
 
+import '../helper/DatabaseHelper.dart';
+
 Future<List<Application>>? apps;
-List<Application> _apps = [];
-List<Apps> _appsListNew = [];
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -29,7 +30,8 @@ class _SplashScreenState extends State<SplashScreen> {
     //checkIfDataAvaiable();
 
     super.initState();
-    getAppsData();
+    initializeData();
+    getAppsData(context);
   }
 
   // @override
@@ -90,9 +92,16 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
+  Future<List<Notifications>> initializeData() async {
+    DatabaseHelper.instance.initializeDatabase();
+    var notificationFromDatabase =
+        await DatabaseHelper.instance.getNotifications(0);
+    return notificationFromDatabase;
+  }
+
   //Get set apps data
-  Future<void> getAppsData() async {
-    InstalledApps _installedApps = new InstalledApps();
+  Future<void> getAppsData(BuildContext context) async {
+    //InstalledApps _installedApps = new InstalledApps();
     //await _installedApps.getAppsList();
     // _appsListNew = _installedApps.listOfApps;
 

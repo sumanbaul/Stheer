@@ -7,10 +7,17 @@ import 'package:notifoo/pages/pomodoro_home.dart';
 import 'package:notifoo/widgets/CustomBottomBar/BottomNavigation.dart';
 import 'package:notifoo/widgets/navigation/nav_drawer_widget.dart';
 
+import '../../model/Notifications.dart';
 import '../../pages/habit_hub_page.dart';
 import 'TabItem.dart';
 
 class App extends StatefulWidget {
+  App({
+    Key? key,
+    this.notificationsFromDb,
+  });
+  final List<Notifications>? notificationsFromDb;
+
   @override
   State<StatefulWidget> createState() => AppState();
 }
@@ -27,6 +34,7 @@ class AppState extends State<App> {
       icon: Icons.home,
       page: Homepage(
         title: 'Notifoo',
+        //notificationsFromDb: this.widget.notificationsFromDb,
       ),
     ),
     TabItem(

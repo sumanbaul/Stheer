@@ -9,6 +9,7 @@ import 'package:notifoo/pages/Profile.dart';
 import 'package:notifoo/pages/SignIn.dart';
 import 'package:notifoo/pages/SplashScreen.dart';
 import 'package:notifoo/pages/TestPage.dart';
+import 'package:notifoo/pages/habit_hub_page.dart';
 import 'package:notifoo/widgets/CustomBottomBar/navigator.dart';
 //import 'helper/DatabaseHelper.dart';
 //import 'model/apps.dart';
@@ -77,11 +78,12 @@ class _MyAppState extends State<MyApp> {
             initialRoute: '/splash',
             routes: {
               // When navigating to the "/" route, build the FirstScreen widget.
-              '/': (context) => NotificationsLister(),
+              '/': (context) => SplashScreen(),
               // When navigating to the "/splash" route, build the SecondScreen widget.
               '/home': (context) => Homepage(title: "Home"),
               '/second': (context) => TestPage(title: "Test"),
               '/splash': (context) => SplashScreen(),
+              '/habits': (context) => HabitHubPage(),
               '/signin': (context) => SignIn(),
               '/profile': (context) => Profile(title: "Profile"),
               '/app': (context) => App(),

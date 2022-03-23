@@ -77,6 +77,7 @@ class _HabitHubPage extends State<HabitHubPage> {
                         _descriptionController.text = type,
                         _addItem(),
                       },
+                  onEdit: (String title, String type) => {},
                   id: null)
               .showForm(null), //_showForm(null),
           child: Icon(
@@ -168,12 +169,27 @@ class _HabitHubPage extends State<HabitHubPage> {
             habits: _habits,
             context: context,
             onCreate: (String title, String type) => {
+                  // _titleController.text = title,
+                  // _descriptionController.text = type,
+                  // _updateItem(id),
+                },
+            onEdit: (String title, String type) => {
                   _titleController.text = title,
                   _descriptionController.text = type,
                   _updateItem(id),
                 },
             id: id)
         .showForm(id);
+  }
+
+  void onMenuClick(BuildContext context, List<HabitsModel> habits, int id) {
+    ShowForm(
+      context: context,
+      habits: habits,
+      id: id,
+      onCreate: (String title, String type) => {},
+      onEdit: (String title, String type) => {},
+    ).showForm(id);
   }
 
   PopupMenuItem<HabitCardMenuItem> buildHabitMenuItem(HabitCardMenuItem item) =>

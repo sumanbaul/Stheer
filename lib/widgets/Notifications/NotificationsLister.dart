@@ -15,11 +15,15 @@ import 'package:device_apps/device_apps.dart';
 import 'package:notifoo/model/Notifications.dart';
 
 //Initialize singleton
-//#todo
 //final AppListHelper appsListHelper = new AppListHelper();
 
 class NotificationsLister extends StatefulWidget {
-  NotificationsLister({Key? key}) : super(key: key);
+  NotificationsLister({
+    Key? key,
+    required this.getNotificationsOfToday,
+  }) : super(key: key);
+
+  final List<Notifications> getNotificationsOfToday;
 
   @override
   _NotificationsListerState createState() => _NotificationsListerState();
@@ -72,11 +76,9 @@ class _NotificationsListerState extends State<NotificationsLister> {
       body: Container(
         height: 800,
         padding: EdgeInsets.zero,
-        // child: NotificationCatgoryList(
-        //   key: UniqueKey(),
-        // ), //getNotificationListBody(),
-
-        child: NotificationsCategoryWidget(title: 'Stheer'),
+        child: NotificationsCategoryWidget(
+          title: 'Stheer',
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         //backgroundColor: Color(0xffeeaeca),
@@ -104,7 +106,6 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
     // don't use the default receivePort
     // NotificationsListener.receivePort.listen((evt) => onData(evt));
-
     var isServiceRunning = await (NotificationsListener.isRunning);
     print("""Service is ${!isServiceRunning! ? "not " : ""}aleary running""");
 

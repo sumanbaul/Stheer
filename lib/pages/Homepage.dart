@@ -7,12 +7,16 @@ import 'package:notifoo/widgets/buttons/button_widget.dart';
 import 'package:notifoo/widgets/headers/subHeader.dart';
 import 'package:notifoo/widgets/home/home_banner_widget.dart';
 //import 'package:notifoo/widgets/navigation/nav_drawer.dart';
+import '../helper/DatabaseHelper.dart';
+import '../model/Notifications.dart';
 import '../widgets/Notifications/NotificationsLister.dart';
 
 class Homepage extends StatefulWidget {
-  Homepage({Key? key, this.title}) : super(key: key);
+  Homepage({Key? key, this.title, this.notificationsFromDb}) : super(key: key);
 
   final String? title;
+  final List<Notifications>? notificationsFromDb;
+
   @override
   _HomepageState createState() => _HomepageState();
 }
@@ -25,6 +29,25 @@ class _HomepageState extends State<Homepage> {
   //     _selectedTab = index;
   //   });
   // }
+  List<Notifications> _getNotificationsOfToday = [];
+  @override
+  void initState() {
+    initializeData();
+    super.initState();
+  }
+
+  // initializeDatabase(int selectedDay) async {
+  //   DatabaseHelper.instance.initializeDatabase();
+  //   _getNotificationsOfToday =
+  //       await DatabaseHelper.instance.getNotifications(selectedDay);
+  // }
+
+  Future<List<Notifications>> initializeData() async {
+    DatabaseHelper.instance.initializeDatabase();
+    _getNotificationsOfToday =
+        await DatabaseHelper.instance.getNotifications(0);
+    return _getNotificationsOfToday;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +69,8 @@ class _HomepageState extends State<Homepage> {
                   SubHeader(title: "Today's Notifications"),
                   Container(
                     child: Expanded(
-                      child: NotificationsLister(),
+                      child: NotificationsLister(
+                          getNotificationsOfToday: _getNotificationsOfToday),
                     ),
                   )
                 ],
