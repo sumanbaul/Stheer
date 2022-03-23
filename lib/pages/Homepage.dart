@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:notifoo/widgets/navigation/nav_drawer_widget.dart';
-import 'package:notifoo/widgets/Topbar.dart';
-import 'package:notifoo/widgets/buttons/button_widget.dart';
+
 import 'package:notifoo/widgets/headers/subHeader.dart';
 import 'package:notifoo/widgets/home/home_banner_widget.dart';
 //import 'package:notifoo/widgets/navigation/nav_drawer.dart';
@@ -32,15 +30,9 @@ class _HomepageState extends State<Homepage> {
   List<Notifications> _getNotificationsOfToday = [];
   @override
   void initState() {
-    initializeData();
     super.initState();
+    initializeData();
   }
-
-  // initializeDatabase(int selectedDay) async {
-  //   DatabaseHelper.instance.initializeDatabase();
-  //   _getNotificationsOfToday =
-  //       await DatabaseHelper.instance.getNotifications(selectedDay);
-  // }
 
   Future<List<Notifications>> initializeData() async {
     DatabaseHelper.instance.initializeDatabase();

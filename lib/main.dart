@@ -65,9 +65,9 @@ class _MyAppState extends State<MyApp> {
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
             theme: ThemeData.dark().copyWith(
-              primaryColor: Colors.transparent, //Color(0xff0A0E21),
-              scaffoldBackgroundColor:
-                  Colors.transparent, // Color.fromARGB(235, 34, 32, 48),
+              primaryColor: Color.fromARGB(220, 0, 0, 0), //Color(0xff0A0E21),
+              scaffoldBackgroundColor: Color.fromARGB(
+                  0, 29, 29, 29), // Color.fromARGB(235, 34, 32, 48),
               brightness: Brightness.dark,
               textTheme: TextTheme(
                 bodyText2: getBarlowFont(),
@@ -80,10 +80,10 @@ class _MyAppState extends State<MyApp> {
               // When navigating to the "/" route, build the FirstScreen widget.
               //  '/': (context) => SplashScreen(),
               // When navigating to the "/splash" route, build the SecondScreen widget.
-              '/home': (context) => Homepage(title: "Home"),
-              '/second': (context) => TestPage(title: "Test"),
+              //'/home': (context) => Homepage(title: "Home"),
+              // '/second': (context) => TestPage(title: "Test"),
               //'/splash': (context) => SplashScreen(),
-              '/habits': (context) => HabitHubPage(),
+              // '/habits': (context) => HabitHubPage(),
               '/signin': (context) => SignIn(),
               '/profile': (context) => Profile(title: "Profile"),
               '/app': (context) => App(),

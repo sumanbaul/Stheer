@@ -30,11 +30,10 @@ class AppState extends State<App> {
   // list tabs here
   final List<TabItem> tabs = [
     TabItem(
-      tabName: "Home",
+      tabName: "abc",
       icon: Icons.home,
       page: Homepage(
-        title: 'Notifoo',
-        //notificationsFromDb: this.widget.notificationsFromDb,
+        title: 'Stheer',
       ),
     ),
     TabItem(
@@ -106,25 +105,29 @@ class AppState extends State<App> {
       // with multiple appbars on one screen
       // eventually breaking the app
       child: Scaffold(
-        drawer: NavigationDrawerWidget(),
-        // floatingActionButtonLocation:
-        //     FloatingActionButtonLocation.miniCenterDocked,
-
-        // floatingActionButton: FloatingActionButton(
-        //   onPressed: () {},
-        //   backgroundColor: Colors.blueAccent,
-        // ),
-        //drawer: NavigationDrawerWidget(),
-        body: IndexedStack(
-          index: currentTab,
-          children: tabs.map((e) => e.page).toList(),
-        ),
-        // Bottom navigation
-        bottomNavigationBar: BottomNavigation(
-          onSelectTab: _selectTab,
-          tabs: tabs,
-        ),
-      ),
+          drawer: NavigationDrawerWidget(),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {},
+            backgroundColor: Color.fromRGBO(233, 99, 150, 1),
+            child: Icon(Icons.abc),
+          ),
+          //drawer: NavigationDrawerWidget(),
+          body: IndexedStack(
+            index: currentTab,
+            children: tabs.map((e) => e.page).toList(),
+          ),
+          // Bottom navigation
+          bottomNavigationBar: BottomAppBar(
+            child: BottomNavigation(
+              onSelectTab: _selectTab,
+              tabs: tabs,
+            ),
+            notchMargin: 4.0,
+            shape: CircularNotchedRectangle(),
+            color: Colors.transparent,
+          )),
     );
   }
 }
