@@ -1,9 +1,6 @@
 import 'dart:async';
-
-import 'package:collection/collection.dart';
-import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
-import 'package:notifoo/helper/DatabaseHelper.dart';
+import 'package:notifoo/helper/NotificationsHelper.dart';
 import 'package:notifoo/model/notificationCategory.dart';
 
 import '../../model/Notifications.dart';
@@ -58,63 +55,16 @@ class _NotificationsCategoryWidgetState
 
   @override
   void initState() {
-    //DatabaseHelper.instance.initializeDatabase();
     super.initState();
+    // NotificationsHelper.initializeDbGetNotificationsToday();
     initializeNotificationsByCategory(this.widget.isToday ? 0 : 1);
   }
 
-  Future<Application?> getCurrentAppWithIcon(String packageName) async {
-    return await DeviceApps.getApp(packageName, true);
-  }
-
   initializeNotificationsByCategory(int day) async {
-    // var notificationFromDatabase = this.widget.getNotificationsOfToday.then((value) => null)
-    //     ? await DatabaseHelper.instance.getNotifications(day)
-    //     : this.widget.getNotificationsOfToday;
-    _nc = await getCategoryListFuture(day, this.widget.getNotificationsOfToday);
-    setState(() {});
-  }
-
-  Future<List<NotificationCategory>> getCategoryListFuture(
-      int selectedDay, Future<List<Notifications>> notifications) async {
-    var listByPackageName;
-    var xyz = await notifications;
-    if (xyz.length > 0) {
-      listByPackageName = groupBy(xyz, (Notifications n) {
-        return n.packageName.toString();
-      });
-    }
-    List<NotificationCategory> notificationsByCategory = [];
-
-    if (listByPackageName.length > 0) {
-      listByPackageName.forEach((key, value) async {
-        // print(value[value.length - 1].createdDate);
-        var _app = await (getCurrentAppWithIcon(value[0].packageName));
-
-        var nc = NotificationCategory(
-            packageName: _app?.packageName,
-            appTitle: _app?.appName,
-            appIcon: _app is ApplicationWithIcon
-                ? Image.memory(
-                    _app.icon,
-                    //height: 30.0,
-                    fit: BoxFit.cover,
-                    gaplessPlayback: true,
-                  )
-                : null,
-            //tempIcon: Image.memory(_currentApp.icon),
-            timestamp: value[0].timestamp,
-            message:
-                "You have " + value.length.toString() + " Unread notifications",
-            notificationCount: value.length);
-
-        notificationsByCategory.add(nc);
-      });
-    }
-    notificationsByCategory
-        .sort((a, b) => b.timestamp!.compareTo(a.timestamp!));
-    _nc = notificationsByCategory;
-    return notificationsByCategory;
+    _nc = await NotificationsHelper.getCategoryListFuture(
+        day, this.widget.getNotificationsOfToday);
+    return _nc;
+    // setState(() {});
   }
 
   Widget getNotificationListBody() {
@@ -193,44 +143,35 @@ class _NotificationsCategoryWidgetState
             // decoration: BoxDecoration(color: Colors.brown),
             margin: EdgeInsets.only(top: 0.0),
             child: FutureBuilder<List<NotificationCategory>>(
-                future: getCategoryListFuture(
+                future: NotificationsHelper.getCategoryListFuture(
                     0, this.widget.getNotificationsOfToday),
                 builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.none:
-                      return Text('none');
-                    case ConnectionState.active:
-                      return Text('active');
-                    case ConnectionState.waiting:
-                      return Center(
-                          child: CircularProgressIndicator(
-                        color: Colors.white70,
-                      ));
-                    case ConnectionState.done:
-                      if (snapshot.hasData) {
-                        return MediaQuery.removePadding(
-                          context: context,
-                          removeTop: true,
-                          child: ListView.builder(
-                            itemCount: snapshot.data!.length,
-                            itemBuilder: (context, index) {
-                              return NotificationsCard(
-                                notificationsCategoryList: _nc,
-                                index: index,
-                                // key: UniqueKey(), //widget.key,
-                              );
-                            },
-                            physics: BouncingScrollPhysics(
-                              parent: AlwaysScrollableScrollPhysics(),
-                            ),
-                          ),
-                        );
-                      } else {
-                        return Center(child: Text('Nothing to display'));
-                      }
-                    default:
-                      return Text('default');
+                  if (snapshot.connectionState != ConnectionState.done) {
+                    return NotificationsHelper.buildLoader();
                   }
+                  if (snapshot.hasError) {
+                    return NotificationsHelper.buildError();
+                  }
+                  if (snapshot.hasData) {
+                    return MediaQuery.removePadding(
+                      context: context,
+                      removeTop: true,
+                      child: ListView.builder(
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index) {
+                          return NotificationsCard(
+                            notificationsCategoryList: _nc,
+                            index: index,
+                            // key: UniqueKey(), //widget.key,
+                          );
+                        },
+                        physics: BouncingScrollPhysics(
+                          parent: AlwaysScrollableScrollPhysics(),
+                        ),
+                      ),
+                    );
+                  }
+                  return NotificationsHelper.buildNoData();
                 }),
           ),
         ),

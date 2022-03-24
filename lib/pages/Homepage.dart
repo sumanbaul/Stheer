@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:notifoo/helper/NotificationsHelper.dart';
 import 'package:notifoo/widgets/navigation/nav_drawer_widget.dart';
 
 import 'package:notifoo/widgets/headers/subHeader.dart';
 import 'package:notifoo/widgets/home/home_banner_widget.dart';
 //import 'package:notifoo/widgets/navigation/nav_drawer.dart';
-import '../helper/DatabaseHelper.dart';
 import '../model/Notifications.dart';
 import '../widgets/Notifications/NotificationsLister.dart';
 
@@ -20,13 +20,6 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  //int _selectedTab = 0;
-
-  // void _selectedIndex(int index) {
-  //   setState(() {
-  //     _selectedTab = index;
-  //   });
-  // }
   List<Notifications> _getNotificationsOfToday = [];
   @override
   void initState() {
@@ -35,9 +28,8 @@ class _HomepageState extends State<Homepage> {
   }
 
   Future<List<Notifications>> initializeData() async {
-    DatabaseHelper.instance.initializeDatabase();
     _getNotificationsOfToday =
-        await DatabaseHelper.instance.getNotifications(0);
+        await NotificationsHelper.initializeDbGetNotificationsToday();
     return _getNotificationsOfToday;
   }
 
@@ -62,7 +54,8 @@ class _HomepageState extends State<Homepage> {
                   Container(
                     child: Expanded(
                       child: NotificationsLister(
-                          getNotificationsOfToday: _getNotificationsOfToday),
+                        getNotificationsOfToday: _getNotificationsOfToday,
+                      ),
                     ),
                   )
                 ],

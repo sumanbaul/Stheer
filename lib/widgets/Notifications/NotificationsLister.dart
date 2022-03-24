@@ -1,21 +1,11 @@
-import 'dart:convert';
 import 'dart:isolate';
 import 'dart:ui';
 import 'dart:async';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
-import 'package:notifoo/helper/AppListHelper.dart';
-import 'package:notifoo/helper/DatabaseHelper.dart';
-import 'package:notifoo/model/apps.dart';
-import 'package:notifoo/widgets/Notifications/list_category.dart';
+import 'package:notifoo/helper/NotificationsHelper.dart';
 import 'package:notifoo/widgets/Notifications/notification_category.dart';
-import 'package:notifoo/widgets/buttons/appActionButton.dart';
-import 'package:device_apps/device_apps.dart';
 import 'package:notifoo/model/Notifications.dart';
-
-import '../../model/notificationCategory.dart';
 
 //Initialize singleton
 //final AppListHelper appsListHelper = new AppListHelper();
@@ -34,12 +24,9 @@ class NotificationsLister extends StatefulWidget {
 
 class _NotificationsListerState extends State<NotificationsLister> {
   bool isToday = true;
-  List<NotificationCategory> _nc =
-      []; // check what this variable is doing??????
-  List<NotificationCategory> notificationCategoryStream = [];
-  String? packageName = "";
+  // List<NotificationCategory> notificationCategoryStream = [];
+  //String? packageName = "";
   Future<List<Notifications>>? notificationsOfToday;
-  Application? _currentApp;
 
   bool appsLoaded = false;
 
@@ -54,7 +41,9 @@ class _NotificationsListerState extends State<NotificationsLister> {
   void initState() {
     super.initState();
     initPlatformState();
-    initPopulateData();
+
+    NotificationsHelper.initPopulateData(this.widget.getNotificationsOfToday);
+    //initPopulateData();
     //DatabaseHelper.instance.initializeDatabase();
   }
 
@@ -87,8 +76,9 @@ class _NotificationsListerState extends State<NotificationsLister> {
         child: NotificationsCategoryWidget(
           title: 'Stheer',
           isToday: isToday,
-          getNotificationsOfToday:
-              initPopulateData(), //this.widget.getNotificationsOfToday,
+          getNotificationsOfToday: NotificationsHelper.initPopulateData(this
+              .widget
+              .getNotificationsOfToday), //this.widget.getNotificationsOfToday,
           refresh: callSetState,
         ),
       ),
@@ -108,13 +98,17 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
+    Notifications? _currentNotification;
     NotificationsListener.initialize(callbackHandle: _callback);
 
     // this can fix restart<debug> can't handle error
     IsolateNameServer.removePortNameMapping("_notifoolistener_");
     IsolateNameServer.registerPortWithName(port.sendPort, "_notifoolistener_");
     //IsolateNameServer.registerPortWithName(port.sendPort, "insta");
-    port.listen((message) => onData(message));
+    port.listen((message) async {
+      _currentNotification =
+          await NotificationsHelper.onData(message, flagEntry ?? "");
+    }); //onData(message, flagEntry!));
 
     // don't use the default receivePort
     // NotificationsListener.receivePort.listen((evt) => onData(evt));
@@ -127,176 +121,9 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
     setState(() {
       started = isServiceRunning;
+      _currentNotification ??
+          this.widget.getNotificationsOfToday.add(_currentNotification!);
     });
-  }
-
-  Apps? getCurrentApp(String packageName) {
-    //Apps app;
-    Apps? app;
-    if (packageName != "") {
-      // getCurrentAppWithIcon(packageName);
-      // app = await DeviceApps.getApp('com.frandroid.app');
-      //_currentApp = await DeviceApps.getApp(packageName);
-      _currentApp = (() async {
-        await DeviceApps.getApp(packageName);
-      })() as Application;
-
-      // AppListHelper().appListData.forEach((element) async {
-      //   if (element.packageName == packageName) {
-      //     _currentApp = await DeviceApps.getApp(packageName);
-      //     // _currentApp = app;
-      //     //_icon = app.icon;
-      //     //Application appxx = app;
-      //   }
-      // });
-    }
-    return app; // as Application;
-  }
-
-  Future<Application?> getCurrentAppWithIcon(String packageName) async {
-    _currentApp = await DeviceApps.getApp(packageName, true);
-    return _currentApp;
-  }
-
-//critical function below
-//This function is triggered on receiving of data from port
-  void onData(NotificationEvent event) async {
-    var eventAppWithIcon = await (getCurrentAppWithIcon(event.packageName!));
-    print(event); // this is needed for later
-
-    if (!eventAppWithIcon!.systemApp) {
-      if (event.packageName!.contains("skydrive") ||
-          (event.packageName!.contains("service")) ||
-          // (event.packageName.contains("android")) ||
-          (event.packageName!.contains("notifoo")) ||
-          (event.packageName!.contains("screenshot")) ||
-          (event.title!.contains("WhatsApp")) ||
-          (event.packageName!.contains("deskclock")) ||
-          (event.packageName!.contains("wellbeing")) ||
-          (event.packageName!.contains("weather2")) ||
-          (event.packageName!.contains("gallery"))) {
-        print(event.packageName);
-      } else {
-        packageName = event.packageName;
-        // print("Success Package Found: " + app.packageName);
-        //var jsondata2 = json.decode(event.toString());
-        Map<String, dynamic> jsonresponse = json.decode(event.toString());
-
-        var createatday = event.createAt!.day;
-        print("Create AT Day: $createatday");
-        var today = new DateTime.now().day;
-        print('today: $today');
-        //var xx = jsonresponse.containsKey('summaryText');
-        if (!jsonresponse.containsKey('summaryText') &&
-            event.createAt!.day >= today) {
-          //Redundancy check, currently not in use, need to use it to...
-          //filter out redundant notifications
-
-          // bool redundancy;
-          // redundantNotificationCheck(event)!.then((bool value) {
-          //   redundancy = value;
-          // });
-
-          if ((event.text != flagEntry) && event.text != null) {
-            var currentNotification = Notifications(
-                title: event.title,
-                appTitle: _currentApp!.appName,
-                // appIcon: _currentApp is ApplicationWithIcon
-                //     ? Image.memory(_currentApp.icon)
-                //     : null,
-                text: event.text,
-                message: event.message,
-                packageName: event.packageName,
-                timestamp: event.timestamp,
-                createAt: event.createAt!.millisecondsSinceEpoch.toString(),
-                eventJson: event.toString(),
-                createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
-                isDeleted: 0
-                // infoText: jsonData["text"],
-                // showWhen: 1,
-                // subText: jsonData["text"],
-                // timestamp: event.timestamp.toString(),
-                // packageName: jsonData["packageName"],
-                // text: jsonData["text"],
-                // summaryText: jsonData["summaryText"] ?? ""
-                );
-
-            //add current notification to this Global Variable(getNotificationsOfToday)
-            //inside context
-
-            await DatabaseHelper.instance
-                .insertNotification(currentNotification);
-            setState(() {
-              this.widget.getNotificationsOfToday.add(currentNotification);
-              print("Setstate getting hit: $currentNotification");
-            });
-            //initClearNotificationsState();
-            flagEntry = event.text;
-          } else {
-            // # TODO fix here
-
-            // var titleLength = jsonresponse["textLines"].length;
-
-            var currentNotification = Notifications(
-                title: jsonresponse["textLines"] ??
-                    jsonresponse["textLines"] as String?,
-                text: event.text,
-                message: event.message,
-                packageName: event.packageName,
-                timestamp: event.timestamp,
-                createAt: event.createAt!.millisecondsSinceEpoch.toString(),
-                eventJson: event.toString(),
-                createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
-                isDeleted: 0
-                // infoText: jsonData["text"],
-                // showWhen: 1,
-                // subText: jsonData["text"],
-                // timestamp: event.timestamp.toString(),
-                // packageName: jsonData["packageName"],
-                // text: jsonData["text"],
-                // summaryText: jsonData["summaryText"] ?? ""
-                );
-
-            //initClearNotificationsState();
-            this.setState(() {
-              this.widget.getNotificationsOfToday.add(currentNotification);
-              print("Setstate getting hit: $currentNotification");
-            });
-          }
-        }
-      }
-
-      setState(() {});
-      // if (!event.packageName.contains("example") ||
-      //     !event.packageName.contains("skydrive") ||
-      //     !event.packageName.contains("skydrive") ||
-      //     !event.packageName.contains("xiaomi")) {
-      //   // TODO: fix bug
-      //   // NotificationsListener.promoteToForeground("");
-      // }
-      // print("Print Notification: $event");
-    }
-  }
-
-  Future<bool>? redundantNotificationCheck(NotificationEvent event) async {
-    var getNotificationModel = await DatabaseHelper.instance
-        .getNotificationsByPackageToday(event.packageName);
-
-    Future<bool>? entryFlag;
-
-    getNotificationModel.forEach((key) {
-      if (key.packageName!.contains(event.packageName!)) {
-        if (key.title!.contains(event.title!) &&
-            key.text!.contains(event.text!)) {
-          entryFlag = Future<bool>.value(true);
-          //return Future<bool>.value(true);
-        } else {
-          entryFlag = Future<bool>.value(false);
-        }
-      }
-    });
-
-    return entryFlag!;
   }
 
   void startListening() async {
@@ -337,6 +164,131 @@ class _NotificationsListerState extends State<NotificationsLister> {
     });
   }
 
+  // Future<Application?> getCurrentAppWithIcon(String packageName) async {
+  //   _currentApp = await DeviceApps.getApp(packageName, true);
+  //   return _currentApp;
+  // }
+
+//critical function below
+//This function is triggered on receiving of data from port
+  // void onData(NotificationEvent event, String flat) async {
+  //   var eventAppWithIcon = await (getCurrentAppWithIcon(event.packageName!));
+  //   print(event); // this is needed for later
+
+  //   if (!eventAppWithIcon!.systemApp) {
+  //     if (event.packageName!.contains("skydrive") ||
+  //         (event.packageName!.contains("service")) ||
+  //         // (event.packageName.contains("android")) ||
+  //         (event.packageName!.contains("notifoo")) ||
+  //         (event.packageName!.contains("screenshot")) ||
+  //         (event.title!.contains("WhatsApp")) ||
+  //         (event.packageName!.contains("deskclock")) ||
+  //         (event.packageName!.contains("wellbeing")) ||
+  //         (event.packageName!.contains("weather2")) ||
+  //         (event.packageName!.contains("gallery"))) {
+  //       print(event.packageName);
+  //     } else {
+  //       packageName = event.packageName;
+  //       // print("Success Package Found: " + app.packageName);
+  //       //var jsondata2 = json.decode(event.toString());
+  //       Map<String, dynamic> jsonresponse = json.decode(event.toString());
+
+  //       var createatday = event.createAt!.day;
+  //       print("Create AT Day: $createatday");
+  //       var today = new DateTime.now().day;
+  //       print('today: $today');
+  //       //var xx = jsonresponse.containsKey('summaryText');
+  //       if (!jsonresponse.containsKey('summaryText') &&
+  //           event.createAt!.day >= today) {
+  //         //Redundancy check, currently not in use, need to use it to...
+  //         //filter out redundant notifications
+
+  //         // bool redundancy;
+  //         //  NotificationsHelper.redundantNotificationCheck(event).then((bool value) {
+  //         //    redundancy = value;
+  //         //  });
+
+  //         if ((event.text != flagEntry) && event.text != null) {
+  //           var currentNotification = Notifications(
+  //               title: event.title,
+  //               appTitle: _currentApp!.appName,
+  //               // appIcon: _currentApp is ApplicationWithIcon
+  //               //     ? Image.memory(_currentApp.icon)
+  //               //     : null,
+  //               text: event.text,
+  //               message: event.message,
+  //               packageName: event.packageName,
+  //               timestamp: event.timestamp,
+  //               createAt: event.createAt!.millisecondsSinceEpoch.toString(),
+  //               eventJson: event.toString(),
+  //               createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
+  //               isDeleted: 0
+  //               // infoText: jsonData["text"],
+  //               // showWhen: 1,
+  //               // subText: jsonData["text"],
+  //               // timestamp: event.timestamp.toString(),
+  //               // packageName: jsonData["packageName"],
+  //               // text: jsonData["text"],
+  //               // summaryText: jsonData["summaryText"] ?? ""
+  //               );
+
+  //           //add current notification to this Global Variable(getNotificationsOfToday)
+  //           //inside context
+
+  //           await DatabaseHelper.instance
+  //               .insertNotification(currentNotification);
+  //           setState(() {
+  //             this.widget.getNotificationsOfToday.add(currentNotification);
+  //             print("Setstate getting hit: $currentNotification");
+  //           });
+  //           //initClearNotificationsState();
+  //           flagEntry = event.text;
+  //         } else {
+  //           // # TODO fix here
+
+  //           // var titleLength = jsonresponse["textLines"].length;
+
+  //           var currentNotification = Notifications(
+  //               title: jsonresponse["textLines"] ??
+  //                   jsonresponse["textLines"] as String?,
+  //               text: event.text,
+  //               message: event.message,
+  //               packageName: event.packageName,
+  //               timestamp: event.timestamp,
+  //               createAt: event.createAt!.millisecondsSinceEpoch.toString(),
+  //               eventJson: event.toString(),
+  //               createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
+  //               isDeleted: 0
+  //               // infoText: jsonData["text"],
+  //               // showWhen: 1,
+  //               // subText: jsonData["text"],
+  //               // timestamp: event.timestamp.toString(),
+  //               // packageName: jsonData["packageName"],
+  //               // text: jsonData["text"],
+  //               // summaryText: jsonData["summaryText"] ?? ""
+  //               );
+
+  //           //initClearNotificationsState();
+  //           this.setState(() {
+  //             this.widget.getNotificationsOfToday.add(currentNotification);
+  //             print("Setstate getting hit: $currentNotification");
+  //           });
+  //         }
+  //       }
+  //     }
+
+  //     setState(() {});
+  //     // if (!event.packageName.contains("example") ||
+  //     //     !event.packageName.contains("skydrive") ||
+  //     //     !event.packageName.contains("skydrive") ||
+  //     //     !event.packageName.contains("xiaomi")) {
+  //     //   // TODO: fix bug
+  //     //   // NotificationsListener.promoteToForeground("");
+  //     // }
+  //     // print("Print Notification: $event");
+  //   }
+  // }
+
   Future<void> initClearNotificationsState() async {
     //ClearAllNotifications.clear();
   }
@@ -352,56 +304,56 @@ class _NotificationsListerState extends State<NotificationsLister> {
   //   setState(() {});
   // }
 
-  Future<List<NotificationCategory>> getCategoryListFuture(
-      int selectedDay, List<Notifications>? notifications) async {
-    var listByPackageName;
+  // Future<List<NotificationCategory>> getCategoryListFuture(
+  //     int selectedDay, List<Notifications>? notifications) async {
+  //   var listByPackageName;
 
-    if (notifications != null) {
-      listByPackageName = groupBy(notifications, (Notifications n) {
-        return n.packageName.toString();
-      });
-    }
-    List<NotificationCategory> notificationsByCategory = [];
+  //   if (notifications != null) {
+  //     listByPackageName = groupBy(notifications, (Notifications n) {
+  //       return n.packageName.toString();
+  //     });
+  //   }
+  //   List<NotificationCategory> notificationsByCategory = [];
 
-    if (listByPackageName.length > 0) {
-      listByPackageName.forEach((key, value) async {
-        // print(value[value.length - 1].createdDate);
-        var _app = await (getCurrentAppWithIcon(value[0].packageName));
+  //   if (listByPackageName.length > 0) {
+  //     listByPackageName.forEach((key, value) async {
+  //       // print(value[value.length - 1].createdDate);
+  //       var _app = await (getCurrentAppWithIcon(value[0].packageName));
 
-        var nc = NotificationCategory(
-            packageName: _app?.packageName,
-            appTitle: _app?.appName,
-            appIcon: _app is ApplicationWithIcon
-                ? Image.memory(
-                    _app.icon,
-                    //height: 30.0,
-                    fit: BoxFit.cover,
-                    gaplessPlayback: true,
-                  )
-                : null,
-            //tempIcon: Image.memory(_currentApp.icon),
-            timestamp: value[0].timestamp,
-            message:
-                "You have " + value.length.toString() + " Unread notifications",
-            notificationCount: value.length);
+  //       var nc = NotificationCategory(
+  //           packageName: _app?.packageName,
+  //           appTitle: _app?.appName,
+  //           appIcon: _app is ApplicationWithIcon
+  //               ? Image.memory(
+  //                   _app.icon,
+  //                   //height: 30.0,
+  //                   fit: BoxFit.cover,
+  //                   gaplessPlayback: true,
+  //                 )
+  //               : null,
+  //           //tempIcon: Image.memory(_currentApp.icon),
+  //           timestamp: value[0].timestamp,
+  //           message:
+  //               "You have " + value.length.toString() + " Unread notifications",
+  //           notificationCount: value.length);
 
-        notificationsByCategory.add(nc);
-      });
+  //       notificationsByCategory.add(nc);
+  //     });
 
-      setState(() {
-        notificationsByCategory
-            .sort((a, b) => b.timestamp!.compareTo(a.timestamp!));
-        _nc = notificationsByCategory;
-      });
-    }
+  //     setState(() {
+  //       notificationsByCategory
+  //           .sort((a, b) => b.timestamp!.compareTo(a.timestamp!));
+  //       _nc = notificationsByCategory;
+  //     });
+  //   }
 
-    return notificationsByCategory;
-  }
+  //   return notificationsByCategory;
+  // }
 
-  Future<List<Notifications>> initPopulateData() async {
-    return this.widget.getNotificationsOfToday.isNotEmpty ||
-            this.widget.getNotificationsOfToday.length > 0
-        ? this.widget.getNotificationsOfToday
-        : await DatabaseHelper.instance.getNotifications(0);
-  }
+  // Future<List<Notifications>> initPopulateData() async {
+  //   return this.widget.getNotificationsOfToday.isNotEmpty ||
+  //           this.widget.getNotificationsOfToday.length > 0
+  //       ? this.widget.getNotificationsOfToday
+  //       : await DatabaseHelper.instance.getNotifications(0);
+  // }
 }

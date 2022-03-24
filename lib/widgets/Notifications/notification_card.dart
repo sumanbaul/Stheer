@@ -66,8 +66,10 @@ class NotificationsCard extends StatelessWidget {
                                 child: CircleAvatar(
                                     backgroundColor: Colors.transparent,
                                     //clipBehavior: Clip.hardEdge,
-                                    child: notificationsCategoryList![index]
-                                        .appIcon),
+                                    child: notificationsCategoryList!.isNotEmpty
+                                        ? notificationsCategoryList![index]
+                                            .appIcon
+                                        : Text('No Icon')),
                                 // backgroundImage:
                                 //     notificationsCategoryList[index]
                                 //         .appIcon
