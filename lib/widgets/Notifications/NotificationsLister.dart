@@ -37,7 +37,8 @@ class _NotificationsListerState extends State<NotificationsLister> {
   List<NotificationCategory> _nc =
       []; // check what this variable is doing??????
   List<NotificationCategory> notificationCategoryStream = [];
-
+  String? packageName = "";
+  Future<List<Notifications>>? notificationsOfToday;
   Application? _currentApp;
 
   bool appsLoaded = false;
@@ -47,8 +48,6 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
   bool started = false;
   bool _loading = false;
-  String? packageName = "";
-
   ReceivePort port = ReceivePort();
 
   @override
@@ -70,6 +69,11 @@ class _NotificationsListerState extends State<NotificationsLister> {
     send?.send(evt);
   }
 
+  void callSetState() {
+    setState(
+        () {}); // it can be called without parameters. It will redraw based on changes done in _SecondWidgetState
+  }
+
   @override
   Widget build(BuildContext context) {
     // initializeNotificationsByCategory(this.isToday ? 0 : 1);
@@ -81,11 +85,12 @@ class _NotificationsListerState extends State<NotificationsLister> {
         height: 800,
         padding: EdgeInsets.zero,
         child: NotificationsCategoryWidget(
-            title: 'Stheer',
-            isToday: isToday,
-            getNotificationsOfToday:
-                initPopulateData() //this.widget.getNotificationsOfToday,
-            ),
+          title: 'Stheer',
+          isToday: isToday,
+          getNotificationsOfToday:
+              initPopulateData(), //this.widget.getNotificationsOfToday,
+          refresh: callSetState,
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         //backgroundColor: Color(0xffeeaeca),
@@ -221,7 +226,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
             await DatabaseHelper.instance
                 .insertNotification(currentNotification);
-            this.setState(() {
+            setState(() {
               this.widget.getNotificationsOfToday.add(currentNotification);
               print("Setstate getting hit: $currentNotification");
             });
@@ -317,6 +322,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
       setState(() {
         started = true;
         _loading = false;
+        //this.widget.getNotificationsOfToday;
       });
     }
   }
@@ -393,8 +399,9 @@ class _NotificationsListerState extends State<NotificationsLister> {
   }
 
   Future<List<Notifications>> initPopulateData() async {
-    return this.widget.getNotificationsOfToday.isNotEmpty
-        ? await DatabaseHelper.instance.getNotifications(0)
-        : this.widget.getNotificationsOfToday;
+    return this.widget.getNotificationsOfToday.isNotEmpty ||
+            this.widget.getNotificationsOfToday.length > 0
+        ? this.widget.getNotificationsOfToday
+        : await DatabaseHelper.instance.getNotifications(0);
   }
 }

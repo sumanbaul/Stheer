@@ -15,10 +15,12 @@ class NotificationsCategoryWidget extends StatefulWidget {
     this.title,
     required this.getNotificationsOfToday,
     required this.isToday,
+    this.refresh,
   }) : super(key: key);
   final String? title;
   final Future<List<Notifications>> getNotificationsOfToday;
   final bool isToday;
+  final Function? refresh;
 
   @override
   State<NotificationsCategoryWidget> createState() =>
