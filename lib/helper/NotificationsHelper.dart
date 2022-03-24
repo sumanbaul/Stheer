@@ -60,8 +60,8 @@ class NotificationsHelper {
 
   //critical function below
 //This function is triggered on receiving of data from port
-  static Future<Notifications> onData(
-      NotificationEvent event, String flagEntry) async {
+  //static Future<Notifications> onData(
+  static Future<void> onData(NotificationEvent event, String flagEntry) async {
     var eventAppWithIcon = await (getCurrentAppWithIcon(event.packageName!));
     print(event); // this is needed for later
     Notifications? _notification;
@@ -149,7 +149,7 @@ class NotificationsHelper {
         }
       }
     }
-    return _notification!;
+    //return _notification!;
   }
 
   static Future<List<NotificationCategory>> getCategoryListFuture(

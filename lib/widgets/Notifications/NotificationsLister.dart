@@ -106,8 +106,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
     IsolateNameServer.registerPortWithName(port.sendPort, "_notifoolistener_");
     //IsolateNameServer.registerPortWithName(port.sendPort, "insta");
     port.listen((message) async {
-      _currentNotification =
-          await NotificationsHelper.onData(message, flagEntry ?? "");
+      NotificationsHelper.onData(message, flagEntry ?? "");
     }); //onData(message, flagEntry!));
 
     // don't use the default receivePort
@@ -121,8 +120,8 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
     setState(() {
       started = isServiceRunning;
-      _currentNotification ??
-          this.widget.getNotificationsOfToday.add(_currentNotification!);
+      // _currentNotification ??
+      //     this.widget.getNotificationsOfToday.add(_currentNotification!);
     });
   }
 
