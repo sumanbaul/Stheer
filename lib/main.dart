@@ -5,13 +5,14 @@ import 'package:google_fonts/google_fonts.dart';
 //import 'package:notifoo/helper/AppListHelper.dart';
 import 'package:notifoo/helper/provider/google_sign_in.dart';
 import 'package:notifoo/pages/Homepage.dart';
+import 'package:notifoo/pages/Pomodoro.dart';
 import 'package:notifoo/pages/Profile.dart';
 import 'package:notifoo/pages/SignIn.dart';
 import 'package:notifoo/pages/SplashScreen.dart';
 import 'package:notifoo/pages/TestPage.dart';
 import 'package:notifoo/pages/habit_hub_page.dart';
 import 'package:notifoo/widgets/CustomBottomBar/navigator.dart';
-//import 'helper/DatabaseHelper.dart';
+import 'helper/DatabaseHelper.dart';
 //import 'model/apps.dart';
 import 'widgets/Notifications/NotificationsLister.dart';
 import 'package:provider/provider.dart';
@@ -19,9 +20,10 @@ import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 Future main() async {
+  //Init all required async components
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  //DatabaseHelper.instance.initializeDatabase();
+  await DatabaseHelper.instance.initializeDatabase();
   //await AppListHelper.getApps();
   debugPaintSizeEnabled = false;
   runApp(MyApp());
@@ -65,7 +67,8 @@ class _MyAppState extends State<MyApp> {
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
             theme: ThemeData.dark().copyWith(
-              primaryColor: Color.fromARGB(220, 0, 0, 0), //Color(0xff0A0E21),
+              primaryColor:
+                  Color.fromARGB(255, 20, 20, 20), //Color(0xff0A0E21),
               scaffoldBackgroundColor: Color.fromARGB(
                   0, 29, 29, 29), // Color.fromARGB(235, 34, 32, 48),
               brightness: Brightness.dark,
@@ -89,12 +92,9 @@ class _MyAppState extends State<MyApp> {
               '/signin': (context) => SignIn(),
               '/profile': (context) => Profile(title: "Profile"),
               //'/app': (context) => App(),
-              '/pomodoro': (context) => Profile(title: "Pomodoro"),
+              '/pomodoro': (context) => Pomodoro(title: "Pomodoro"),
             },
           ),
         ),
-
-        // title: "Notifoo",
-        // home: new NotificationsLog(title: "Notifoo"),
       );
 }

@@ -12,12 +12,12 @@ class NotificationsCategoryWidget extends StatefulWidget {
     this.title,
     required this.getNotificationsOfToday,
     required this.isToday,
-    this.refresh,
+    //this.refresh,
   }) : super(key: key);
   final String? title;
   final Future<List<Notifications>> getNotificationsOfToday;
   final bool isToday;
-  final Function? refresh;
+  // final Function? refresh;
 
   @override
   State<NotificationsCategoryWidget> createState() =>
@@ -27,7 +27,6 @@ class NotificationsCategoryWidget extends StatefulWidget {
 class _NotificationsCategoryWidgetState
     extends State<NotificationsCategoryWidget> {
   bool isToday = true;
-  List<NotificationCategory> _nc = [];
 
   List<Color> _colors = [Color.fromRGBO(94, 109, 145, 1.0), Colors.transparent];
 
@@ -61,9 +60,9 @@ class _NotificationsCategoryWidgetState
   }
 
   initializeNotificationsByCategory(int day) async {
-    _nc = await NotificationsHelper.getCategoryListFuture(
+    return await NotificationsHelper.getCategoryListFuture(
         day, this.widget.getNotificationsOfToday);
-    return _nc;
+
     // setState(() {});
   }
 
@@ -149,10 +148,14 @@ class _NotificationsCategoryWidgetState
                   if (snapshot.connectionState != ConnectionState.done) {
                     return NotificationsHelper.buildLoader();
                   }
+
                   if (snapshot.hasError) {
-                    return NotificationsHelper.buildError();
+                    return NotificationsHelper.buildError(
+                        snapshot.error.toString());
+                    //setState(() {});
                   }
                   if (snapshot.hasData) {
+                    print(snapshot.data!.length);
                     return MediaQuery.removePadding(
                       context: context,
                       removeTop: true,
@@ -160,7 +163,7 @@ class _NotificationsCategoryWidgetState
                         itemCount: snapshot.data!.length,
                         itemBuilder: (context, index) {
                           return NotificationsCard(
-                            notificationsCategoryList: _nc,
+                            notificationsCategoryList: snapshot.data,
                             index: index,
                             // key: UniqueKey(), //widget.key,
                           );
@@ -170,12 +173,18 @@ class _NotificationsCategoryWidgetState
                         ),
                       ),
                     );
+                  } else {
+                    return NotificationsHelper.buildNoData();
                   }
-                  return NotificationsHelper.buildNoData();
                 }),
           ),
         ),
       ],
     );
   }
+
+  // _runFuture() {
+  //   _future = Future.delayed(Duration(seconds: 2), this.widget.refresh);
+  //   setState(() {});
+  // }
 }

@@ -39,12 +39,12 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
   @override
   void initState() {
-    super.initState();
     initPlatformState();
 
     NotificationsHelper.initPopulateData(this.widget.getNotificationsOfToday);
     //initPopulateData();
     //DatabaseHelper.instance.initializeDatabase();
+    super.initState();
   }
 
   // we must use static method, to handle in background
@@ -63,6 +63,13 @@ class _NotificationsListerState extends State<NotificationsLister> {
         () {}); // it can be called without parameters. It will redraw based on changes done in _SecondWidgetState
   }
 
+  // getCategoryList(int day) async {
+  //   return await NotificationsHelper.getCategoryListFuture(
+  //       day, this.widget.getNotificationsOfToday);
+
+  //   // setState(() {});
+  // }
+
   @override
   Widget build(BuildContext context) {
     // initializeNotificationsByCategory(this.isToday ? 0 : 1);
@@ -79,7 +86,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
           getNotificationsOfToday: NotificationsHelper.initPopulateData(this
               .widget
               .getNotificationsOfToday), //this.widget.getNotificationsOfToday,
-          refresh: callSetState,
+          //refresh: callSetState,
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -98,17 +105,22 @@ class _NotificationsListerState extends State<NotificationsLister> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    Notifications? _currentNotification;
     NotificationsListener.initialize(callbackHandle: _callback);
-
+    Notifications? _currentNotification;
     // this can fix restart<debug> can't handle error
     IsolateNameServer.removePortNameMapping("_notifoolistener_");
     IsolateNameServer.registerPortWithName(port.sendPort, "_notifoolistener_");
     //IsolateNameServer.registerPortWithName(port.sendPort, "insta");
     port.listen((message) async {
-      NotificationsHelper.onData(message, flagEntry ?? "");
-    }); //onData(message, flagEntry!));
+      _currentNotification =
+          await NotificationsHelper.onData(message, flagEntry ?? "");
 
+      //started = isServiceRunning;
+      pushCurrentNotificationToContext(_currentNotification);
+      // setState(() {
+
+      // });
+    }); //onData(message, flagEntry!));
     // don't use the default receivePort
     // NotificationsListener.receivePort.listen((evt) => onData(evt));
     var isServiceRunning = await (NotificationsListener.isRunning);
@@ -118,11 +130,22 @@ class _NotificationsListerState extends State<NotificationsLister> {
     //var test = this.widget.getNotificationsOfToday;
     ///////
 
+    // setState(() {
+    //   started = isServiceRunning;
+    //   // _currentNotification != null
+    //   //     ? this.widget.getNotificationsOfToday.add(_currentNotification!)
+    //   //     : _currentNotification;
+    // });
+
     setState(() {
       started = isServiceRunning;
-      // _currentNotification ??
-      //     this.widget.getNotificationsOfToday.add(_currentNotification!);
     });
+  }
+
+  void pushCurrentNotificationToContext(Notifications? _currentNotification) {
+    if (_currentNotification != null && _currentNotification.appTitle != "") {
+      this.widget.getNotificationsOfToday.add(_currentNotification);
+    }
   }
 
   void startListening() async {
@@ -145,12 +168,12 @@ class _NotificationsListerState extends State<NotificationsLister> {
           showWhen: true
           //foreground: AppButtonAction(),
           );
-      setState(() {
-        started = true;
-        _loading = false;
-        //this.widget.getNotificationsOfToday;
-      });
     }
+    setState(() {
+      started = true;
+      _loading = false;
+      //this.widget.getNotificationsOfToday;
+    });
   }
 
   void stopListening() async {
@@ -287,10 +310,6 @@ class _NotificationsListerState extends State<NotificationsLister> {
   //     // print("Print Notification: $event");
   //   }
   // }
-
-  Future<void> initClearNotificationsState() async {
-    //ClearAllNotifications.clear();
-  }
 
   //Notifications By Category
 

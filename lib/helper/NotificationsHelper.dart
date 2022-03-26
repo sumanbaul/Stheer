@@ -4,7 +4,6 @@ import 'dart:isolate';
 import 'dart:ui';
 import 'package:collection/collection.dart';
 import 'package:device_apps/device_apps.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 
@@ -50,7 +49,7 @@ class NotificationsHelper {
   // }
 
   static Future<List<Notifications>> initializeDbGetNotificationsToday() async {
-    DatabaseHelper.instance.initializeDatabase();
+    // DatabaseHelper.instance.initializeDatabase();
     return await DatabaseHelper.instance.getNotifications(0);
   }
 
@@ -61,7 +60,8 @@ class NotificationsHelper {
   //critical function below
 //This function is triggered on receiving of data from port
   //static Future<Notifications> onData(
-  static Future<void> onData(NotificationEvent event, String flagEntry) async {
+  static Future<Notifications> onData(
+      NotificationEvent event, String flagEntry) async {
     var eventAppWithIcon = await (getCurrentAppWithIcon(event.packageName!));
     print(event); // this is needed for later
     Notifications? _notification;
@@ -107,13 +107,13 @@ class NotificationsHelper {
 
             //add current notification to this Global Variable(getNotificationsOfToday)
             //inside context
-
+            _notification = currentNotification;
             await DatabaseHelper.instance
                 .insertNotification(currentNotification);
 
             //initClearNotificationsState();
             flagEntry = event.text.toString();
-            _notification = currentNotification;
+            return _notification;
           } else {
             // # TODO fix here
 
@@ -145,47 +145,52 @@ class NotificationsHelper {
             _notification = currentNotification;
             await DatabaseHelper.instance
                 .insertNotification(currentNotification);
+            return _notification;
           }
         }
       }
     }
-    //return _notification!;
+    return _notification ?? new Notifications();
   }
 
   static Future<List<NotificationCategory>> getCategoryListFuture(
       int selectedDay, Future<List<Notifications>> notifications) async {
     var listByPackageName;
+    List<NotificationCategory> notificationsByCategory = [];
     var _notifications = await notifications;
     if (_notifications.length > 0) {
       listByPackageName = groupBy(_notifications, (Notifications n) {
         return n.packageName.toString();
       });
+
+      if (listByPackageName.length > 0) {
+        listByPackageName.forEach((key, value) async {
+          // print(value[value.length - 1].createdDate);
+          if (value != null) {
+            Application? _app =
+                await (getCurrentAppWithIcon(value[0].packageName));
+
+            var nc = NotificationCategory(
+                packageName: _app?.packageName,
+                appTitle: _app?.appName,
+                appIcon: _app is ApplicationWithIcon
+                    ? Image.memory(_app.icon)
+                    : null,
+                //tempIcon: Image.memory(_currentApp.icon),
+                timestamp: value[0].timestamp,
+                message: "You have " +
+                    value.length.toString() +
+                    " Unread notifications",
+                notificationCount: value.length);
+
+            notificationsByCategory.add(nc);
+          }
+        });
+      }
+      notificationsByCategory
+          .sort((a, b) => b.timestamp!.compareTo(a.timestamp!));
     }
-    List<NotificationCategory> notificationsByCategory = [];
-
-    if (listByPackageName.length > 0) {
-      listByPackageName.forEach((key, value) async {
-        // print(value[value.length - 1].createdDate);
-        var _app = await (getCurrentAppWithIcon(value[0].packageName));
-
-        var nc = NotificationCategory(
-            packageName: _app?.packageName,
-            appTitle: _app?.appName,
-            appIcon:
-                _app is ApplicationWithIcon ? Image.memory(_app.icon) : null,
-            //tempIcon: Image.memory(_currentApp.icon),
-            timestamp: value[0].timestamp,
-            message:
-                "You have " + value.length.toString() + " Unread notifications",
-            notificationCount: value.length);
-
-        notificationsByCategory.add(nc);
-      });
-    }
-    notificationsByCategory
-        .sort((a, b) => b.timestamp!.compareTo(a.timestamp!));
-    //_nc = notificationsByCategory;
-    return notificationsByCategory;
+    return notificationsByCategory; // as Future<List<NotificationCategory>>;
   }
 
   static Future<List<Notifications>> initPopulateData(
@@ -222,15 +227,22 @@ class NotificationsHelper {
     return Center(
       child: CircularProgressIndicator(
         color: Colors.white70,
+        value: 18.0,
+        strokeWidth: 4.0,
       ),
     );
   }
 
-  static buildError() {
-    return Text('Error');
+  static buildError(String error) {
+    return Text('Error: ' + error);
   }
 
   static buildNoData() {
     return Text('No Data / default');
+  }
+
+  //will be used in future to clear notifications
+  Future<void> initClearNotificationsState() async {
+    //ClearAllNotifications.clear();
   }
 }
