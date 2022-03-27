@@ -27,7 +27,7 @@ class NotificationsCategoryWidget extends StatefulWidget {
 class _NotificationsCategoryWidgetState
     extends State<NotificationsCategoryWidget> {
   bool isToday = true;
-
+  bool hasData = false;
   List<Color> _colors = [Color.fromRGBO(94, 109, 145, 1.0), Colors.transparent];
 
   @override
@@ -60,10 +60,23 @@ class _NotificationsCategoryWidgetState
   }
 
   initializeNotificationsByCategory(int day) async {
-    return await NotificationsHelper.getCategoryListFuture(
-        day, this.widget.getNotificationsOfToday);
+    var _getNotificationsOfToday = await this.widget.getNotificationsOfToday;
+    return _getNotificationsOfToday.length > 0
+        ? await NotificationsHelper.getCategoryListFuture(
+            day, this.widget.getNotificationsOfToday)
+        : refreshData();
+
+    // print(
+    //     "initializeNotificationsByCategory - >getNotificationsOfToday: $_getNotificationsOfToday.lenth");
+    // return await NotificationsHelper.getCategoryListFuture(
+    //     day, getNotificationsOfToday);
 
     // setState(() {});
+  }
+
+  Future<List<Notifications>> refreshData() async {
+    print("Refresh data triggered");
+    return await NotificationsHelper.initializeDbGetNotificationsToday();
   }
 
   Widget getNotificationListBody() {
@@ -162,9 +175,10 @@ class _NotificationsCategoryWidgetState
                       child: ListView.builder(
                         itemCount: snapshot.data!.length,
                         itemBuilder: (context, index) {
-                          return NotificationsCard(
+                          return new NotificationsCard(
                             notificationsCategoryList: snapshot.data,
                             index: index,
+                            key: GlobalKey(),
                             // key: UniqueKey(), //widget.key,
                           );
                         },

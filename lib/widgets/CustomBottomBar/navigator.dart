@@ -108,6 +108,7 @@ class AppState extends State<App> {
           drawer: NavigationDrawerWidget(),
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerDocked,
+          extendBody: false,
           floatingActionButton: FloatingActionButton(
             onPressed: () {},
             backgroundColor: Color.fromRGBO(233, 99, 150, 1),
@@ -124,9 +125,10 @@ class AppState extends State<App> {
               onSelectTab: _selectTab,
               tabs: tabs,
             ),
-            notchMargin: 4.0,
-            shape: CircularNotchedRectangle(),
-            color: Colors.transparent,
+            // notchMargin: 4.0,
+            shape: const CircularNotchedRectangle(),
+            color: Color.fromARGB(235, 34, 32, 48),
+            elevation: 0,
           )),
     );
   }

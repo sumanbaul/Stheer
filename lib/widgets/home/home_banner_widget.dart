@@ -4,10 +4,20 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:notifoo/widgets/Topbar.dart';
 
+import '../../model/Notifications.dart';
+
 class HomeBannerWidget extends StatefulWidget {
-  HomeBannerWidget({Key? key, this.title, this.onClicked}) : super(key: key);
   final String? title;
   final VoidCallback? onClicked;
+  final Future<List<Notifications>> notifications;
+
+  HomeBannerWidget({
+    Key? key,
+    this.title,
+    this.onClicked,
+    required this.notifications,
+  }) : super(key: key);
+
   @override
   _BannerState createState() => _BannerState();
 }
@@ -23,16 +33,17 @@ class _BannerState extends State<HomeBannerWidget> {
   Color? gradientStart = Colors.transparent;
   Color? gradientEnd = Colors.black;
 
-  Future<String>? totalNotifications;
+  int totalNotifications = 0;
+
   Stream<String>? totalNotificationsStream;
 
   @override
   void initState() {
-    DatabaseHelper.instance.initializeDatabase();
+    //DatabaseHelper.instance.initializeDatabase();
 
     super.initState();
-
-    totalNotificationsStream = getTotalNotifications();
+    getCount();
+    //totalNotificationsStream = getTotalNotifications();
     // getTotalNotifications().then((String result) {
     //   setState(() {
     //     _totalNotifications = result;
@@ -57,34 +68,42 @@ class _BannerState extends State<HomeBannerWidget> {
     super.dispose();
   }
 
+  Future<int> getCount() async {
+    final x = await this.widget.notifications;
+    print(x);
+    setState(() {});
+    return totalNotifications = x.length;
+  }
+
   Widget bannerSection(BuildContext context) {
     //double _width = MediaQuery.of(context).size.width * 0.55;
     double _height = 320; //MediaQuery.of(context).size.height * 0.40;
+    return buildBanner(_height, totalNotifications);
 
-    return StreamBuilder<String>(
-        initialData: "0",
-        stream: totalNotificationsStream!,
-        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-              return Text('none');
-            case ConnectionState.active:
-            case ConnectionState.waiting:
-              return CircularProgressIndicator();
-            case ConnectionState.done:
-              if (snapshot.hasData) {
-                return buildBanner(_height, snapshot.data.toString());
-              } else {
-                return buildBanner(_height, '0');
-              }
+    // return StreamBuilder<String>(
+    //     initialData: "0",
+    //     stream: totalNotificationsStream!,
+    //     builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+    //       switch (snapshot.connectionState) {
+    //         case ConnectionState.none:
+    //           return Text('none');
+    //         case ConnectionState.active:
+    //         case ConnectionState.waiting:
+    //           return CircularProgressIndicator();
+    //         case ConnectionState.done:
+    //           if (snapshot.hasData) {
+    //             return buildBanner(_height, snapshot.data.toString());
+    //           } else {
+    //             return buildBanner(_height, '0');
+    //           }
 
-            default:
-              return Text('default');
-          }
-        });
+    //         default:
+    //           return Text('default');
+    //       }
+    //     });
   }
 
-  Widget buildBanner(double height, String nCount) {
+  Widget buildBanner(double height, int nCount) {
     return Container(
       margin: EdgeInsets.only(bottom: 15.0),
       decoration: BoxDecoration(
@@ -122,7 +141,7 @@ class _BannerState extends State<HomeBannerWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Topbar(
-                title: "Notifoo",
+                title: "Stheer",
                 onClicked: widget.onClicked,
               ),
               Container(
@@ -171,7 +190,7 @@ class _BannerState extends State<HomeBannerWidget> {
     ),
   );
 
-  Widget _getReadNotifications(String notificationCount) {
+  Widget _getReadNotifications(int notificationCount) {
     return Container(
       // margin: EdgeInsets.only(top: 0),
       padding: EdgeInsets.all(20),
@@ -214,7 +233,7 @@ class _BannerState extends State<HomeBannerWidget> {
         children: [
           Center(
             child: Text(
-              notificationCount, //'$_totalNotifications',
+              notificationCount.toString(), //'$_totalNotifications',
               style: GoogleFonts.lato(
                 textStyle: TextStyle(
                   letterSpacing: 1.2,

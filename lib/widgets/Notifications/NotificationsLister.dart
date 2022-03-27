@@ -63,13 +63,6 @@ class _NotificationsListerState extends State<NotificationsLister> {
         () {}); // it can be called without parameters. It will redraw based on changes done in _SecondWidgetState
   }
 
-  // getCategoryList(int day) async {
-  //   return await NotificationsHelper.getCategoryListFuture(
-  //       day, this.widget.getNotificationsOfToday);
-
-  //   // setState(() {});
-  // }
-
   @override
   Widget build(BuildContext context) {
     // initializeNotificationsByCategory(this.isToday ? 0 : 1);
@@ -80,7 +73,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
       body: Container(
         height: 800,
         padding: EdgeInsets.zero,
-        child: NotificationsCategoryWidget(
+        child: new NotificationsCategoryWidget(
           title: 'Stheer',
           isToday: isToday,
           getNotificationsOfToday: NotificationsHelper.initPopulateData(this
@@ -112,8 +105,7 @@ class _NotificationsListerState extends State<NotificationsLister> {
     IsolateNameServer.registerPortWithName(port.sendPort, "_notifoolistener_");
     //IsolateNameServer.registerPortWithName(port.sendPort, "insta");
     port.listen((message) async {
-      _currentNotification =
-          await NotificationsHelper.onData(message, flagEntry ?? "");
+      _currentNotification = await NotificationsHelper.onData(message);
 
       //started = isServiceRunning;
       pushCurrentNotificationToContext(_currentNotification);
@@ -127,8 +119,10 @@ class _NotificationsListerState extends State<NotificationsLister> {
     print("""Service is ${!isServiceRunning! ? "not " : ""}aleary running""");
 
     //for testing
-    //var test = this.widget.getNotificationsOfToday;
-    ///////
+    var test = this.widget.getNotificationsOfToday;
+    print(
+        "Length of NotificationLister-> getNotificationsOfToday:$test.length");
+    /////
 
     // setState(() {
     //   started = isServiceRunning;

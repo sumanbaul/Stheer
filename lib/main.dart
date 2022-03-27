@@ -63,6 +63,7 @@ class _MyAppState extends State<MyApp> {
             statusBarIconBrightness: Brightness.dark, // status bar icons' color
             systemNavigationBarIconBrightness:
                 Brightness.dark, //navigation bar icons' color
+            systemNavigationBarDividerColor: Colors.transparent,
           ),
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
@@ -70,7 +71,7 @@ class _MyAppState extends State<MyApp> {
               primaryColor:
                   Color.fromARGB(255, 20, 20, 20), //Color(0xff0A0E21),
               scaffoldBackgroundColor: Color.fromARGB(
-                  0, 29, 29, 29), // Color.fromARGB(235, 34, 32, 48),
+                  235, 34, 32, 48), // Color.fromARGB(235, 34, 32, 48),
               brightness: Brightness.dark,
               textTheme: TextTheme(
                 bodyText2: getBarlowFont(),

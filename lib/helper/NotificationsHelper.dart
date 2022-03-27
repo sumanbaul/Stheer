@@ -60,11 +60,10 @@ class NotificationsHelper {
   //critical function below
 //This function is triggered on receiving of data from port
   //static Future<Notifications> onData(
-  static Future<Notifications> onData(
-      NotificationEvent event, String flagEntry) async {
+  static Future<Notifications> onData(NotificationEvent event) async {
     var eventAppWithIcon = await (getCurrentAppWithIcon(event.packageName!));
     print(event); // this is needed for later
-    Notifications? _notification;
+    Notifications _notification;
     if (!eventAppWithIcon!.systemApp) {
       if (event.packageName!.contains("skydrive") ||
           (event.packageName!.contains("service")) ||
@@ -89,7 +88,8 @@ class NotificationsHelper {
         //var xx = jsonresponse.containsKey('summaryText');
         if (!jsonresponse.containsKey('summaryText') &&
             event.createAt!.day >= today) {
-          if ((event.text != flagEntry) && event.text != null) {
+          // if ((event.text != flagEntry) && event.text != null) {
+          if (event.text != null) {
             var currentNotification = Notifications(
                 title: event.title,
                 appTitle: eventAppWithIcon.appName,
@@ -112,8 +112,9 @@ class NotificationsHelper {
                 .insertNotification(currentNotification);
 
             //initClearNotificationsState();
-            flagEntry = event.text.toString();
-            return _notification;
+            // flagEntry = event.text.toString();
+            print("$_notification.appTitle");
+            return currentNotification;
           } else {
             // # TODO fix here
 
@@ -150,7 +151,8 @@ class NotificationsHelper {
         }
       }
     }
-    return _notification ?? new Notifications();
+    _notification = new Notifications();
+    return _notification;
   }
 
   static Future<List<NotificationCategory>> getCategoryListFuture(
@@ -190,6 +192,8 @@ class NotificationsHelper {
       notificationsByCategory
           .sort((a, b) => b.timestamp!.compareTo(a.timestamp!));
     }
+    print(
+        "NotificationsHelper -> NotificationsCategory$notificationsByCategory.length");
     return notificationsByCategory; // as Future<List<NotificationCategory>>;
   }
 

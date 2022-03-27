@@ -14,7 +14,10 @@ class BottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       elevation: 0,
-      selectedLabelStyle: TextStyle(color: Color.fromRGBO(0, 117, 212, 1)),
+      selectedLabelStyle: TextStyle(
+        color: Colors.white,
+      ),
+
       unselectedLabelStyle: TextStyle(color: Colors.grey),
       backgroundColor:
           Color.fromARGB(235, 34, 32, 48), //Color.fromARGB(255, 33, 31, 46),
@@ -43,12 +46,13 @@ class BottomNavigation extends StatelessWidget {
         ),
         // ignore: deprecated_member_use
         label: tabName,
+        backgroundColor: Colors.redAccent,
         tooltip: tabName);
   }
 
   Color _tabColor({int? index}) {
     return AppState.currentTab == index
-        ? Color.fromRGBO(0, 117, 212, 1)
+        ? Color.fromARGB(255, 255, 255, 255)
         : Colors.grey;
   }
 }
