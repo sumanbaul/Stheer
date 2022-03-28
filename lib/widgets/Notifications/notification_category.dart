@@ -175,9 +175,7 @@ class _NotificationsCategoryWidgetState
                       child: ListView.builder(
                         itemCount: snapshot.data!.length,
                         itemBuilder: (context, index) {
-                          return new NotificationsCard(
-                            notificationsCategoryList: snapshot.data,
-                            index: index,
+                          return new Container(
                             key: GlobalKey(),
                             // key: UniqueKey(), //widget.key,
                           );

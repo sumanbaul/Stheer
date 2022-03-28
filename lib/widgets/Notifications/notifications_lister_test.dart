@@ -8,26 +8,38 @@ import 'package:path/path.dart';
 import '../../helper/NotificationsHelper.dart';
 import '../../model/Notifications.dart';
 import '../../model/notificationCategory.dart';
+import '../../util/notifications_factory.dart';
 import 'list_category.dart';
 
-// ignore: must_be_immutable
 class NotificationsListerWidget extends StatefulWidget {
-  Future<List<Notifications>> notificationsOfTheDay;
-  NotificationsListerWidget({Key? key, required this.notificationsOfTheDay})
-      : super(key: key);
+  final Future<List<Notifications>> notificationsOfTheDay;
+  final appendToList;
+
+  NotificationsListerWidget({
+    Key? key,
+    required this.notificationsOfTheDay,
+    this.appendToList,
+  }) : super(key: key);
 
   @override
   State<NotificationsListerWidget> createState() =>
-      _NotificationsListerWidgetState();
+      _NotificationsListerWidgetState(
+        notificationsOfToday: this.notificationsOfTheDay,
+      );
 }
 
 class _NotificationsListerWidgetState extends State<NotificationsListerWidget> {
+  _NotificationsListerWidgetState({
+    required this.notificationsOfToday,
+  });
   bool isToday = true;
-  Future<List<Notifications>>? notificationsOfToday;
+  Future<List<Notifications>> notificationsOfToday;
   Future<List<NotificationCategory>>? notificationsOfTodayByCat;
-  bool started = false;
+  bool started = true;
   bool _loading = false;
   ReceivePort port = ReceivePort();
+
+  var x = NotificationsFactory().initializeDatabase();
 
   //Theme
   List<Color> _colors = [Color.fromRGBO(94, 109, 145, 1.0), Colors.transparent];
@@ -38,9 +50,10 @@ class _NotificationsListerWidgetState extends State<NotificationsListerWidget> {
   void initState() {
     //initPlatformState();
 
-    _getNotifications();
     super.initState();
     initPlatformState();
+    notificationsOfToday = this.widget.notificationsOfTheDay;
+    notificationsOfTodayByCat = _getNotifications();
   }
 
   @override
@@ -73,13 +86,12 @@ class _NotificationsListerWidgetState extends State<NotificationsListerWidget> {
   }
 
   Future<List<NotificationCategory>> _getNotifications() async {
-    notificationsOfToday = this.widget.notificationsOfTheDay;
+    //_notificationsOfToday = this.widget.notificationsOfTheDay;
     //NotificationsHelper.initializeDbGetNotificationsToday();
-    return notificationsOfTodayByCat =
-        notificationsByCategory(notificationsOfToday!);
+    return _notificationsByCategory(notificationsOfToday);
   }
 
-  Future<List<NotificationCategory>> notificationsByCategory(
+  Future<List<NotificationCategory>> _notificationsByCategory(
       Future<List<Notifications>> notificationsFuture) async {
     return NotificationsHelper.getCategoryListFuture(0, notificationsFuture);
   }
@@ -91,20 +103,27 @@ class _NotificationsListerWidgetState extends State<NotificationsListerWidget> {
     // this can fix restart<debug> can't handle error
     IsolateNameServer.removePortNameMapping("_notifoolistener_");
     IsolateNameServer.registerPortWithName(port.sendPort, "_notifoolistener_");
+
     //IsolateNameServer.registerPortWithName(port.sendPort, "insta");
     port.listen((message) async {
       _currentNotification = await NotificationsHelper.onData(message);
+      // don't use the default receivePort
+      // NotificationsListener.receivePort.listen((evt) => onData(evt));
 
       //started = isServiceRunning;
       if (_currentNotification != null &&
           _currentNotification?.appTitle != null) {
-        setState(() {
-          final _notifications = appendCurrentNotificationToList(
-              _currentNotification, notificationsOfToday);
-          this.widget.notificationsOfTheDay = _notifications;
-          notificationsOfTodayByCat = NotificationsHelper.getCategoryListFuture(
-              0, this.widget.notificationsOfTheDay);
-        });
+        // final _notifications = appendCurrentNotificationToList(
+        //     _currentNotification, notificationsOfToday);
+
+        this
+            .widget
+            .appendToList(_currentNotification, this.notificationsOfToday);
+
+        //this.widget.notificationsOfTheDay = _notifications;
+        //notificationsOfToday = _notifications;
+        notificationsOfTodayByCat =
+            NotificationsHelper.getCategoryListFuture(0, notificationsOfToday);
       }
     }); //onData(message, flagEntry!));
     // don't use the default receivePort
@@ -114,28 +133,31 @@ class _NotificationsListerWidgetState extends State<NotificationsListerWidget> {
     if (!isServiceRunning) {
       startListening();
       isServiceRunning = true;
+      started = isServiceRunning;
     }
 
-    setState(() {
-      started = isServiceRunning!;
-    });
+    // if (this.mounted == true) {
+    //   setState(() {
+    //     started = isServiceRunning!;
+    //   });
+    // }
   }
 
 //Example of appending into list of type Future
-  Future<List<Notifications>> appendCurrentNotificationToList(
-      Notifications? _currentNotification,
-      Future<List<Notifications>>? notifications) async {
-    if (_currentNotification != null && _currentNotification.appTitle != "") {
-      // final _notifications = await notifications;
-      // _notifications!.add(_currentNotification);
+  // Future<List<Notifications>> appendCurrentNotificationToList(
+  //     Notifications? _currentNotification,
+  //     Future<List<Notifications>>? notifications) async {
+  //   if (_currentNotification != null && _currentNotification.appTitle != "") {
+  //     // final _notifications = await notifications;
+  //     // _notifications!.add(_currentNotification);
 
-      // return _notifications;
-      final _notifications = await this.widget.notificationsOfTheDay;
-      _notifications.add(_currentNotification);
-      return _notifications;
-    }
-    return notifications!;
-  }
+  //     // return _notifications;
+  //     final _notifications = await this.widget.notificationsOfTheDay;
+  //     _notifications.add(_currentNotification);
+  //     return _notifications;
+  //   }
+  //   return notifications!;
+  // }
 
   // we must use static method, to handle in background
   static void _callback(NotificationEvent evt) {
@@ -188,7 +210,7 @@ class _NotificationsListerWidgetState extends State<NotificationsListerWidget> {
 
   Widget _buildContainer(BuildContext context) {
     return Container(
-      height: 600,
+      height: 700,
       padding: EdgeInsets.only(top: 15.0),
       decoration: BoxDecoration(
         shape: BoxShape.rectangle,
@@ -303,7 +325,7 @@ class _NotificationsListerWidgetState extends State<NotificationsListerWidget> {
                         itemCount: snapshot.data!.length,
                         itemBuilder: (context, index) {
                           return new NotificationsCard(
-                            notificationsCategoryList: snapshot.data,
+                            // notificationsCategoryList: snapshot.data,
                             index: index,
                             key: GlobalKey(),
                             // key: UniqueKey(), //widget.key,

@@ -9,13 +9,13 @@ import '../../model/Notifications.dart';
 class HomeBannerWidget extends StatefulWidget {
   final String? title;
   final VoidCallback? onClicked;
-  final Future<List<Notifications>> notifications;
+  //final Future<List<Notifications>> notifications;
 
   HomeBannerWidget({
     Key? key,
     this.title,
     this.onClicked,
-    required this.notifications,
+    // required this.notifications,
   }) : super(key: key);
 
   @override
@@ -42,7 +42,7 @@ class _BannerState extends State<HomeBannerWidget> {
     //DatabaseHelper.instance.initializeDatabase();
 
     super.initState();
-    getCount();
+    totalNotifications = getCount();
     //totalNotificationsStream = getTotalNotifications();
     // getTotalNotifications().then((String result) {
     //   setState(() {
@@ -59,7 +59,7 @@ class _BannerState extends State<HomeBannerWidget> {
   @override
   void didUpdateWidget(HomeBannerWidget oldWidget) async {
     super.didUpdateWidget(oldWidget);
-    totalNotificationsStream = getTotalNotifications();
+    // totalNotificationsStream = getTotalNotifications();
     setState(() {});
   }
 
@@ -68,11 +68,12 @@ class _BannerState extends State<HomeBannerWidget> {
     super.dispose();
   }
 
-  Future<int> getCount() async {
-    final x = await this.widget.notifications;
-    print(x);
-    setState(() {});
-    return totalNotifications = x.length;
+  int getCount() {
+    // final x = await this.widget.notifications;
+    //print(x);
+    //setState(() {});
+    //  return totalNotifications = x.length;
+    return 10;
   }
 
   Widget bannerSection(BuildContext context) {
