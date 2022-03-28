@@ -29,6 +29,9 @@ class _NotificationsListerWidgetState extends State<NotificationsListerWidget> {
   bool _loading = false;
   ReceivePort port = ReceivePort();
 
+  //Theme
+  List<Color> _colors = [Color.fromRGBO(94, 109, 145, 1.0), Colors.transparent];
+
   String? flagEntry; //this variable need to check later,
   //after notfications logic is cleaned
   @override
@@ -46,16 +49,14 @@ class _NotificationsListerWidgetState extends State<NotificationsListerWidget> {
       backgroundColor: Colors.transparent,
       //appBar: Topbar.getTopbar(widget.title),
       //bottomNavigationBar: BottomBar.getBottomBar(context),
-      body: Container(
-        height: 800,
-        padding: EdgeInsets.zero,
-        child: new NotificationsCategoryWidget(
-          title: 'Stheer',
-          isToday: isToday,
-          //getNotificationsOfToday: notificationsOfToday!,
-          notificationsByCategory: notificationsOfTodayByCat!,
-          //refresh: callSetState,
-        ),
+      body: Column(
+        children: [
+          Container(
+            height: 800,
+            padding: EdgeInsets.zero,
+            child: _buildContainer(context),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         //backgroundColor: Color(0xffeeaeca),
@@ -101,8 +102,8 @@ class _NotificationsListerWidgetState extends State<NotificationsListerWidget> {
           final _notifications = appendCurrentNotificationToList(
               _currentNotification, notificationsOfToday);
           this.widget.notificationsOfTheDay = _notifications;
-          notificationsOfTodayByCat =
-              NotificationsHelper.getCategoryListFuture(0, _notifications);
+          notificationsOfTodayByCat = NotificationsHelper.getCategoryListFuture(
+              0, this.widget.notificationsOfTheDay);
         });
       }
     }); //onData(message, flagEntry!));
@@ -184,37 +185,8 @@ class _NotificationsListerWidgetState extends State<NotificationsListerWidget> {
       _loading = false;
     });
   }
-}
 
-////////////////////////////////////////////////
-class NotificationsCategoryWidget extends StatefulWidget {
-  NotificationsCategoryWidget({
-    Key? key,
-    this.title,
-    //required this.getNotificationsOfToday,
-    required this.isToday,
-    required this.notificationsByCategory,
-    //this.refresh,
-  }) : super(key: key);
-  final String? title;
-  //final Future<List<Notifications>> getNotificationsOfToday;
-  final Future<List<NotificationCategory>> notificationsByCategory;
-  final bool isToday;
-  // final Function? refresh;
-
-  @override
-  State<NotificationsCategoryWidget> createState() =>
-      _NotificationsCategoryWidgetState();
-}
-
-class _NotificationsCategoryWidgetState
-    extends State<NotificationsCategoryWidget> {
-  bool isToday = true;
-  bool hasData = false;
-  List<Color> _colors = [Color.fromRGBO(94, 109, 145, 1.0), Colors.transparent];
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildContainer(BuildContext context) {
     return Container(
       height: 600,
       padding: EdgeInsets.only(top: 15.0),
@@ -311,7 +283,7 @@ class _NotificationsCategoryWidgetState
             // decoration: BoxDecoration(color: Colors.brown),
             margin: EdgeInsets.only(top: 0.0),
             child: FutureBuilder<List<NotificationCategory>>(
-                future: this.widget.notificationsByCategory,
+                future: notificationsOfTodayByCat,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState != ConnectionState.done) {
                     return NotificationsHelper.buildLoader();
@@ -352,3 +324,170 @@ class _NotificationsCategoryWidgetState
     );
   }
 }
+
+////////////////////////////////////////////////
+// class NotificationsCategoryWidget extends StatefulWidget {
+//   NotificationsCategoryWidget({
+//     Key? key,
+//     this.title,
+//     //required this.getNotificationsOfToday,
+//     required this.isToday,
+//     required this.notificationsByCategory,
+//     //this.refresh,
+//   }) : super(key: key);
+//   final String? title;
+//   //final Future<List<Notifications>> getNotificationsOfToday;
+//   final Future<List<NotificationCategory>> notificationsByCategory;
+//   final bool isToday;
+//   // final Function? refresh;
+
+//   @override
+//   State<NotificationsCategoryWidget> createState() =>
+//       _NotificationsCategoryWidgetState();
+// }
+
+// class _NotificationsCategoryWidgetState
+//     extends State<NotificationsCategoryWidget> {
+//   bool isToday = true;
+//   bool hasData = false;
+//   List<Color> _colors = [Color.fromRGBO(94, 109, 145, 1.0), Colors.transparent];
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       height: 600,
+//       padding: EdgeInsets.only(top: 15.0),
+//       decoration: BoxDecoration(
+//         shape: BoxShape.rectangle,
+//         borderRadius: BorderRadius.only(
+//           topLeft: Radius.circular(30.0),
+//           topRight: Radius.circular(30.0),
+//         ),
+//         gradient: LinearGradient(
+//           colors: _colors,
+//           begin: Alignment.topCenter,
+//           end: Alignment.bottomCenter,
+//           //stops: _stops
+//         ),
+//       ),
+//       child: getNotificationListBody(context),
+//     );
+//   }
+
+//   Widget getNotificationListBody(BuildContext context) {
+//     return Column(
+//       children: [
+//         Container(
+//           height: 30,
+//           margin: EdgeInsets.only(bottom: 10.0),
+//           padding: EdgeInsets.symmetric(horizontal: 30.0),
+//           //color: Colors.blueAccent,
+//           child: Row(
+//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//             children: [
+//               ElevatedButton(
+//                 style: ElevatedButton.styleFrom(
+//                     onPrimary: isToday ? Colors.black87 : Colors.white24,
+//                     primary: isToday ? Colors.grey[300] : Colors.grey[600],
+//                     minimumSize: Size(88, 36),
+//                     padding: EdgeInsets.symmetric(horizontal: 16),
+//                     shape: const RoundedRectangleBorder(
+//                       borderRadius: BorderRadius.all(Radius.circular(20)),
+//                     )),
+//                 onPressed: () async {
+//                   //  await getCategoryList(0);
+
+//                   setState(() {
+//                     isToday = true;
+//                   });
+//                   // notificationCategoryStream = isToday
+//                   //     ? getCategoryListStream(0)
+//                   //     : getCategoryListStream(1);
+//                 },
+//                 child: Text('Today'),
+//               ),
+//               ElevatedButton(
+//                 style: ElevatedButton.styleFrom(
+//                     onPrimary: isToday ? Colors.white24 : Colors.black87,
+//                     primary: isToday ? Colors.grey[600] : Colors.grey[300],
+//                     minimumSize: Size(88, 36),
+//                     padding: EdgeInsets.symmetric(horizontal: 16),
+//                     shape: const RoundedRectangleBorder(
+//                       borderRadius: BorderRadius.all(Radius.circular(20)),
+//                     )),
+//                 onPressed: () async {
+//                   //  await getCategoryList(1);
+
+//                   setState(() {
+//                     isToday = false;
+//                   });
+//                   // notificationCategoryStream = isToday
+//                   //     ? getCategoryListStream(0)
+//                   //     : getCategoryListStream(1);
+//                 },
+//                 child: Text('Yesterday'),
+//               ),
+//               ElevatedButton(
+//                 style: ElevatedButton.styleFrom(
+//                     onPrimary: Colors.white24,
+//                     primary: Colors.grey[600],
+//                     minimumSize: Size(88, 36),
+//                     padding: EdgeInsets.symmetric(horizontal: 16),
+//                     shape: const RoundedRectangleBorder(
+//                       borderRadius: BorderRadius.all(Radius.circular(20)),
+//                     )),
+//                 onPressed: () {},
+//                 child: Text('History'),
+//               )
+//             ],
+//           ),
+//         ),
+//         Flexible(
+//           flex: 1,
+//           fit: FlexFit.tight,
+//           child: Container(
+//             //height: 200,
+//             // decoration: BoxDecoration(color: Colors.brown),
+//             margin: EdgeInsets.only(top: 0.0),
+//             child: FutureBuilder<List<NotificationCategory>>(
+//                 future: this.widget.notificationsByCategory,
+//                 builder: (context, snapshot) {
+//                   if (snapshot.connectionState != ConnectionState.done) {
+//                     return NotificationsHelper.buildLoader();
+//                   }
+
+//                   if (snapshot.hasError) {
+//                     return NotificationsHelper.buildError(
+//                         snapshot.error.toString());
+//                     //setState(() {});
+//                   }
+//                   if (snapshot.hasData) {
+//                     print(snapshot.data!.length);
+//                     return MediaQuery.removePadding(
+//                       context: context,
+//                       removeTop: true,
+//                       child: ListView.builder(
+//                         itemCount: snapshot.data!.length,
+//                         itemBuilder: (context, index) {
+//                           return new NotificationsCard(
+//                             notificationsCategoryList: snapshot.data,
+//                             index: index,
+//                             key: GlobalKey(),
+//                             // key: UniqueKey(), //widget.key,
+//                           );
+//                         },
+//                         physics: BouncingScrollPhysics(
+//                           parent: AlwaysScrollableScrollPhysics(),
+//                         ),
+//                       ),
+//                     );
+//                   } else {
+//                     return NotificationsHelper.buildNoData();
+//                   }
+//                 }),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }

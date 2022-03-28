@@ -158,7 +158,7 @@ class NotificationsHelper {
   static Future<List<NotificationCategory>> getCategoryListFuture(
       int selectedDay, Future<List<Notifications>> notifications) async {
     var listByPackageName;
-    List<NotificationCategory> notificationsByCategory = [];
+    final List<NotificationCategory> notificationsByCategory = [];
     var _notifications = await notifications;
     if (_notifications.length > 0) {
       listByPackageName = groupBy(_notifications, (Notifications n) {
