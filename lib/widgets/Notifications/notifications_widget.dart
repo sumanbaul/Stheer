@@ -6,6 +6,7 @@ import 'package:flutter_notification_listener/flutter_notification_listener.dart
 import 'package:notifoo/model/notificationCategory.dart';
 
 import '../../helper/NotificationsHelper.dart';
+import '../../helper/notificationCatHelper.dart';
 import '../../model/Notifications.dart';
 import 'notification_card.dart';
 
@@ -19,8 +20,9 @@ class NotificationsListWidget extends StatefulWidget {
 
 class _NotificationsListWidgetState extends State<NotificationsListWidget> {
   Future<List<Notifications>>? notificationsOfTheDay;
-  Future<List<NotificationCategory>>? notificationsByCat;
+  Future<List<NotificationCategory>>? notificationsByCatFuture;
   List<Notifications>? notifications;
+  List<NotificationCategory>? notificationsByCat;
   bool started = false;
   bool _loading = false;
   bool isToday = true;
@@ -33,8 +35,13 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
   @override
   void initState() {
     super.initState();
+
     initPlatformState();
-    notificationsOfTheDay = initializeData(isToday);
+    //notificationsOfTheDay = initializeData(isToday);
+    notificationsOfTheDay =
+        NotificationsHelper.initializeDbGetNotificationsToday(isToday ? 0 : 1);
+    notificationsByCatFuture =
+        NotificationCatHelper.getNotificationsByCategoryInit(isToday);
   }
 
   @override
@@ -82,7 +89,9 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
         setState(() {
           notificationsOfTheDay =
               appendElements(notificationsOfTheDay!, _currentNotification!);
-          notificationsByCat = notificationsByCategory(notifications!);
+          notificationsByCatFuture =
+              NotificationCatHelper.getNotificationsByCategoryUpdate(
+                  notificationsOfTheDay!, isToday);
         });
       }
     }); //onData(message, flagEntry!));
@@ -104,9 +113,9 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
       Notifications elementToAdd) async {
     final list = await listFuture;
     list.add(elementToAdd);
-    list
-      ..sort(
-          (a, b) => (b.createAt.toString()).compareTo(a.createAt.toString()));
+    // list
+    //   ..sort(
+    //       (a, b) => (b.createAt.toString()).compareTo(a.createAt.toString()));
     return list;
   }
 
@@ -159,18 +168,20 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
     });
   }
 
-  Future<List<Notifications>> initializeData(bool istoday) async {
-    notificationsOfTheDay = initializeNotifications(istoday);
-    // final _ntList = await NotificationsHelper.initializeDbGetNotificationsToday(
-    //     istoday ? 0 : 1);
+  // Future<List<Notifications>> initializeData(bool istoday) async {
+  //   List<NotificationCategory> _ncList =
+  //       await NotificationCatHelper.getNotificationsByCategory(istoday);
+  //   notificationsOfTheDay = initializeNotifications(istoday);
+  //   // final _ntList = await NotificationsHelper.initializeDbGetNotificationsToday(
+  //   //     istoday ? 0 : 1);
 
-    notifications = await notificationsOfTheDay;
+  //   notifications = await notificationsOfTheDay;
 
-    if (notifications!.length > 0) {
-      notificationsByCat = notificationsByCategory(notifications!);
-    }
-    return notifications!;
-  }
+  //   if (notifications!.length > 0) {
+  //     notificationsByCatFuture = notificationsByCategory(notifications!);
+  //   }
+  //   return notifications!;
+  // }
 
   Future<List<Notifications>> initializeNotifications(bool istoday) async {
     return await NotificationsHelper.initializeDbGetNotificationsToday(
@@ -183,11 +194,11 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
   //   return _ntCat;
   // }
 
-  Future<List<NotificationCategory>> notificationsByCategory(
-      List<Notifications> notificationsFuture) async {
-    return await NotificationsHelper.getCategoryListFuture(
-        isToday ? 0 : 1, notificationsFuture);
-  }
+  // Future<List<NotificationCategory>> notificationsByCategory(
+  //     List<Notifications> notificationsFuture) async {
+  //   return await NotificationsHelper.getCategoryListFuture(
+  //       isToday ? 0 : 1, notificationsFuture);
+  // }
 
   // Future<List<NotificationCategory>> initializeCatData() async {
   //   final _ntList = initializeData();
@@ -242,8 +253,9 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
                     setState(() {
                       isToday = true;
                       //notificationsOfTheDay = initializeData(isToday);
-                      notificationsByCat =
-                          notificationsByCategory(notifications!);
+                      notificationsByCatFuture =
+                          NotificationCatHelper.getNotificationsByCategoryInit(
+                              isToday);
                     });
                   }
                 },
@@ -264,8 +276,9 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
                     setState(() {
                       isToday = false;
                       //notificationsOfTheDay = initializeData(isToday);
-                      notificationsByCat =
-                          notificationsByCategory(notifications!);
+                      notificationsByCatFuture =
+                          NotificationCatHelper.getNotificationsByCategoryInit(
+                              isToday);
                     });
                   }
                 },
@@ -294,7 +307,7 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
             // decoration: BoxDecoration(color: Colors.brown),
             margin: EdgeInsets.only(top: 0.0),
             child: FutureBuilder<List<NotificationCategory>>(
-                future: notificationsByCat,
+                future: notificationsByCatFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState != ConnectionState.done) {
                     return NotificationsHelper.buildLoader();

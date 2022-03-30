@@ -146,7 +146,7 @@ class NotificationsHelper {
   }
 
   static Future<List<NotificationCategory>> getCategoryListFuture(
-      int selectedDay, List<Notifications> notifications) async {
+      List<Notifications> notifications) async {
     final listByPackageName;
     List<NotificationCategory> notificationsByCategory = [];
     final _notifications = notifications;

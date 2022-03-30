@@ -6,10 +6,14 @@ import 'list_detail.dart';
 
 class NotificationsCard extends StatelessWidget {
   const NotificationsCard(
-      {Key? key, this.index, required this.notificationsCategory})
+      {Key? key,
+      this.index,
+      required this.notificationsCategory,
+      this.notification})
       : super(key: key);
   final int? index;
   final NotificationCategory? notificationsCategory;
+  final Notification? notification;
 
   buildNotificationCard(BuildContext context) {
     return Container(
@@ -144,6 +148,7 @@ class NotificationsCard extends StatelessWidget {
                             title: notificationsCategory!.appTitle,
                             appIcon: notificationsCategory!.appIcon,
                             appTitle: notificationsCategory!.appTitle,
+                            notification: notification,
                           ),
                         ),
                       ),

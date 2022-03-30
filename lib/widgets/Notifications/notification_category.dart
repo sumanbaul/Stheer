@@ -153,7 +153,7 @@ class _NotificationsCategoryWidgetState
             // decoration: BoxDecoration(color: Colors.brown),
             margin: EdgeInsets.only(top: 0.0),
             child: FutureBuilder<List<NotificationCategory>>(
-                future: NotificationsHelper.getCategoryListFuture(0, list!),
+                future: NotificationsHelper.getCategoryListFuture(list!),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState != ConnectionState.done) {
                     return NotificationsHelper.buildLoader();

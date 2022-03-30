@@ -1,11 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:notifoo/helper/AppListHelper.dart';
 import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:notifoo/helper/datetime_ago.dart';
 import 'package:notifoo/model/list_detail_model.dart';
-import 'package:notifoo/widgets/Topbar.dart';
 
 class NotificationDetailList extends StatefulWidget {
   // In the constructor, require a Todo.
@@ -15,6 +12,7 @@ class NotificationDetailList extends StatefulWidget {
     this.title,
     this.appIcon,
     this.appTitle,
+    this.notification,
   }) : super(key: key);
   //NotificationCatgoryList({Key key, this.title}) : super(key: key);
   //final AppListHelper appsListHelper = new AppListHelper();
@@ -23,6 +21,7 @@ class NotificationDetailList extends StatefulWidget {
   final String? packageName;
   final Image? appIcon;
   final String? appTitle;
+  final Notification? notification;
 
   @override
   _NotificationCatgoryListState createState() =>
