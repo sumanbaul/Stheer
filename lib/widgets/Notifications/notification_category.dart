@@ -26,6 +26,7 @@ class NotificationsCategoryWidget extends StatefulWidget {
 
 class _NotificationsCategoryWidgetState
     extends State<NotificationsCategoryWidget> {
+  List<Notifications>? list;
   bool isToday = true;
   bool hasData = false;
   List<Color> _colors = [Color.fromRGBO(94, 109, 145, 1.0), Colors.transparent];
@@ -61,10 +62,7 @@ class _NotificationsCategoryWidgetState
 
   initializeNotificationsByCategory(int day) async {
     var _getNotificationsOfToday = await this.widget.getNotificationsOfToday;
-    return _getNotificationsOfToday.length > 0
-        ? await NotificationsHelper.getCategoryListFuture(
-            day, this.widget.getNotificationsOfToday)
-        : refreshData();
+    return _getNotificationsOfToday.length > 0 ? "" : refreshData();
 
     // print(
     //     "initializeNotificationsByCategory - >getNotificationsOfToday: $_getNotificationsOfToday.lenth");
@@ -76,7 +74,7 @@ class _NotificationsCategoryWidgetState
 
   Future<List<Notifications>> refreshData() async {
     print("Refresh data triggered");
-    return await NotificationsHelper.initializeDbGetNotificationsToday();
+    return await NotificationsHelper.initializeDbGetNotificationsToday(0);
   }
 
   Widget getNotificationListBody() {
@@ -155,8 +153,7 @@ class _NotificationsCategoryWidgetState
             // decoration: BoxDecoration(color: Colors.brown),
             margin: EdgeInsets.only(top: 0.0),
             child: FutureBuilder<List<NotificationCategory>>(
-                future: NotificationsHelper.getCategoryListFuture(
-                    0, this.widget.getNotificationsOfToday),
+                future: NotificationsHelper.getCategoryListFuture(0, list!),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState != ConnectionState.done) {
                     return NotificationsHelper.buildLoader();

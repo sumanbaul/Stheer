@@ -3,10 +3,11 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
+import 'package:notifoo/model/notificationCategory.dart';
 
 import '../../helper/NotificationsHelper.dart';
-import '../../helper/datetime_ago.dart';
 import '../../model/Notifications.dart';
+import 'notification_card.dart';
 
 class NotificationsListWidget extends StatefulWidget {
   NotificationsListWidget({Key? key}) : super(key: key);
@@ -18,6 +19,8 @@ class NotificationsListWidget extends StatefulWidget {
 
 class _NotificationsListWidgetState extends State<NotificationsListWidget> {
   Future<List<Notifications>>? notificationsOfTheDay;
+  Future<List<NotificationCategory>>? notificationsByCat;
+  List<Notifications>? notifications;
   bool started = false;
   bool _loading = false;
   bool isToday = true;
@@ -31,7 +34,7 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
   void initState() {
     super.initState();
     initPlatformState();
-    initializeData();
+    notificationsOfTheDay = initializeData(isToday);
   }
 
   @override
@@ -79,6 +82,7 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
         setState(() {
           notificationsOfTheDay =
               appendElements(notificationsOfTheDay!, _currentNotification!);
+          notificationsByCat = notificationsByCategory(notifications!);
         });
       }
     }); //onData(message, flagEntry!));
@@ -100,6 +104,9 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
       Notifications elementToAdd) async {
     final list = await listFuture;
     list.add(elementToAdd);
+    list
+      ..sort(
+          (a, b) => (b.createAt.toString()).compareTo(a.createAt.toString()));
     return list;
   }
 
@@ -152,10 +159,41 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
     });
   }
 
-  Future<void> initializeData() async {
-    notificationsOfTheDay =
-        NotificationsHelper.initializeDbGetNotificationsToday();
+  Future<List<Notifications>> initializeData(bool istoday) async {
+    notificationsOfTheDay = initializeNotifications(istoday);
+    // final _ntList = await NotificationsHelper.initializeDbGetNotificationsToday(
+    //     istoday ? 0 : 1);
+
+    notifications = await notificationsOfTheDay;
+
+    if (notifications!.length > 0) {
+      notificationsByCat = notificationsByCategory(notifications!);
+    }
+    return notifications!;
   }
+
+  Future<List<Notifications>> initializeNotifications(bool istoday) async {
+    return await NotificationsHelper.initializeDbGetNotificationsToday(
+        istoday ? 0 : 1);
+  }
+
+  // Future<List<NotificationCategory>> updateData(bool istoday) async {
+  //   final _ntCat = await notificationsByCategory(
+  //       NotificationsHelper.initializeDbGetNotificationsToday(istoday ? 0 : 1));
+  //   return _ntCat;
+  // }
+
+  Future<List<NotificationCategory>> notificationsByCategory(
+      List<Notifications> notificationsFuture) async {
+    return await NotificationsHelper.getCategoryListFuture(
+        isToday ? 0 : 1, notificationsFuture);
+  }
+
+  // Future<List<NotificationCategory>> initializeCatData() async {
+  //   final _ntList = initializeData();
+  //   notificationsOfTheDay = _ntList;
+  //   return notificationsByCat = notificationsByCategory(_ntList);
+  // }
 
   Widget _buildContainer(BuildContext context) {
     return Container(
@@ -200,13 +238,14 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
                     )),
                 onPressed: () async {
                   //  await getCategoryList(0);
-
-                  setState(() {
-                    isToday = true;
-                  });
-                  // notificationCategoryStream = isToday
-                  //     ? getCategoryListStream(0)
-                  //     : getCategoryListStream(1);
+                  if (isToday == false) {
+                    setState(() {
+                      isToday = true;
+                      //notificationsOfTheDay = initializeData(isToday);
+                      notificationsByCat =
+                          notificationsByCategory(notifications!);
+                    });
+                  }
                 },
                 child: Text('Today'),
               ),
@@ -221,13 +260,14 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
                     )),
                 onPressed: () async {
                   //  await getCategoryList(1);
-
-                  setState(() {
-                    isToday = false;
-                  });
-                  // notificationCategoryStream = isToday
-                  //     ? getCategoryListStream(0)
-                  //     : getCategoryListStream(1);
+                  if (isToday == true) {
+                    setState(() {
+                      isToday = false;
+                      //notificationsOfTheDay = initializeData(isToday);
+                      notificationsByCat =
+                          notificationsByCategory(notifications!);
+                    });
+                  }
                 },
                 child: Text('Yesterday'),
               ),
@@ -253,8 +293,8 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
             //height: 200,
             // decoration: BoxDecoration(color: Colors.brown),
             margin: EdgeInsets.only(top: 0.0),
-            child: FutureBuilder<List<Notifications>>(
-                future: notificationsOfTheDay,
+            child: FutureBuilder<List<NotificationCategory>>(
+                future: notificationsByCat,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState != ConnectionState.done) {
                     return NotificationsHelper.buildLoader();
@@ -266,7 +306,8 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
                     //setState(() {});
                   }
                   if (snapshot.hasData) {
-                    print(snapshot.data!.length);
+                    print(
+                        "Snapshot.length -> NotificationsWidget:$snapshot.data!.length");
                     return MediaQuery.removePadding(
                       context: context,
                       removeTop: true,
@@ -274,22 +315,34 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
                         itemCount: snapshot.data!.length,
                         itemBuilder: (context, index) {
                           final entry = snapshot.data![index];
-                          return ListTile(
-                              trailing: Text(
-                                  entry.packageName.toString().split('.').last),
-                              title: Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(entry.title ?? "no title"),
-                                    Text(entry.text ?? "No message"),
-                                    // Text(entry.createAt
-                                    //     .toString()
-                                    //     .substring(0, 19)),
-                                  ],
-                                ),
-                              ));
+                          // final app = NotificationsHelper.getCurrentAppWithIcon(
+                          //     entry.packageName!);
+                          return NotificationsCard(
+                            notificationsCategory: entry,
+                            //index: index,
+                            key: GlobalKey(),
+                            // key: UniqueKey(), //widget.key,
+                          );
                         },
+                        //   ListTile(
+                        //       trailing: Text(
+                        //           entry.packageName.toString().split('.').last),
+                        //       title: Container(
+                        //         child: Column(
+                        //           crossAxisAlignment: CrossAxisAlignment.start,
+                        //           children: [
+                        //             // CircleAvatar(
+                        //             //   child:  await NotificationsHelper.getCurrentAppWithIcon(event.packageName!)) ?? entry.packageName Image.memory(bytes),
+                        //             // ),
+                        //             Text(entry.title ?? "no title"),
+                        //             Text(entry.text ?? "No message"),
+                        //             // Text(entry.createAt
+                        //             //     .toString()
+                        //             //     .substring(0, 19)),
+                        //           ],
+                        //         ),
+                        //       ));
+                        // },
                         physics: BouncingScrollPhysics(
                           parent: AlwaysScrollableScrollPhysics(),
                         ),
@@ -303,181 +356,5 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
         ),
       ],
     );
-  }
-}
-
-class NotificationsCard extends StatelessWidget {
-  const NotificationsCard({Key? key, this.index, this.notifications})
-      : super(key: key);
-  final int? index;
-  final List<Notifications>? notifications;
-
-  buildNotificationCard(BuildContext context, int index) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 15),
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-      child: Card(
-        elevation: 0.0,
-        margin: EdgeInsets.only(top: 0.0),
-        color: Colors.transparent,
-        child: Stack(children: [
-          Column(
-            // crossAxisAlignment: CrossAxisAlignment.stretch,
-            // mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                //  margin: EdgeInsets.only(bottom: 10),
-                height: 100,
-                padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 12.0),
-                decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Color.fromRGBO(59, 66, 84, 1),
-                        Color.fromRGBO(41, 47, 61, 1)
-                      ],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
-                    //color: Color.fromRGBO(40, 48, 59, 1),
-                    // color: Color.fromRGBO(58, 66, 86, 1.0),
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Color.fromRGBO(84, 98, 117, 1),
-                          blurRadius: 8,
-                          spreadRadius: 2,
-                          offset: Offset(-3, -3)),
-                      BoxShadow(
-                          color: Color.fromRGBO(40, 48, 59, 1),
-                          blurRadius: 8,
-                          spreadRadius: 2,
-                          offset: Offset(3, 3)),
-                    ]),
-                child: Container(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              // CircleAvatar(
-                              //   radius: 25.0,
-                              //   child:
-                              //       notifications![index].appIcon,
-                              //   // backgroundImage:
-                              //   //     notificationsCategoryList[index]
-                              //   //         .appIcon
-                              //   //         .image,
-                              //   //backgroundImage: _nc[index].appIcon,
-                              //   //child: _nc[index].appIcon,
-                              //   // child: ClipRRect(
-                              //   //   child: _nc[index].appIcon,
-                              //   //   borderRadius: BorderRadius.circular(100.0),
-                              //   // ),
-                              //   backgroundColor: Colors.black12,
-                              // ),
-                              // ClipOval(
-                              //   child: Image(
-                              //     image: _nc[index].appIcon.image,
-                              //     fit: BoxFit.cover,
-                              //     width: 50.0,
-                              //     height: 50.0,
-                              //     gaplessPlayback: true,
-                              //     alignment: Alignment.center,
-                              //   ),
-                              // ),
-                              SizedBox(
-                                width: 8,
-                              ),
-                              Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    notifications![index].appTitle!,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18.0),
-                                  ),
-                                  SizedBox(
-                                    height: 3.0,
-                                  ),
-                                  Text(
-                                    "$notifications![index].text", //'Tap to view details',
-                                    style: TextStyle(
-                                        color:
-                                            Color.fromRGBO(196, 196, 196, 1)),
-                                  )
-                                ],
-                              ),
-                            ],
-                          ),
-                          Icon(Icons.keyboard_arrow_right)
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              notifications![index].message!,
-                              style: TextStyle(
-                                fontSize: 13.0,
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              // readTimestamp(
-                              //     notifications![index].createAt),
-                              'sometyhing',
-                              style: TextStyle(
-                                  color: Colors.white54, fontSize: 13),
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          new Positioned.fill(
-              child: new Material(
-                  type: MaterialType.transparency,
-                  color: Colors.transparent,
-                  child: new InkWell(
-                    borderRadius: BorderRadius.circular(20),
-                    onTap: () => {
-                      // print('tapped'),
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => NotificationDetailList(
-                      //       packageName:
-                      //           notificationsCategoryList![index].packageName,
-                      //       title: notificationsCategoryList![index].appTitle,
-                      //       //appIcon: notificationsCategoryList![index].appIcon,
-                      //       appTitle:
-                      //           notificationsCategoryList![index].appTitle,
-                      //     ),
-                      //   ),
-                      // ),
-                    },
-                  )))
-        ]),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return buildNotificationCard(context, this.index!);
   }
 }

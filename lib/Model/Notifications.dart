@@ -1,7 +1,9 @@
+import 'package:flutter/cupertino.dart';
+
 class Notifications {
   final int? id;
   final String? appTitle;
-  // final Image appIcon;
+  //final Icon? appIcon;
   final String? title;
   final String? text;
   final String? message;
@@ -21,7 +23,7 @@ class Notifications {
       {this.id,
       this.title,
       this.appTitle,
-      //    this.appIcon,
+      // this.appIcon,
       this.text,
       this.message,
       this.packageName,
@@ -40,7 +42,25 @@ class Notifications {
       'id': id,
       'title': title,
       'appTitle': appTitle,
-      //   'appIcon': appIcon,
+      //'appIcon': appIcon,
+      'text': text,
+      'message': message,
+      'packageName': packageName,
+      'timestamp': timestamp,
+      'createAt': createAt,
+      'eventJson': eventJson,
+      'createdDate': createdDate,
+      'isDeleted': isDeleted
+      //'signature': signature
+    };
+  }
+
+  Map<String, dynamic> toMapDb() {
+    return {
+      'id': id,
+      'title': title,
+      'appTitle': appTitle,
+      // 'appIcon': appIcon,
       'text': text,
       'message': message,
       'packageName': packageName,

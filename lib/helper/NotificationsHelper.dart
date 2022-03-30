@@ -48,9 +48,10 @@ class NotificationsHelper {
   //   return notificationEvent;
   // }
 
-  static Future<List<Notifications>> initializeDbGetNotificationsToday() async {
+  static Future<List<Notifications>> initializeDbGetNotificationsToday(
+      int day) async {
     // DatabaseHelper.instance.initializeDatabase();
-    return await DatabaseHelper.instance.getNotifications(0);
+    return await DatabaseHelper.instance.getNotifications(day);
   }
 
   static Future<Application?> getCurrentAppWithIcon(String packageName) async {
@@ -61,9 +62,10 @@ class NotificationsHelper {
 //This function is triggered on receiving of data from port
   //static Future<Notifications> onData(
   static Future<Notifications> onData(NotificationEvent event) async {
-    var eventAppWithIcon = await (getCurrentAppWithIcon(event.packageName!));
+    final _event = event;
+    final eventAppWithIcon = await (getCurrentAppWithIcon(event.packageName!));
     print(event); // this is needed for later
-    Notifications _notification;
+    final Notifications _notification;
     if (!eventAppWithIcon!.systemApp) {
       if (event.packageName!.contains("skydrive") ||
           (event.packageName!.contains("service")) ||
@@ -77,41 +79,32 @@ class NotificationsHelper {
           (event.packageName!.contains("gallery"))) {
         print(event.packageName);
       } else {
-        // print("Success Package Found: " + app.packageName);
-        //var jsondata2 = json.decode(event.toString());
-        Map<String, dynamic> jsonresponse = json.decode(event.toString());
-
-        var createatday = event.createAt!.day;
+        final Map<String, dynamic> jsonresponse = json.decode(event.toString());
+        final createatday = event.createAt!.day;
+        final today = DateTime.now().day;
         print("Create AT Day: $createatday");
-        var today = new DateTime.now().day;
-        print('today: $today');
-        //var xx = jsonresponse.containsKey('summaryText');
+
         if (!jsonresponse.containsKey('summaryText') &&
             event.createAt!.day >= today) {
           // if ((event.text != flagEntry) && event.text != null) {
           if (event.text != null) {
-            var currentNotification = Notifications(
-                title: event.title,
-                appTitle: eventAppWithIcon.appName,
-                // appIcon: _currentApp is ApplicationWithIcon
-                //     ? Image.memory(_currentApp.icon)
-                //     : null,
-                text: event.text,
-                message: event.message,
-                packageName: event.packageName,
-                timestamp: event.timestamp,
-                createAt: event.createAt!.millisecondsSinceEpoch.toString(),
-                eventJson: event.toString(),
-                createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
-                isDeleted: 0);
+            final currentNotification = Notifications(
+              title: _event.title,
+              appTitle: eventAppWithIcon.appName,
+              text: _event.text,
+              message: _event.message,
+              packageName: _event.packageName,
+              timestamp: _event.timestamp,
+              createAt: _event.createAt!.millisecondsSinceEpoch.toString(),
+              eventJson: _event.toString(),
+              createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
+              isDeleted: 0,
+            );
 
-            //add current notification to this Global Variable(getNotificationsOfToday)
-            //inside context
             _notification = currentNotification;
+
             await DatabaseHelper.instance
                 .insertNotification(currentNotification);
-
-            //initClearNotificationsState();
             // flagEntry = event.text.toString();
             print("$_notification.appTitle");
             return currentNotification;
@@ -120,7 +113,7 @@ class NotificationsHelper {
 
             // var titleLength = jsonresponse["textLines"].length;
 
-            var currentNotification = Notifications(
+            final currentNotification = Notifications(
                 title: jsonresponse["textLines"] ??
                     jsonresponse["textLines"] as String?,
                 text: event.text,
@@ -140,9 +133,6 @@ class NotificationsHelper {
                 // summaryText: jsonData["summaryText"] ?? ""
                 );
 
-            //initClearNotificationsState();
-
-            //print("Setstate getting hit: $currentNotification");
             _notification = currentNotification;
             await DatabaseHelper.instance
                 .insertNotification(currentNotification);
@@ -156,10 +146,10 @@ class NotificationsHelper {
   }
 
   static Future<List<NotificationCategory>> getCategoryListFuture(
-      int selectedDay, Future<List<Notifications>> notifications) async {
-    var listByPackageName;
-    final List<NotificationCategory> notificationsByCategory = [];
-    var _notifications = await notifications;
+      int selectedDay, List<Notifications> notifications) async {
+    final listByPackageName;
+    List<NotificationCategory> notificationsByCategory = [];
+    final _notifications = notifications;
     if (_notifications.length > 0) {
       listByPackageName = groupBy(_notifications, (Notifications n) {
         return n.packageName.toString();
@@ -168,25 +158,36 @@ class NotificationsHelper {
       if (listByPackageName.length > 0) {
         listByPackageName.forEach((key, value) async {
           // print(value[value.length - 1].createdDate);
-          if (value != null) {
-            Application? _app =
-                await (getCurrentAppWithIcon(value[0].packageName));
+          // if (value != null) {
+          final Application? _app =
+              await (getCurrentAppWithIcon(value[0].packageName));
+          //final _length = value.length;
+          NotificationCategory nc = NotificationCategory(
+              packageName: _app?.packageName,
+              appTitle: _app?.appName,
+              appIcon:
+                  _app is ApplicationWithIcon ? Image.memory(_app.icon) : null,
+              //tempIcon: Image.memory(_currentApp.icon),
+              timestamp: value[0].timestamp,
+              message: "You have " +
+                  value.length.toString() +
+                  " Unread notifications",
+              notificationCount: value.length);
 
-            var nc = NotificationCategory(
-                packageName: _app?.packageName,
-                appTitle: _app?.appName,
-                appIcon: _app is ApplicationWithIcon
-                    ? Image.memory(_app.icon)
-                    : null,
-                //tempIcon: Image.memory(_currentApp.icon),
-                timestamp: value[0].timestamp,
-                message: "You have " +
-                    value.length.toString() +
-                    " Unread notifications",
-                notificationCount: value.length);
+          //  NotificationCategory nc2 = NotificationCategory(
+          // packageName: value[index].packageName,
+          // appTitle: value.,
+          // appIcon:
+          //     _app is ApplicationWithIcon ? Image.memory(_app.icon) : null,
+          // //tempIcon: Image.memory(_currentApp.icon),
+          // timestamp: value[0].timestamp,
+          // message: "You have " +
+          //     value.length.toString() +
+          //     " Unread notifications",
+          // notificationCount: value.length);
 
-            notificationsByCategory.add(nc);
-          }
+          notificationsByCategory.add(nc);
+          // }
         });
       }
       notificationsByCategory

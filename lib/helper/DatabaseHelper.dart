@@ -90,7 +90,7 @@ class DatabaseHelper {
 
   insertNotification(Notifications notifications) async {
     final db = await (database);
-    var res = await db?.insert(Notifications.TABLENAME, notifications.toMap(),
+    var res = await db?.insert(Notifications.TABLENAME, notifications.toMapDb(),
         conflictAlgorithm: ConflictAlgorithm.ignore);
     return res;
   }

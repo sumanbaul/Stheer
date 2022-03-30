@@ -5,7 +5,8 @@ import '../../model/notificationCategory.dart';
 import 'list_detail.dart';
 
 class NotificationsCard extends StatelessWidget {
-  const NotificationsCard({Key? key, this.index, this.notificationsCategory})
+  const NotificationsCard(
+      {Key? key, this.index, required this.notificationsCategory})
       : super(key: key);
   final int? index;
   final NotificationCategory? notificationsCategory;
@@ -60,34 +61,15 @@ class NotificationsCard extends StatelessWidget {
                         children: [
                           Row(
                             children: [
+                              // ClipOval(
+                              //   child: notificationsCategory!.appIcon,
+                              // ),
                               CircleAvatar(
                                 radius: 25.0,
-                                child: CircleAvatar(
-                                    backgroundColor: Colors.transparent,
-                                    //clipBehavior: Clip.hardEdge,
-                                    child: notificationsCategory!.appIcon),
-                                // backgroundImage:
-                                //     notificationsCategoryList[index]
-                                //         .appIcon
-                                //         .image,
-                                //backgroundImage: _nc[index].appIcon,
-                                //child: _nc[index].appIcon,
-                                // child: ClipRRect(
-                                //   child: _nc[index].appIcon,
-                                //   borderRadius: BorderRadius.circular(100.0),
-                                // ),
+                                child: notificationsCategory!.appIcon,
                                 backgroundColor: Colors.black12,
                               ),
-                              // ClipOval(
-                              //   child: Image(
-                              //     image: _nc[index].appIcon.image,
-                              //     fit: BoxFit.cover,
-                              //     width: 50.0,
-                              //     height: 50.0,
-                              //     gaplessPlayback: true,
-                              //     alignment: Alignment.center,
-                              //   ),
-                              // ),
+
                               SizedBox(
                                 width: 8,
                               ),

@@ -24,9 +24,9 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  List<Notifications> _getNotificationsOfToday = [];
-  Future<List<Notifications>>? notificationsOfTheDay;
-  int _notificationsCount = 0;
+  //List<Notifications> _getNotificationsOfToday = [];
+  //Future<List<Notifications>>? notificationsOfTheDay;
+  //int _notificationsCount = 0;
 
   @override
   void initState() {
@@ -36,12 +36,12 @@ class _HomepageState extends State<Homepage> {
     //initializeData();
   }
 
-  Future<List<Notifications>> initializeData() async {
-    _getNotificationsOfToday =
-        await NotificationsHelper.initializeDbGetNotificationsToday();
-    _notificationsCount = _getNotificationsOfToday.length;
-    return _getNotificationsOfToday;
-  }
+  // Future<List<Notifications>> initializeData() async {
+  //   _getNotificationsOfToday =
+  //       await NotificationsHelper.initializeDbGetNotificationsToday(0);
+  //   _notificationsCount = _getNotificationsOfToday.length;
+  //   return _getNotificationsOfToday;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -64,9 +64,9 @@ class _HomepageState extends State<Homepage> {
                   SubHeader(title: "Today's Notifications"),
                   Container(
                     child: Expanded(
-                      // child: NotificationsListWidget(),
+                      child: NotificationsListWidget(),
 
-                      child: NotificationsListerTest(),
+                      //child: NotificationsListerTest(),
 
                       // child: NotificationsLister(
                       //   getNotificationsOfToday: _getNotificationsOfToday,
