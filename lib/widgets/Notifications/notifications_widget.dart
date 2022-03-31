@@ -86,12 +86,16 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
       //started = isServiceRunning;
       if (_currentNotification != null &&
           _currentNotification?.appTitle != null) {
+        var _notifications =
+            appendElements(notificationsOfTheDay!, _currentNotification!);
+        var _notificationsByCat =
+            NotificationCatHelper.getNotificationsByCategoryUpdate(
+          _notifications,
+          isToday,
+        );
         setState(() {
-          notificationsOfTheDay =
-              appendElements(notificationsOfTheDay!, _currentNotification!);
-          notificationsByCatFuture =
-              NotificationCatHelper.getNotificationsByCategoryUpdate(
-                  notificationsOfTheDay!, isToday);
+          notificationsOfTheDay = _notifications;
+          notificationsByCatFuture = _notificationsByCat;
         });
       }
     }); //onData(message, flagEntry!));
@@ -113,9 +117,6 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
       Notifications elementToAdd) async {
     final list = await listFuture;
     list.add(elementToAdd);
-    // list
-    //   ..sort(
-    //       (a, b) => (b.createAt.toString()).compareTo(a.createAt.toString()));
     return list;
   }
 
@@ -168,43 +169,23 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
     });
   }
 
-  // Future<List<Notifications>> initializeData(bool istoday) async {
-  //   List<NotificationCategory> _ncList =
-  //       await NotificationCatHelper.getNotificationsByCategory(istoday);
-  //   notificationsOfTheDay = initializeNotifications(istoday);
-  //   // final _ntList = await NotificationsHelper.initializeDbGetNotificationsToday(
-  //   //     istoday ? 0 : 1);
+  Future<void> refresh() async {
+    var _notificationsOfTheDay =
+        NotificationsHelper.initializeDbGetNotificationsToday(isToday ? 0 : 1);
+    var _notificationsByCatFuture =
+        NotificationCatHelper.getNotificationsByCategory(
+            _notificationsOfTheDay, isToday);
 
-  //   notifications = await notificationsOfTheDay;
-
-  //   if (notifications!.length > 0) {
-  //     notificationsByCatFuture = notificationsByCategory(notifications!);
-  //   }
-  //   return notifications!;
-  // }
+    setState(() {
+      notificationsOfTheDay = _notificationsOfTheDay;
+      notificationsByCatFuture = _notificationsByCatFuture;
+    });
+  }
 
   Future<List<Notifications>> initializeNotifications(bool istoday) async {
     return await NotificationsHelper.initializeDbGetNotificationsToday(
         istoday ? 0 : 1);
   }
-
-  // Future<List<NotificationCategory>> updateData(bool istoday) async {
-  //   final _ntCat = await notificationsByCategory(
-  //       NotificationsHelper.initializeDbGetNotificationsToday(istoday ? 0 : 1));
-  //   return _ntCat;
-  // }
-
-  // Future<List<NotificationCategory>> notificationsByCategory(
-  //     List<Notifications> notificationsFuture) async {
-  //   return await NotificationsHelper.getCategoryListFuture(
-  //       isToday ? 0 : 1, notificationsFuture);
-  // }
-
-  // Future<List<NotificationCategory>> initializeCatData() async {
-  //   final _ntList = initializeData();
-  //   notificationsOfTheDay = _ntList;
-  //   return notificationsByCat = notificationsByCategory(_ntList);
-  // }
 
   Widget _buildContainer(BuildContext context) {
     return Container(
@@ -250,12 +231,14 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
                 onPressed: () async {
                   //  await getCategoryList(0);
                   if (isToday == false) {
+                    isToday = true;
+                    //notificationsOfTheDay = initializeData(isToday);
+                    var _ntCat =
+                        NotificationCatHelper.getNotificationsByCategoryInit(
+                            isToday);
                     setState(() {
                       isToday = true;
-                      //notificationsOfTheDay = initializeData(isToday);
-                      notificationsByCatFuture =
-                          NotificationCatHelper.getNotificationsByCategoryInit(
-                              isToday);
+                      notificationsByCatFuture = _ntCat;
                     });
                   }
                 },
@@ -273,12 +256,14 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
                 onPressed: () async {
                   //  await getCategoryList(1);
                   if (isToday == true) {
+                    isToday = false;
+                    var _ntCat =
+                        NotificationCatHelper.getNotificationsByCategoryInit(
+                            isToday);
                     setState(() {
                       isToday = false;
+                      notificationsByCatFuture = _ntCat;
                       //notificationsOfTheDay = initializeData(isToday);
-                      notificationsByCatFuture =
-                          NotificationCatHelper.getNotificationsByCategoryInit(
-                              isToday);
                     });
                   }
                 },
@@ -309,60 +294,65 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
             child: FutureBuilder<List<NotificationCategory>>(
                 future: notificationsByCatFuture,
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState != ConnectionState.done) {
-                    return NotificationsHelper.buildLoader();
-                  }
-
-                  if (snapshot.hasError) {
-                    return NotificationsHelper.buildError(
-                        snapshot.error.toString());
-                    //setState(() {});
-                  }
-                  if (snapshot.hasData) {
-                    print(
-                        "Snapshot.length -> NotificationsWidget:$snapshot.data!.length");
-                    return MediaQuery.removePadding(
-                      context: context,
-                      removeTop: true,
-                      child: ListView.builder(
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          final entry = snapshot.data![index];
-                          // final app = NotificationsHelper.getCurrentAppWithIcon(
-                          //     entry.packageName!);
-                          return NotificationsCard(
-                            notificationsCategory: entry,
-                            //index: index,
-                            key: GlobalKey(),
-                            // key: UniqueKey(), //widget.key,
-                          );
-                        },
-                        //   ListTile(
-                        //       trailing: Text(
-                        //           entry.packageName.toString().split('.').last),
-                        //       title: Container(
-                        //         child: Column(
-                        //           crossAxisAlignment: CrossAxisAlignment.start,
-                        //           children: [
-                        //             // CircleAvatar(
-                        //             //   child:  await NotificationsHelper.getCurrentAppWithIcon(event.packageName!)) ?? entry.packageName Image.memory(bytes),
-                        //             // ),
-                        //             Text(entry.title ?? "no title"),
-                        //             Text(entry.text ?? "No message"),
-                        //             // Text(entry.createAt
-                        //             //     .toString()
-                        //             //     .substring(0, 19)),
-                        //           ],
-                        //         ),
-                        //       ));
-                        // },
-                        physics: BouncingScrollPhysics(
-                          parent: AlwaysScrollableScrollPhysics(),
-                        ),
-                      ),
-                    );
-                  } else {
-                    return NotificationsHelper.buildNoData();
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                    case ConnectionState.waiting:
+                    case ConnectionState.active:
+                      return NotificationsHelper.buildLoader();
+                    case ConnectionState.done:
+                      if (snapshot.hasError) {
+                        return NotificationsHelper.buildError(
+                            snapshot.error.toString());
+                      }
+                      if (snapshot.hasData) {
+                        var data = snapshot.data;
+                        print(
+                            "Snapshot.length -> NotificationsWidget:${snapshot.data!.length}");
+                        return MediaQuery.removePadding(
+                          context: context,
+                          removeTop: true,
+                          child: RefreshIndicator(
+                            onRefresh: () => refresh(),
+                            child: ListView.builder(
+                              itemCount: data!.length,
+                              itemBuilder: (context, index) {
+                                // final app = NotificationsHelper.getCurrentAppWithIcon(
+                                //     entry.packageName!);
+                                return NotificationsCard(
+                                  notificationsCategory: data[index],
+                                  //index: index,
+                                  key: GlobalKey(),
+                                  // key: UniqueKey(), //widget.key,
+                                );
+                              },
+                              //   ListTile(
+                              //       trailing: Text(
+                              //           entry.packageName.toString().split('.').last),
+                              //       title: Container(
+                              //         child: Column(
+                              //           crossAxisAlignment: CrossAxisAlignment.start,
+                              //           children: [
+                              //             // CircleAvatar(
+                              //             //   child:  await NotificationsHelper.getCurrentAppWithIcon(event.packageName!)) ?? entry.packageName Image.memory(bytes),
+                              //             // ),
+                              //             Text(entry.title ?? "no title"),
+                              //             Text(entry.text ?? "No message"),
+                              //             // Text(entry.createAt
+                              //             //     .toString()
+                              //             //     .substring(0, 19)),
+                              //           ],
+                              //         ),
+                              //       ));
+                              // },
+                              physics: BouncingScrollPhysics(
+                                parent: AlwaysScrollableScrollPhysics(),
+                              ),
+                            ),
+                          ),
+                        );
+                      } else {
+                        return NotificationsHelper.buildNoData();
+                      }
                   }
                 }),
           ),
