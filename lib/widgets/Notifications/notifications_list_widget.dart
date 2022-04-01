@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:flutter/material.dart';
@@ -321,25 +322,6 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
                                   // key: UniqueKey(), //widget.key,
                                 );
                               },
-                              //   ListTile(
-                              //       trailing: Text(
-                              //           entry.packageName.toString().split('.').last),
-                              //       title: Container(
-                              //         child: Column(
-                              //           crossAxisAlignment: CrossAxisAlignment.start,
-                              //           children: [
-                              //             // CircleAvatar(
-                              //             //   child:  await NotificationsHelper.getCurrentAppWithIcon(event.packageName!)) ?? entry.packageName Image.memory(bytes),
-                              //             // ),
-                              //             Text(entry.title ?? "no title"),
-                              //             Text(entry.text ?? "No message"),
-                              //             // Text(entry.createAt
-                              //             //     .toString()
-                              //             //     .substring(0, 19)),
-                              //           ],
-                              //         ),
-                              //       ));
-                              // },
                               physics: BouncingScrollPhysics(
                                 parent: AlwaysScrollableScrollPhysics(),
                               ),

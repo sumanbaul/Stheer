@@ -18,7 +18,7 @@ class NotificationsCard extends StatelessWidget {
   buildNotificationCard(BuildContext context) {
     var _timestamp = readTimestamp(notificationsCategory!.timestamp!);
     return Container(
-      margin: EdgeInsets.only(bottom: 15),
+      margin: EdgeInsets.only(bottom: 10, top: 5),
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
       child: Card(
         elevation: 0.0,
