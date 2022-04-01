@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-
-import '../../helper/datetime_ago.dart';
 import '../../model/notificationCategory.dart';
 import 'list_detail.dart';
 
@@ -132,8 +130,7 @@ class NotificationsCard extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
-                              readTimestamp(
-                                  notificationsCategoryList![index].timestamp!),
+                              notificationsCategoryList![index].timestamp!,
                               style: TextStyle(
                                   color: Colors.white54, fontSize: 13),
                             ),

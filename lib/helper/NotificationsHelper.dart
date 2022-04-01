@@ -10,6 +10,7 @@ import 'package:flutter_notification_listener/flutter_notification_listener.dart
 import '../model/Notifications.dart';
 import '../model/notificationCategory.dart';
 import 'DatabaseHelper.dart';
+import 'datetime_ago.dart';
 
 class NotificationsHelper {
   static bool started = false;
@@ -168,7 +169,7 @@ class NotificationsHelper {
               appIcon:
                   _app is ApplicationWithIcon ? Image.memory(_app.icon) : null,
               //tempIcon: Image.memory(_currentApp.icon),
-              timestamp: value[0].timestamp,
+              timestamp: readTimestamp(value[0].timestamp),
               message: "You have " +
                   value.length.toString() +
                   " Unread notifications",

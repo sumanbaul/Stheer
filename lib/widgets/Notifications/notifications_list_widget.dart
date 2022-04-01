@@ -29,8 +29,6 @@ class NotificationsListWidget extends StatefulWidget {
 class _NotificationsListWidgetState extends State<NotificationsListWidget> {
   Future<List<Notifications>>? notificationsOfTheDay;
   Future<List<NotificationCategory>>? notificationsByCatFuture;
-  List<Notifications>? notifications;
-  List<NotificationCategory>? notificationsByCat;
   bool started = false;
   bool _loading = false;
   bool isToday = true;

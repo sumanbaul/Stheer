@@ -7,7 +7,7 @@ class NotificationCategory {
   final Image? tempIcon;
   final String? message;
   final String? packageName;
-  final int? timestamp;
+  final String? timestamp;
   final int? notificationCount;
 
   NotificationCategory(
