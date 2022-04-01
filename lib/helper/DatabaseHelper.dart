@@ -102,7 +102,7 @@ class DatabaseHelper {
 
     var lastMidnight =
         DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
-
+    print("Now in DB:${now.day}");
     //var today = new DateTime.now().millisecondsSinceEpoch;
     //print('Date from Db: $lastMidnight');
 

@@ -11,6 +11,7 @@ import '../model/Notifications.dart';
 import '../model/notificationCategory.dart';
 import 'DatabaseHelper.dart';
 import 'datetime_ago.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class NotificationsHelper {
   static bool started = false;
@@ -163,13 +164,15 @@ class NotificationsHelper {
           final Application? _app =
               await (getCurrentAppWithIcon(value[0].packageName));
           //final _length = value.length;
+          var dt =
+              DateTime.fromMicrosecondsSinceEpoch(value[0].timestamp * 1000);
           NotificationCategory nc = NotificationCategory(
               packageName: _app?.packageName,
               appTitle: _app?.appName,
               appIcon:
                   _app is ApplicationWithIcon ? Image.memory(_app.icon) : null,
               //tempIcon: Image.memory(_currentApp.icon),
-              timestamp: readTimestamp(value[0].timestamp),
+              timestamp: timeago.format(dt),
               message: "You have " +
                   value.length.toString() +
                   " Unread notifications",
