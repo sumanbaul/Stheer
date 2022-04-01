@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:notifoo/helper/DatabaseHelper.dart';
 import 'package:notifoo/widgets/Topbar.dart';
-
-import '../../model/Notifications.dart';
 
 class HomeBannerWidget extends StatefulWidget {
   final String? title;
   final VoidCallback? onClicked;
+  final int? notificationCount;
   //final Future<List<Notifications>> notifications;
 
   HomeBannerWidget({
     Key? key,
     this.title,
     this.onClicked,
+    this.notificationCount,
     // required this.notifications,
   }) : super(key: key);
 
@@ -39,16 +37,8 @@ class _BannerState extends State<HomeBannerWidget> {
 
   @override
   void initState() {
-    //DatabaseHelper.instance.initializeDatabase();
-
     super.initState();
-    totalNotifications = getCount();
-    //totalNotificationsStream = getTotalNotifications();
-    // getTotalNotifications().then((String result) {
-    //   setState(() {
-    //     _totalNotifications = result;
-    //   });
-    // });
+    totalNotifications = this.widget.notificationCount!;
   }
 
   @override
@@ -56,52 +46,9 @@ class _BannerState extends State<HomeBannerWidget> {
     return Container(child: bannerSection(context));
   }
 
-  @override
-  void didUpdateWidget(HomeBannerWidget oldWidget) async {
-    super.didUpdateWidget(oldWidget);
-    // totalNotificationsStream = getTotalNotifications();
-    setState(() {});
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  int getCount() {
-    // final x = await this.widget.notifications;
-    //print(x);
-    //setState(() {});
-    //  return totalNotifications = x.length;
-    return 10;
-  }
-
   Widget bannerSection(BuildContext context) {
-    //double _width = MediaQuery.of(context).size.width * 0.55;
     double _height = 320; //MediaQuery.of(context).size.height * 0.40;
     return buildBanner(_height, totalNotifications);
-
-    // return StreamBuilder<String>(
-    //     initialData: "0",
-    //     stream: totalNotificationsStream!,
-    //     builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-    //       switch (snapshot.connectionState) {
-    //         case ConnectionState.none:
-    //           return Text('none');
-    //         case ConnectionState.active:
-    //         case ConnectionState.waiting:
-    //           return CircularProgressIndicator();
-    //         case ConnectionState.done:
-    //           if (snapshot.hasData) {
-    //             return buildBanner(_height, snapshot.data.toString());
-    //           } else {
-    //             return buildBanner(_height, '0');
-    //           }
-
-    //         default:
-    //           return Text('default');
-    //       }
-    //     });
   }
 
   Widget buildBanner(double height, int nCount) {
@@ -432,14 +379,4 @@ class _BannerState extends State<HomeBannerWidget> {
       ),
     ),
   );
-}
-
-// Future<String> getTotalNotifications() async {
-//   var getNotifications = await DatabaseHelper.instance.getNotifications(0);
-//   return getNotifications.length.toString();
-// }
-
-Stream<String> getTotalNotifications() async* {
-  var getNotifications = await DatabaseHelper.instance.getNotifications(0);
-  yield getNotifications.length.toString();
 }

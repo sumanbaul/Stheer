@@ -28,4 +28,10 @@ class NotificationCatHelper {
     List<Notifications> _notifications = await notifications;
     return await NotificationsHelper.getCategoryListFuture(_notifications);
   }
+
+  static Future<List<NotificationCategory>> getNotificationsByCat(
+      List<Notifications> notifications, bool istoday) async {
+    //List<Notifications> _notifications = await notifications;
+    return await NotificationsHelper.getCategoryListFuture(notifications);
+  }
 }

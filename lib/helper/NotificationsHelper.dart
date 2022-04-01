@@ -72,7 +72,7 @@ class NotificationsHelper {
           // (event.packageName.contains("android")) ||
           (event.packageName!.contains("notifoo")) ||
           (event.packageName!.contains("screenshot")) ||
-          (event.title!.contains("WhatsApp")) ||
+          // (event.title ??  event.title!.contains("WhatsApp")) ||  //needs to be checked
           (event.packageName!.contains("deskclock")) ||
           (event.packageName!.contains("wellbeing")) ||
           (event.packageName!.contains("weather2")) ||
@@ -194,7 +194,7 @@ class NotificationsHelper {
           .sort((a, b) => b.timestamp!.compareTo(a.timestamp!));
     }
     print(
-        "NotificationsHelper -> NotificationsCategory$notificationsByCategory.length");
+        "NotificationsHelper -> NotificationsCategory${notificationsByCategory.length}");
     return notificationsByCategory; // as Future<List<NotificationCategory>>;
   }
 

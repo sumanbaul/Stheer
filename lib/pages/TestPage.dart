@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:notifoo/widgets/Notifications/list_category.dart';
-import 'package:notifoo/widgets/Topbar.dart';
+
+import '../widgets/Notifications/notifications_list_widget.dart';
 
 class TestPage extends StatefulWidget {
   TestPage({Key? key, this.title}) : super(key: key);
@@ -25,7 +25,7 @@ class _ListPageState extends State<TestPage> {
     return Scaffold(
       backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
       //appBar: Topbar.getTopbar(widget.title),
-      body: NotificationCatgoryList(),
+      body: NotificationsListWidget(),
       //bottomNavigationBar: BottomBar.getBottomBar(context),
     );
   }

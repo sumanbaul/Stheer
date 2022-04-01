@@ -1,17 +1,24 @@
 import 'dart:isolate';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 import 'package:notifoo/model/notificationCategory.dart';
+// import 'package:notifoo/pages/Homepage.dart';
+// import 'package:notifoo/widgets/home/home_banner_widget.dart';
 
 import '../../helper/NotificationsHelper.dart';
 import '../../helper/notificationCatHelper.dart';
 import '../../model/Notifications.dart';
 import 'notification_card.dart';
 
+// Callback
+//typedef void DetailsCallback(HomeBannerWidget val);
+
 class NotificationsListWidget extends StatefulWidget {
-  NotificationsListWidget({Key? key}) : super(key: key);
+  final Function(Future<int>)? onCountChange;
+  final VoidCallback? onCountAdded;
+  NotificationsListWidget({Key? key, this.onCountAdded, this.onCountChange})
+      : super(key: key);
 
   @override
   State<NotificationsListWidget> createState() =>
@@ -37,11 +44,7 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
     super.initState();
 
     initPlatformState();
-    //notificationsOfTheDay = initializeData(isToday);
-    notificationsOfTheDay =
-        NotificationsHelper.initializeDbGetNotificationsToday(isToday ? 0 : 1);
-    notificationsByCatFuture =
-        NotificationCatHelper.getNotificationsByCategoryInit(isToday);
+    initData();
   }
 
   @override
@@ -86,16 +89,13 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
       //started = isServiceRunning;
       if (_currentNotification != null &&
           _currentNotification?.appTitle != null) {
-        var _notifications =
+        final _notifications =
             appendElements(notificationsOfTheDay!, _currentNotification!);
-        var _notificationsByCat =
-            NotificationCatHelper.getNotificationsByCategoryUpdate(
-          _notifications,
-          isToday,
-        );
+        var _notificationsByCat = _notifications.then((value) =>
+            NotificationCatHelper.getNotificationsByCat(value, isToday));
         setState(() {
-          notificationsOfTheDay = _notifications;
           notificationsByCatFuture = _notificationsByCat;
+          notificationsOfTheDay = _notifications;
         });
       }
     }); //onData(message, flagEntry!));
@@ -169,22 +169,18 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
     });
   }
 
-  Future<void> refresh() async {
-    var _notificationsOfTheDay =
+  Future<void> initData() async {
+    final _notificationsOfTheDay =
         NotificationsHelper.initializeDbGetNotificationsToday(isToday ? 0 : 1);
-    var _notificationsByCatFuture =
-        NotificationCatHelper.getNotificationsByCategory(
-            _notificationsOfTheDay, isToday);
 
+    final _notificationsByCatFuture = _notificationsOfTheDay.then(
+        (value) => NotificationCatHelper.getNotificationsByCat(value, isToday));
+    final _onCountChange = _notificationsOfTheDay.then((value) => value.length);
     setState(() {
       notificationsOfTheDay = _notificationsOfTheDay;
       notificationsByCatFuture = _notificationsByCatFuture;
+      this.widget.onCountChange!(_onCountChange);
     });
-  }
-
-  Future<List<Notifications>> initializeNotifications(bool istoday) async {
-    return await NotificationsHelper.initializeDbGetNotificationsToday(
-        istoday ? 0 : 1);
   }
 
   Widget _buildContainer(BuildContext context) {
@@ -312,7 +308,7 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
                           context: context,
                           removeTop: true,
                           child: RefreshIndicator(
-                            onRefresh: () => refresh(),
+                            onRefresh: () => initData(),
                             child: ListView.builder(
                               itemCount: data!.length,
                               itemBuilder: (context, index) {
