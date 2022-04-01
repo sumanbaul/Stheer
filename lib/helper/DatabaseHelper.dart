@@ -97,9 +97,14 @@ class DatabaseHelper {
 
   Future<List<Notifications>> getNotifications(int selectedDay) async {
     final db = await (database);
-    var yesterday = DateTime.now().subtract(Duration(days: 1));
+    var yesterday = selectedDay == 0
+        ? DateTime.now().subtract(Duration(days: 1))
+        : DateTime.now().subtract(Duration(days: 2));
     var now = selectedDay == 0 ? DateTime.now() : yesterday;
+    var nextDay = DateTime.now();
 
+    var midnight = DateTime(nextDay.year, nextDay.month, nextDay.day)
+        .millisecondsSinceEpoch;
     var lastMidnight =
         DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
     print("Now in DB:${now.day}");
@@ -107,7 +112,9 @@ class DatabaseHelper {
     //print('Date from Db: $lastMidnight');
 
     String whereString = 'timestamp >= ?';
-    List<dynamic> whereArguments = [lastMidnight];
+    List<dynamic> whereArguments = [
+      lastMidnight,
+    ];
 
     final List<Map<String, dynamic>> maps = await db!.query(
         Notifications.TABLENAME,
@@ -115,7 +122,12 @@ class DatabaseHelper {
         where: whereString,
         whereArgs: whereArguments);
 
-    return List.generate(maps.length, (i) {
+    // raw query
+    List<Map<String, dynamic>> maps2 = await db.rawQuery(
+        'SELECT * FROM ${Notifications.TABLENAME} where timestamp >=? and timestamp <?',
+        ['$lastMidnight', '$midnight']);
+
+    return List.generate(maps2.length, (i) {
       return Notifications(
         //  id: maps[i]['id'],
         title: maps[i]['title'],
