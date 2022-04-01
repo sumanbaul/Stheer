@@ -311,14 +311,17 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
                             child: ListView.builder(
                               itemCount: data!.length,
                               itemBuilder: (context, index) {
-                                // final app = NotificationsHelper.getCurrentAppWithIcon(
-                                //     entry.packageName!);
-                                return NotificationsCard(
-                                  notificationsCategory: data[index],
-                                  //index: index,
-                                  key: GlobalKey(),
-                                  // key: UniqueKey(), //widget.key,
-                                );
+                                if (data.length > 0) {
+                                  return NotificationsCard(
+                                    notificationsCategory: data[index],
+                                    //index: index,
+                                    key: GlobalKey(),
+                                    // key: UniqueKey(), //widget.key,
+                                  );
+                                } else {
+                                  return Text(
+                                      "You don't have any notifications today.");
+                                }
                               },
                               physics: BouncingScrollPhysics(
                                 parent: AlwaysScrollableScrollPhysics(),
