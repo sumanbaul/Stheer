@@ -25,6 +25,7 @@ dependencies:
   #Notifications
   flutter_notification_listener: ^1.0.7
   #clear_all_notifications: ^0.0.2 
+  eraser: ^2.0.1
   timeago: ^3.2.2
 
   collection: ^1.15.0

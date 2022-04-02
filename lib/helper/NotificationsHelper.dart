@@ -111,7 +111,7 @@ class NotificationsHelper {
             print("$_notification.appTitle");
             return currentNotification;
           } else {
-            // # TODO fix here
+            // # TODO: Change for cleaning notifications better
 
             // var titleLength = jsonresponse["textLines"].length;
 

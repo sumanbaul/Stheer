@@ -1,3 +1,4 @@
+import 'package:eraser/eraser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -25,6 +26,7 @@ Future main() async {
   //await AppListHelper.getApps();
   debugPaintSizeEnabled = false;
   runApp(MyApp());
+  Eraser.clearAllAppNotifications();
 }
 
 class MyApp extends StatefulWidget {

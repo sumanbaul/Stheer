@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'package:eraser/eraser.dart';
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:flutter/material.dart';
@@ -26,7 +27,8 @@ class NotificationsListWidget extends StatefulWidget {
       _NotificationsListWidgetState();
 }
 
-class _NotificationsListWidgetState extends State<NotificationsListWidget> {
+class _NotificationsListWidgetState extends State<NotificationsListWidget>
+    with WidgetsBindingObserver {
   Future<List<Notifications>>? notificationsOfTheDay;
   Future<List<NotificationCategory>>? notificationsByCatFuture;
   bool started = false;
@@ -44,6 +46,20 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
 
     initPlatformState();
     initData();
+    WidgetsBinding.instance?.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (AppLifecycleState.resumed == state) {
+      Eraser.clearAllAppNotifications();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance?.removeObserver(this);
+    super.dispose();
   }
 
   @override
@@ -165,6 +181,7 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
     setState(() {
       started = false;
       _loading = false;
+      Eraser.clearAllAppNotifications();
     });
   }
 
@@ -273,7 +290,11 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget> {
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
                     )),
-                onPressed: () {},
+                onPressed: () {
+                  setState(() {
+                    Eraser.clearAllAppNotifications();
+                  });
+                },
                 child: Text('History'),
               )
             ],
