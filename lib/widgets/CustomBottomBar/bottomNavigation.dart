@@ -22,6 +22,8 @@ class BottomNavigation extends StatelessWidget {
       backgroundColor:
           Color.fromARGB(235, 34, 32, 48), //Color.fromARGB(255, 33, 31, 46),
       type: BottomNavigationBarType.fixed,
+      selectedItemColor: Colors.white,
+
       items: tabs!
           .map(
             (e) => _buildItem(

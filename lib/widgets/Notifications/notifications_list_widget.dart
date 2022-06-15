@@ -109,8 +109,8 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
         var _notificationsByCat = _notifications.then((value) =>
             NotificationCatHelper.getNotificationsByCat(value, isToday));
         setState(() {
+          //notificationsOfTheDay = _notifications;
           notificationsByCatFuture = _notificationsByCat;
-          notificationsOfTheDay = _notifications;
         });
       }
     }); //onData(message, flagEntry!));
@@ -132,6 +132,7 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
       Notifications elementToAdd) async {
     final list = await listFuture;
     list.add(elementToAdd);
+
     return list;
   }
 
