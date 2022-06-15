@@ -25,7 +25,7 @@ class ShowForm {
   });
   // This function will be triggered when the floating button is pressed
   // It will also be triggered when you want to update an item
-  Future<Widget> showForm(HabitsModel? habit, String title) async {
+  Future<void> showForm(HabitsModel? habit, String title) async {
     if (habit != null) {
       // id == null -> create new item
       // id != null -> update an existing item
@@ -117,6 +117,8 @@ class ShowForm {
           ],
         ),
       ),
-    );
+    ).whenComplete(() {
+      print('Hey there, I\'m calling after hide bottomSheet');
+    });
   }
 }

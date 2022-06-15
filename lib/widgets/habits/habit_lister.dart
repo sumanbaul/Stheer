@@ -153,7 +153,7 @@ class HabitListerWidget extends StatelessWidget {
                       onSelected: (habititem) => onMenuClick(
                         context,
                         listOfHabits,
-                        listOfHabits[index]!,
+                        listOfHabits[index],
                       ), //onSelected(habititem),
                       color: Colors.blueGrey,
                       elevation: 5,
