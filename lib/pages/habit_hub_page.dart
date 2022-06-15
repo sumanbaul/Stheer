@@ -77,9 +77,11 @@ class _HabitHubPage extends State<HabitHubPage> {
                         _descriptionController.text = type,
                         _addItem(),
                       },
-                  onEdit: (String title, String type) => {},
+                  onEdit: (String title, String type) => {
+                        print("on edit pressed: $title"),
+                      },
                   id: null)
-              .showForm(null), //_showForm(null),
+              .showForm(null, 'Add new habit'), //_showForm(null),
           child: Icon(
             Icons.add,
             color: Colors.white70,
@@ -163,33 +165,35 @@ class _HabitHubPage extends State<HabitHubPage> {
         ));
   }
 
-  habitMenuItemClick(BuildContext context, int id) {
-    print('habitMenuItemClick is clicked');
-    ShowForm(
-            habits: _habits,
-            context: context,
-            onCreate: (String title, String type) => {
-                  // _titleController.text = title,
-                  // _descriptionController.text = type,
-                  // _updateItem(id),
-                },
-            onEdit: (String title, String type) => {
-                  _titleController.text = title,
-                  _descriptionController.text = type,
-                  _updateItem(id),
-                },
-            id: id)
-        .showForm(id);
-  }
+  // habitMenuItemClick(BuildContext context, int id) {
+  //   print('habitMenuItemClick is clicked');
+  //   print('ID of Habit:$id');
+  //   ShowForm(
+  //           habits: _habits,
+  //           context: context,
+  //           onCreate: (String title, String type) => {
+  //                 // _titleController.text = title,
+  //                 // _descriptionController.text = type,
+  //                 // _updateItem(id),
+  //               },
+  //           onEdit: (String title, String type) => {
+  //                 _titleController.text = title,
+  //                 _descriptionController.text = type,
+  //                 _updateItem(id),
+  //               },
+  //           id: id)
+  //       .showForm(null, 'Edit habit');
+  // }
 
-  void onMenuClick(BuildContext context, List<HabitsModel> habits, int id) {
+  void onMenuClick(
+      BuildContext context, List<HabitsModel> habits, HabitsModel habit) {
     ShowForm(
       context: context,
       habits: habits,
-      id: id,
+      id: habit.id,
       onCreate: (String title, String type) => {},
       onEdit: (String title, String type) => {},
-    ).showForm(id);
+    ).showForm(habit, 'Edit habit');
   }
 
   PopupMenuItem<HabitCardMenuItem> buildHabitMenuItem(HabitCardMenuItem item) =>

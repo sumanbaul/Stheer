@@ -25,14 +25,14 @@ class ShowForm {
   });
   // This function will be triggered when the floating button is pressed
   // It will also be triggered when you want to update an item
-  Future<Widget> showForm(int? id) async {
-    if (id != null) {
+  Future<Widget> showForm(HabitsModel? habit, String title) async {
+    if (habit != null) {
       // id == null -> create new item
       // id != null -> update an existing item
       //////Here is an issue, that needs to be fixed
-      final existingHabit = habits.firstWhere((element) => element.id == id);
-      _titleController.text = existingHabit.habitTitle!;
-      _descriptionController.text = existingHabit.habitType!;
+      //final existingHabit = habits.firstWhere((element) => element.id == id);
+      _titleController.text = habit.habitTitle!;
+      _descriptionController.text = habit.habitType!;
     }
 
     return await showModalBottomSheet(
@@ -63,7 +63,7 @@ class ShowForm {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Add New Habit',
+                    '$title',
                     style: TextStyle(
                       fontSize: 20.0,
                       fontWeight: FontWeight.bold,

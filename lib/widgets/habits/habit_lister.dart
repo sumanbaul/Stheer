@@ -153,7 +153,7 @@ class HabitListerWidget extends StatelessWidget {
                       onSelected: (habititem) => onMenuClick(
                         context,
                         listOfHabits,
-                        listOfHabits[index].id!,
+                        listOfHabits[index]!,
                       ), //onSelected(habititem),
                       color: Colors.blueGrey,
                       elevation: 5,
@@ -258,13 +258,15 @@ class HabitListerWidget extends StatelessWidget {
         ),
       );
 
-  void onMenuClick(BuildContext context, List<HabitsModel> habits, int id) {
+  void onMenuClick(
+      BuildContext context, List<HabitsModel> habits, HabitsModel habit) {
+    // var _habit = habit;
     ShowForm(
       context: context,
       habits: habits,
-      id: id,
+      id: habit.id,
       onCreate: (String title, String type) => {},
       onEdit: (String title, String type) => {},
-    ).showForm(id);
+    ).showForm(habit, 'Edit Habit');
   }
 }
