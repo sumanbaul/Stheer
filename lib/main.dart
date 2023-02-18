@@ -4,16 +4,16 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 //import 'package:notifoo/helper/AppListHelper.dart';
-import 'package:notifoo/helper/provider/google_sign_in.dart';
-import 'package:notifoo/pages/Homepage.dart';
-import 'package:notifoo/pages/Pomodoro.dart';
-import 'package:notifoo/pages/Profile.dart';
-import 'package:notifoo/pages/SignIn.dart';
+import 'package:notifoo/src/helper/provider/google_sign_in.dart';
+import 'package:notifoo/src/pages/Homepage.dart';
+import 'package:notifoo/src/pages/Pomodoro.dart';
+import 'package:notifoo/src/pages/Profile.dart';
+import 'package:notifoo/src/pages/SignIn.dart';
 // import 'package:notifoo/pages/SplashScreen.dart';
 // import 'package:notifoo/pages/TestPage.dart';
 // import 'package:notifoo/pages/habit_hub_page.dart';
-import 'package:notifoo/widgets/CustomBottomBar/navigator.dart';
-import 'helper/DatabaseHelper.dart';
+import 'package:notifoo/src/widgets/CustomBottomBar/navigator.dart';
+import 'src/helper/DatabaseHelper.dart';
 import 'package:provider/provider.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -26,7 +26,7 @@ Future main() async {
   //await AppListHelper.getApps();
   debugPaintSizeEnabled = false;
   runApp(MyApp());
-  Eraser.clearAllAppNotifications();
+  // Eraser.clearAllAppNotifications();
 }
 
 class MyApp extends StatefulWidget {

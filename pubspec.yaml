@@ -19,7 +19,7 @@ dependencies:
   path: ^1.8.0
 
   # Google Sign in
-  firebase_auth: ^3.3.9
+  firebase_auth: ^4.2.6
   google_sign_in: ^5.2.4
 
   #Notifications
@@ -33,10 +33,10 @@ dependencies:
  
 
   #fonts
-  google_fonts: ^2.3.1
+  google_fonts: ^4.0.3
 
   # Google Icons
-  font_awesome_flutter: ^9.2.0
+  font_awesome_flutter: ^10.4.0
 
   # State Management
   provider: ^6.0.2
