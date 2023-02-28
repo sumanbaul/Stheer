@@ -1,20 +1,22 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:notifoo/src/model/apps.dart';
 import 'package:notifoo/src/model/habits_model.dart';
 import 'package:notifoo/src/model/pomodoro_timer.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-
+import 'package:path_provider/path_provider.dart';
 import '../../src/model/Notifications.dart';
+import '../model/tasks.dart';
 
 class DatabaseHelper {
-  //Create a private constructor
-  DatabaseHelper._();
-
   static const databaseName = 'notifoo_database.db';
   static final DatabaseHelper instance = DatabaseHelper._();
   static Database? _database;
+
+  //Create a private constructor
+  DatabaseHelper._();
 
   //Queries
   String _deviceAppsTable =
@@ -23,6 +25,16 @@ class DatabaseHelper {
       '''CREATE TABLE tblpomodorolog (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, taskName TEXT, duration TEXT, isCompleted INTEGER, createdDate TEXT, isDeleted INTEGER)''';
   String _notificationsLogTable =
       '''CREATE TABLE notifications (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, appTitle TEXT, text TEXT, message TEXT, packageName TEXT, timestamp INTEGER, createAt TEXT, eventJson TEXT, createdDate TEXT, isDeleted INTEGER, UNIQUE(title , text))''';
+  String _createTasksTable = '''CREATE TABLE Tasks(
+            id INTEGER PRIMARY KEY,
+            title TEXT,
+            isCompleted INTEGER,
+            taskType TEXT,
+            color TEXT,
+            createdDate TEXT,
+            modifiedDate TEXT,
+            repeatitions INTEGER
+          )''';
 
   String _habitsTable = '''CREATE TABLE IF NOT EXISTS tblhabits (
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
@@ -55,9 +67,13 @@ class DatabaseHelper {
     // final db = await database;
     //print("Version: $db.getVersion()");
 
+    //Tasks
+    // Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    //final path = join(documentsDirectory.path, 'tasks.db');
+
     return await openDatabase(
       join(await getDatabasesPath(), databaseName),
-      version: 6,
+      version: 8,
       onCreate: _onCreate,
       onUpgrade: (db, oldVersion, newVersion) => {
         //BELOW CODE IS CURRENTLY NOT IN USE
@@ -67,12 +83,25 @@ class DatabaseHelper {
             db.execute(_deviceAppsAlterTableV3),
           }
         else if (oldVersion == 3)
-          {db.execute(_deviceAppsAlterTableV3), db.close()}
+          {
+            db.execute(_deviceAppsAlterTableV3),
+            db.close(),
+          }
+        else if (oldVersion == 7)
+          {
+            db.execute(_deviceAppsAlterTableV3),
+            db.execute(_createTasksTable),
+            db.close(),
+          }
       },
     );
   }
 
   Future _onCreate(Database db, int version) async {
+    print("_onCreate() method executing");
+    Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    //final path = join(documentsDirectory.path, 'tasks.db');
+
     await db.execute(_pomodoroLogTable);
 
     await db.execute(_notificationsLogTable);
@@ -80,6 +109,8 @@ class DatabaseHelper {
     await db.execute(_deviceAppsTable);
 
     await db.execute(_habitsTable);
+
+    await db.execute(_createTasksTable);
     print(await db.query("tblhabits"));
   }
 
@@ -322,5 +353,32 @@ class DatabaseHelper {
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
     }
+  }
+
+  // Insert tasks on database
+  createTask(Tasks newTask) async {
+    await deleteAllTasks();
+    final db = await database;
+    final res = await db?.insert('Tasks', newTask.toJson());
+
+    return res;
+  }
+
+  // Delete all employees
+  Future<int> deleteAllTasks() async {
+    final db = await database;
+    final res = await db?.rawDelete('DELETE FROM Tasks');
+
+    return res!;
+  }
+
+  Future<List<Tasks>> getAllTasks() async {
+    final db = await database;
+    final res = await db?.rawQuery("SELECT * FROM Tasks");
+
+    List<Tasks> list =
+        res!.isNotEmpty ? res.map((c) => Tasks.fromJson(c)).toList() : [];
+
+    return list;
   }
 }

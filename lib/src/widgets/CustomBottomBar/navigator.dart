@@ -4,6 +4,7 @@ import 'package:notifoo/src/pages/Pomodoro.dart';
 import 'package:notifoo/src/pages/Profile.dart';
 import 'package:notifoo/src/pages/TestPage.dart';
 import 'package:notifoo/src/pages/pomodoro_home.dart';
+import 'package:notifoo/src/pages/task_page.dart';
 import 'package:notifoo/src/widgets/CustomBottomBar/BottomNavigation.dart';
 import 'package:notifoo/src/widgets/navigation/nav_drawer_widget.dart';
 
@@ -46,9 +47,10 @@ class AppState extends State<App> {
     TabItem(
       tabName: "Habits",
       icon: Icons.add_task_rounded,
-      page: HabitHubPage(
-        title: 'Profile',
-      ),
+      page: TaskPage(),
+      // page: HabitHubPage(
+      //   title: 'Profile',
+      // ),
     ),
     TabItem(
       tabName: "Pomodoro Home",
