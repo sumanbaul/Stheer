@@ -357,7 +357,14 @@ class DatabaseHelper {
 
   // Insert tasks on database
   createTask(Tasks newTask) async {
-    await deleteAllTasks();
+    //await deleteAllTasks();
+    final db = await database;
+    final res = await db?.insert('Tasks', newTask.toJson());
+
+    return res;
+  }
+
+  insertTask(Tasks newTask) async {
     final db = await database;
     final res = await db?.insert('Tasks', newTask.toJson());
 

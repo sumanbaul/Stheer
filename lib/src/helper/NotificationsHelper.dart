@@ -68,81 +68,85 @@ class NotificationsHelper {
     final eventAppWithIcon = await (getCurrentAppWithIcon(event.packageName!));
     print(event); // this is needed for later
     final Notifications _notification;
-    if (!eventAppWithIcon!.systemApp) {
-      if (event.packageName!.contains("skydrive") ||
-          (event.packageName!.contains("service")) ||
-          // (event.packageName.contains("android")) ||
-          (event.packageName!.contains("notifoo")) ||
-          (event.packageName!.contains("screenshot")) ||
-          // (event.title ??  event.title!.contains("WhatsApp")) ||  //needs to be checked
-          (event.packageName!.contains("deskclock")) ||
-          (event.packageName!.contains("wellbeing")) ||
-          (event.packageName!.contains("weather2")) ||
-          (event.packageName!.contains("gallery"))) {
-        print(event.packageName);
-      } else {
-        final Map<String, dynamic> jsonresponse = json.decode(event.toString());
-        final createatday = event.createAt!.day;
-        final today = DateTime.now().day;
-        print("Create AT Day: $createatday");
+    if (eventAppWithIcon != null) {
+      if (!eventAppWithIcon.systemApp) {
+        if (event.packageName!.contains("skydrive") ||
+            (event.packageName!.contains("service")) ||
+            // (event.packageName.contains("android")) ||
+            (event.packageName!.contains("notifoo")) ||
+            (event.packageName!.contains("screenshot")) ||
+            // (event.title ??  event.title!.contains("WhatsApp")) ||  //needs to be checked
+            (event.packageName!.contains("deskclock")) ||
+            (event.packageName!.contains("wellbeing")) ||
+            (event.packageName!.contains("weather2")) ||
+            (event.packageName!.contains("gallery"))) {
+          print(event.packageName);
+        } else {
+          final Map<String, dynamic> jsonresponse =
+              json.decode(event.toString());
+          final createatday = event.createAt!.day;
+          final today = DateTime.now().day;
+          print("Create AT Day: $createatday");
 
-        if (!jsonresponse.containsKey('summaryText') &&
-            event.createAt!.day >= today) {
-          // if ((event.text != flagEntry) && event.text != null) {
-          if (event.text != null) {
-            final currentNotification = Notifications(
-              title: _event.title,
-              appTitle: eventAppWithIcon.appName,
-              text: _event.text,
-              message: _event.message,
-              packageName: _event.packageName,
-              timestamp: _event.timestamp,
-              createAt: _event.createAt!.millisecondsSinceEpoch.toString(),
-              eventJson: _event.toString(),
-              createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
-              isDeleted: 0,
-            );
-
-            _notification = currentNotification;
-
-            await DatabaseHelper.instance
-                .insertNotification(currentNotification);
-            // flagEntry = event.text.toString();
-            print("$_notification.appTitle");
-            return currentNotification;
-          } else {
-            // # TODO: Change for cleaning notifications better
-
-            // var titleLength = jsonresponse["textLines"].length;
-
-            final currentNotification = Notifications(
-                title: jsonresponse["textLines"] ??
-                    jsonresponse["textLines"] as String?,
-                text: event.text,
-                message: event.message,
-                packageName: event.packageName,
-                timestamp: event.timestamp,
-                createAt: event.createAt!.millisecondsSinceEpoch.toString(),
-                eventJson: event.toString(),
+          if (!jsonresponse.containsKey('summaryText') &&
+              event.createAt!.day >= today) {
+            // if ((event.text != flagEntry) && event.text != null) {
+            if (event.text != null) {
+              final currentNotification = Notifications(
+                title: _event.title,
+                appTitle: eventAppWithIcon.appName,
+                text: _event.text,
+                message: _event.message,
+                packageName: _event.packageName,
+                timestamp: _event.timestamp,
+                createAt: _event.createAt!.millisecondsSinceEpoch.toString(),
+                eventJson: _event.toString(),
                 createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
-                isDeleted: 0
-                // infoText: jsonData["text"],
-                // showWhen: 1,
-                // subText: jsonData["text"],
-                // timestamp: event.timestamp.toString(),
-                // packageName: jsonData["packageName"],
-                // text: jsonData["text"],
-                // summaryText: jsonData["summaryText"] ?? ""
-                );
+                isDeleted: 0,
+              );
 
-            _notification = currentNotification;
-            await DatabaseHelper.instance
-                .insertNotification(currentNotification);
-            return _notification;
+              _notification = currentNotification;
+
+              await DatabaseHelper.instance
+                  .insertNotification(currentNotification);
+              // flagEntry = event.text.toString();
+              print("$_notification.appTitle");
+              return currentNotification;
+            } else {
+              // # TODO: Change for cleaning notifications better
+
+              // var titleLength = jsonresponse["textLines"].length;
+
+              final currentNotification = Notifications(
+                  title: jsonresponse["textLines"] ??
+                      jsonresponse["textLines"] as String?,
+                  text: event.text,
+                  message: event.message,
+                  packageName: event.packageName,
+                  timestamp: event.timestamp,
+                  createAt: event.createAt!.millisecondsSinceEpoch.toString(),
+                  eventJson: event.toString(),
+                  createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
+                  isDeleted: 0
+                  // infoText: jsonData["text"],
+                  // showWhen: 1,
+                  // subText: jsonData["text"],
+                  // timestamp: event.timestamp.toString(),
+                  // packageName: jsonData["packageName"],
+                  // text: jsonData["text"],
+                  // summaryText: jsonData["summaryText"] ?? ""
+                  );
+
+              _notification = currentNotification;
+              await DatabaseHelper.instance
+                  .insertNotification(currentNotification);
+              return _notification;
+            }
           }
         }
       }
     }
+
     _notification = new Notifications();
     return _notification;
   }

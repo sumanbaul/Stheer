@@ -28,13 +28,36 @@ class Tasks {
       this.repeatitions,
       this.taskType});
 
+  // Factory constructor that creates an instance of Tasks from a map
+  factory Tasks.fromMap(Map<String, dynamic> map) {
+    return Tasks(
+      id: map['id'],
+      title: map['title'],
+      isCompleted: map['isCompleted'],
+      taskType: map['taskType'],
+      color: map['color'],
+      createdDate:
+          map['createdDate'] != "" ? DateTime.parse(map['createdDate']) : null,
+      modifiedDate: map['modifiedDate'] != ""
+          ? DateTime.parse(map['modifiedDate'])
+          : null,
+      repeatitions: map['repeatitions'],
+    );
+  }
+
   factory Tasks.fromJson(Map<String, dynamic> json) => Tasks(
         id: json["id"],
         title: json["title"],
         isCompleted: json["isCompleted"],
         color: json["color"],
-        createdDate: DateTime.parse(json["createdDate"]),
-        modifiedDate: DateTime.parse(json["modifiedDate"]),
+        createdDate:
+            json["createdDate"].isEmpty || json["createdDate"] != "null"
+                ? DateTime.parse(json["createdDate"])
+                : null,
+        modifiedDate:
+            (json["modifiedDate"].isEmpty || json["modifiedDate"] != "null")
+                ? DateTime.parse(json["modifiedDate"])
+                : null,
         repeatitions: json["repeatitions"],
         taskType: json["taskType"],
       );
