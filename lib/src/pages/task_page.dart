@@ -177,11 +177,20 @@ class _TaskPageState extends State<TaskPage> {
             ),
             itemCount: snapshot.data.length,
             itemBuilder: (BuildContext context, int index) {
-              var colorString =
-                  snapshot.data[index].color.toString().contains("#")
-                      ? snapshot.data[index].color.toString().split("#").last
-                      : "";
-              int color = int.parse('0xFF$colorString');
+              var colorString = "";
+              int color = 0;
+              if (snapshot.data[index].color.toString().contains("#") &&
+                  snapshot.data[index].color.toString() != "") {
+                colorString =
+                    snapshot.data[index].color.toString().split("#").last;
+                color = int.parse('0xFF$colorString');
+              } else if (snapshot.data[index].color.toString().length > 6) {
+                colorString = snapshot.data[index].color.toString();
+                color = int.parse(colorString);
+              } else {
+                color = 0xFF39375b;
+              }
+
               return ListTile(
                 leading: Text(
                   "${index + 1}",

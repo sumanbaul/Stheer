@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:notifoo/src/model/tasks.dart';
 import 'package:notifoo/src/pages/task_page.dart';
@@ -10,6 +10,7 @@ var _taskType = ["Growth", "Daily", "Projects", "Shopping", "Timer"];
 final TextEditingController _taskNameController = TextEditingController();
 final TextEditingController _repeatitionController = TextEditingController();
 final Map<dynamic, dynamic> _task = {};
+final rnd = math.Random();
 
 String _taskTypeText = "";
 
@@ -21,6 +22,8 @@ class AddTask extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void submit() {
+      var _randomColor = rnd.nextInt(0xffffffff);
+
       _task['id'] = int.parse(DateTime.now().day.toString() +
           DateTime.now().hour.toString() +
           DateTime.now().minute.toString());
@@ -28,7 +31,7 @@ class AddTask extends StatelessWidget {
       _task['repeatitions'] = int.parse(_repeatitionController.text);
       _task['isCompleted'] = int.parse("0");
       _task['taskType'] = _taskTypeText;
-      _task['color'] = "";
+      _task['color'] = _randomColor.toString();
       _task['createdDate'] = DateTime.now().toString();
       _task['modifiedDate'] = "";
 
@@ -82,7 +85,7 @@ class AddTask extends StatelessWidget {
                       labelText: 'Task Name',
                       hintText: 'Enter Required Task',
                     ),
-                    onChanged: ((value) => {taskPageState?.taskName = value}),
+                    //onChanged: ((value) => {taskPageState?.taskName = value}),
                   ),
                 ),
               ),
@@ -97,8 +100,8 @@ class AddTask extends StatelessWidget {
                       labelText: 'Repeatitions',
                       hintText: 'Enter Number of times you need to repeat',
                     ),
-                    onChanged: ((value) =>
-                        {taskPageState?.repeatitions = int.parse(value)}),
+                    // onChanged: ((value) =>
+                    //     {value != "" ? int.parse(value) : 0}),
                   ),
                 ),
               ),
@@ -120,8 +123,9 @@ class AddTask extends StatelessWidget {
                           width: 2, color: Color.fromARGB(255, 91, 61, 119)),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: DropdownButton<String>(
+                      padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      child: DropdownButtonFormField<String>(
+                        menuMaxHeight: 200,
                         focusColor: Colors.white,
                         value: _taskType.first,
                         elevation: 5,
@@ -154,10 +158,11 @@ class AddTask extends StatelessWidget {
                           taskPageState?.taskType = value!;
                           _taskTypeText = value!;
                         }),
-                        underline: Container(
-                          height: 2,
-                          color: Colors.transparent,
-                        ), //underline of the button
+                        onSaved: (newValue) => _taskTypeText,
+                        // underline: Container(
+                        //   height: 2,
+                        //   color: Colors.transparent,
+                        // ), //underline of the button
                       ),
                     ),
                   ),
