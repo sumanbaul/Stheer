@@ -1,8 +1,6 @@
-import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:notifoo/src/model/tasks.dart';
-import 'package:notifoo/src/pages/task_page.dart';
 
 //import 'package:realm/realm.dart';
 var _taskType = ["Growth", "Daily", "Projects", "Shopping", "Timer"];
@@ -16,9 +14,19 @@ String _taskTypeText = "";
 
 class AddTask extends StatelessWidget {
   final Function(String?) onChanged;
+  final VoidCallback onPressed;
+  final taskNameController;
+  final repeatitionController;
   //final Function() onSubmit;
   //final String value;
-  const AddTask({key, required this.onChanged});
+  AddTask({
+    key,
+    required this.onChanged,
+    required this.onPressed,
+    this.repeatitionController,
+    this.taskNameController,
+  });
+
   @override
   Widget build(BuildContext context) {
     void submit() {
@@ -109,67 +117,10 @@ class AddTask extends StatelessWidget {
 
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: double.infinity,
-                  height: 50.0,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 59, 43, 80),
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(color: Colors.black54, blurRadius: 5)
-                      ],
-                      border: Border.all(
-                          width: 2, color: Color.fromARGB(255, 91, 61, 119)),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                      child: DropdownButtonFormField<String>(
-                        menuMaxHeight: 200,
-                        focusColor: Colors.white,
-                        value: _taskType.first,
-                        elevation: 5,
-                        style: TextStyle(
-                            color: Color.fromARGB(255, 220, 195, 252)),
-                        icon: Icon(Icons.arrow_drop_down), //icon of the button
-                        iconSize: 36, //size of the icon
-                        iconEnabledColor: Colors.white,
-                        items: _taskType
-                            .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Container(
-                              width: 100.0,
-                              child: Text(
-                                value,
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                        hint: Text(
-                          "Choose type of task",
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500),
-                        ),
-                        onChanged: ((value) {
-                          taskPageState?.taskType = value!;
-                          _taskTypeText = value!;
-                        }),
-                        onSaved: (newValue) => _taskTypeText,
-                        // underline: Container(
-                        //   height: 2,
-                        //   color: Colors.transparent,
-                        // ), //underline of the button
-                      ),
-                    ),
-                  ),
-                ),
+                child: _taskTypeDropdown(_taskType),
               ),
               Container(
-                child: ElevatedButton(
+                child: MaterialButton(
                   onPressed: () => submit(),
                   //onSubmit(),
                   child: Text('Save Task'),
@@ -180,4 +131,58 @@ class AddTask extends StatelessWidget {
           ),
         ));
   }
+}
+
+//Tasktype dropdown widget
+_taskTypeDropdown(List<String> taskType) {
+  return Container(
+    width: double.infinity,
+    height: 50.0,
+    child: DecoratedBox(
+      decoration: BoxDecoration(
+        color: Color.fromARGB(255, 59, 43, 80),
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [BoxShadow(color: Colors.black54, blurRadius: 5)],
+        border: Border.all(width: 2, color: Color.fromARGB(255, 91, 61, 119)),
+      ),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+        child: DropdownButtonFormField<String>(
+          menuMaxHeight: 200,
+          focusColor: Colors.white,
+          value: _taskType.first,
+          elevation: 5,
+          style: TextStyle(color: Color.fromARGB(255, 220, 195, 252)),
+          icon: Icon(Icons.arrow_drop_down), //icon of the button
+          iconSize: 36, //size of the icon
+          iconEnabledColor: Colors.white,
+          items: taskType.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Container(
+                width: 100.0,
+                child: Text(
+                  value,
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            );
+          }).toList(),
+          hint: Text(
+            "Choose type of task",
+            style: TextStyle(
+                color: Colors.black, fontSize: 14, fontWeight: FontWeight.w500),
+          ),
+          onChanged: ((value) {
+            _taskTypeText = value!;
+          }),
+          onSaved: (newValue) => _taskTypeText,
+          // underline: Container(
+          //   height: 2,
+          //   color: Colors.transparent,
+          // ), //underline of the button
+        ),
+      ),
+    ),
+  );
 }

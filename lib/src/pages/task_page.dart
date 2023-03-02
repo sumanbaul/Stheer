@@ -5,7 +5,6 @@ import 'package:notifoo/src/model/tasks.dart';
 import 'package:notifoo/src/pages/add_task.dart';
 
 String _selectedValue = "";
-_TaskPageState? taskPageState;
 
 class TaskPage extends StatefulWidget {
   const TaskPage({Key? key}) : super(key: key);
@@ -15,6 +14,15 @@ class TaskPage extends StatefulWidget {
 }
 
 class _TaskPageState extends State<TaskPage> {
+  //Controllers
+  final _repeatitionController = TextEditingController();
+  final _taskNameController = TextEditingController();
+
+  // A field value to capture from the child widget
+  String taskName = '';
+  String taskType = '';
+  int repeatitions = 0;
+
   var isLoading = false;
   Tasks fieldValues = Tasks();
 
@@ -22,20 +30,15 @@ class _TaskPageState extends State<TaskPage> {
   void initState() {
     super.initState();
     // Assign this state to the global variable
-    taskPageState = this;
+    //taskPageState = this;
   }
 
   @override
   void dispose() {
     super.dispose();
     // Clear the global variable when disposing this state
-    taskPageState = null;
+    //taskPageState = null;
   }
-
-  // A field value to capture from the child widget
-  String taskName = '';
-  String taskType = '';
-  int repeatitions = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +103,7 @@ class _TaskPageState extends State<TaskPage> {
     );
   }
 
+  //When loading from API
   _loadFromApi() async {
     setState(() {
       isLoading = true;
@@ -116,6 +120,7 @@ class _TaskPageState extends State<TaskPage> {
     });
   }
 
+  //Delete Data
   _deleteData() async {
     setState(() {
       isLoading = true;
@@ -133,10 +138,14 @@ class _TaskPageState extends State<TaskPage> {
     print('All employees deleted');
   }
 
+  //To Add Task Page
   Route _createRouteToAddTask() {
     print("TaskName: " + taskName);
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => AddTask(
+        repeatitionController: _repeatitionController,
+        taskNameController: _taskNameController,
+        onPressed: () => {},
         onChanged: (newValue) {
           setState(
             () {
@@ -196,10 +205,9 @@ class _TaskPageState extends State<TaskPage> {
                   "${index + 1}",
                   style: TextStyle(fontSize: 20.0),
                 ),
-                title: Text(
-                    "${snapshot.data[index].title} | ${snapshot.data[index].createdDate} "),
+                title: Text("${snapshot.data[index].title} "),
                 subtitle: Text(
-                    'Repeat: ${snapshot.data[index].repeatitions} | Type:${snapshot.data[index].taskType} '),
+                    'Repeat: Type:${snapshot.data[index].taskType} | ${snapshot.data[index].createdDate} '),
                 isThreeLine: true,
                 trailing: Text('Repeat: ${snapshot.data[index].repeatitions}'),
                 tileColor: Color(color),
