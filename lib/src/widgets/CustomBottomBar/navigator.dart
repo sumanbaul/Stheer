@@ -3,6 +3,7 @@ import 'package:notifoo/src/pages/Homepage.dart';
 import 'package:notifoo/src/pages/Pomodoro.dart';
 import 'package:notifoo/src/pages/Profile.dart';
 import 'package:notifoo/src/pages/TestPage.dart';
+import 'package:notifoo/src/pages/habit_tracker.dart';
 import 'package:notifoo/src/pages/pomodoro_home.dart';
 import 'package:notifoo/src/pages/task_page.dart';
 import 'package:notifoo/src/widgets/CustomBottomBar/BottomNavigation.dart';
@@ -45,7 +46,7 @@ class AppState extends State<App> {
       ),
     ),
     TabItem(
-      tabName: "Habits",
+      tabName: "Tasks",
       icon: Icons.add_task_rounded,
       page: TaskPage(),
       // page: HabitHubPage(
@@ -53,12 +54,19 @@ class AppState extends State<App> {
       // ),
     ),
     TabItem(
-      tabName: "Pomodoro Home",
+      tabName: "Habit Tracker",
       icon: Icons.settings,
-      page: PomodoroHome(
-        title: 'Pomodoro Home',
-      ),
+      page: HabitTracker(
+          //title: 'Pomodoro Home',
+          ),
     ),
+    // TabItem(
+    //   tabName: "Pomodoro Home",
+    //   icon: Icons.settings,
+    //   page: PomodoroHome(
+    //     title: 'Pomodoro Home',
+    //   ),
+    // ),
   ];
 
   AppState() {
