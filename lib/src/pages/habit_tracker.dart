@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:notifoo/src/components/monthly_summary.dart';
 import 'package:notifoo/src/helper/habit_database.dart';
 
 import '../components/floating_action_btn.dart';
@@ -105,7 +106,7 @@ class _HabitTrackerState extends State<HabitTracker> {
     Navigator.of(context, rootNavigator: true).pop();
   }
 
-//on delete
+  //on delete
   void deleteHabit(int? index) {
     setState(() {
       db.todaysHabitList.removeAt(index!);
@@ -120,17 +121,27 @@ class _HabitTrackerState extends State<HabitTracker> {
       floatingActionButton: FloatingActionBtn(
         onPressed: createNewHabit,
       ),
-      body: ListView.builder(
-        itemCount: db.todaysHabitList.length,
-        itemBuilder: ((context, index) {
-          return HabitTile(
-            habitName: db.todaysHabitList[index][0],
-            habitCompleted: db.todaysHabitList[index][1],
-            onChanged: (value) => checkBoxTapped(value, index),
-            settingsTapped: (context) => openHabitSettings(index),
-            deleteTapped: (context) => deleteHabit(index),
-          );
-        }),
+      body: ListView(
+        children: [
+          //monthly sumary heatmap
+          MonthlySummaryHeatmap(datasets: db.heatMapDataSet, startDate: _myBox.get("START_DATE")),
+
+          //List of habits
+          ListView.builder(
+            itemCount: db.todaysHabitList.length,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: ((context, index) {
+              return HabitTile(
+                habitName: db.todaysHabitList[index][0],
+                habitCompleted: db.todaysHabitList[index][1],
+                onChanged: (value) => checkBoxTapped(value, index),
+                settingsTapped: (context) => openHabitSettings(index),
+                deleteTapped: (context) => deleteHabit(index),
+              );
+            }),
+          ),
+        ],
       ),
     );
   }
