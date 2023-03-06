@@ -1,11 +1,9 @@
-import 'package:eraser/eraser.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 //import 'package:notifoo/helper/AppListHelper.dart';
 import 'package:notifoo/src/helper/provider/google_sign_in.dart';
-import 'package:notifoo/src/pages/Homepage.dart';
 import 'package:notifoo/src/pages/Pomodoro.dart';
 import 'package:notifoo/src/pages/Profile.dart';
 import 'package:notifoo/src/pages/SignIn.dart';
@@ -23,8 +21,15 @@ Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await DatabaseHelper.instance.initializeDatabase();
+
+  //Initialize Hive
+  await Hive.initFlutter();
+
+  //open a box
+  await Hive.openBox("Habit_Database");
+
   //await AppListHelper.getApps();
-  debugPaintSizeEnabled = false;
+  // debugPaintSizeEnabled = false;
   runApp(MyApp());
   // Eraser.clearAllAppNotifications();
 }
