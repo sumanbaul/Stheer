@@ -35,6 +35,15 @@ class HabitDatabase {
     }
   }
 
+  loadPreviousData(DateTime? date) {
+    if ((_myBox.get(convertDateTimeToString(date!))) != null) {
+      var data = _myBox.get(convertDateTimeToString(date));
+      return data;
+    } else {
+      return null;
+    }
+  }
+
   //update database
   void updateDatabase() {
     // update todays entry

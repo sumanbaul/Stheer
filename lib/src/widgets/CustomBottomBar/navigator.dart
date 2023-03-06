@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:notifoo/src/pages/Homepage.dart';
 import 'package:notifoo/src/pages/Pomodoro.dart';
-import 'package:notifoo/src/pages/Profile.dart';
-import 'package:notifoo/src/pages/TestPage.dart';
 import 'package:notifoo/src/pages/habit_tracker.dart';
-import 'package:notifoo/src/pages/pomodoro_home.dart';
 import 'package:notifoo/src/pages/task_page.dart';
 import 'package:notifoo/src/widgets/CustomBottomBar/BottomNavigation.dart';
 import 'package:notifoo/src/widgets/navigation/nav_drawer_widget.dart';
 
 import '../../../src/model/Notifications.dart';
-import '../../../src/pages/habit_hub_page.dart';
 import 'TabItem.dart';
 
 class App extends StatefulWidget {
@@ -32,7 +28,7 @@ class AppState extends State<App> {
   // list tabs here
   final List<TabItem> tabs = [
     TabItem(
-      tabName: "abc",
+      tabName: "Home",
       icon: Icons.home,
       page: Homepage(
         title: 'Stheer',
@@ -45,17 +41,17 @@ class AppState extends State<App> {
         title: 'Pomodoro',
       ),
     ),
-    TabItem(
-      tabName: "Tasks",
-      icon: Icons.add_task_rounded,
-      page: TaskPage(),
-      // page: HabitHubPage(
-      //   title: 'Profile',
-      // ),
-    ),
+    // TabItem(
+    //   tabName: "Tasks",
+    //   icon: Icons.add_task_rounded,
+    //   page: TaskPage(),
+    //   // page: HabitHubPage(
+    //   //   title: 'Profile',
+    //   // ),
+    // ),
     TabItem(
       tabName: "Habit Tracker",
-      icon: Icons.settings,
+      icon: Icons.add_task_rounded,
       page: HabitTracker(
           //title: 'Pomodoro Home',
           ),

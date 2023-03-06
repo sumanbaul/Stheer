@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:notifoo/src/components/monthly_summary.dart';
+import 'package:notifoo/src/components/monthly_summary_heatmap.dart';
 import 'package:notifoo/src/helper/habit_database.dart';
 
 import '../components/floating_action_btn.dart';
@@ -75,6 +75,13 @@ class _HabitTrackerState extends State<HabitTracker> {
     db.updateDatabase();
   }
 
+  void loadPreviousData(DateTime dateTime) {
+    db.loadPreviousData(dateTime);
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(dateTime.toString())));
+  }
+
   //settings clicked
   void openHabitSettings(int index) {
     showDialog(
@@ -122,9 +129,15 @@ class _HabitTrackerState extends State<HabitTracker> {
         onPressed: createNewHabit,
       ),
       body: ListView(
+        //padding: EdgeInsets.only(top: 40, bottom: 15),
+        physics: BouncingScrollPhysics(),
         children: [
           //monthly sumary heatmap
-          MonthlySummaryHeatmap(datasets: db.heatMapDataSet, startDate: _myBox.get("START_DATE")),
+          MonthlySummaryHeatmap(
+            datasets: db.heatMapDataSet,
+            startDate: _myBox.get("START_DATE"),
+            heatMapOnClick: (value1) => loadPreviousData(value1!),
+          ),
 
           //List of habits
           ListView.builder(
@@ -141,6 +154,10 @@ class _HabitTrackerState extends State<HabitTracker> {
               );
             }),
           ),
+
+          SizedBox(
+            height: 10,
+          )
         ],
       ),
     );

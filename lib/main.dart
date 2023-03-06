@@ -62,28 +62,27 @@ class _MyAppState extends State<MyApp> {
         create: (context) => GoogleSignInProvider(),
         child: AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle(
-            //statusBarColor: Colors.transparent, //i like transaparent :-)
-            systemNavigationBarColor: Color.fromARGB(235, 34, 32,
-                48), //Color.fromARGB(255, 33, 31, 46), // navigation bar color
-            statusBarIconBrightness: Brightness.dark, // status bar icons' color
-            systemNavigationBarIconBrightness:
-                Brightness.dark, //navigation bar icons' color
-            systemNavigationBarDividerColor: Colors.transparent,
-          ),
+              //statusBarColor: Colors.transparent, //i like transaparent :-)
+              //systemNavigationBarColor: Color.fromARGB(235, 34, 32, 48), //Color.fromARGB(255, 33, 31, 46), // navigation bar color
+              //statusBarIconBrightness: Brightness.dark, // status bar icons' color
+              //systemNavigationBarIconBrightness: Brightness.dark, //navigation bar icons' color
+              //  systemNavigationBarDividerColor: Colors.transparent,
+              ),
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
             theme: ThemeData.dark().copyWith(
               primaryColor:
-                  Color.fromARGB(255, 20, 20, 20), //Color(0xff0A0E21),
+                  Color.fromARGB(115, 20, 20, 20), //Color(0xff0A0E21),
               scaffoldBackgroundColor: Color.fromARGB(
                   235, 34, 32, 48), // Color.fromARGB(235, 34, 32, 48),
-              brightness: Brightness.dark,
+              // brightness: Brightness.dark,
               textTheme: TextTheme(
                 bodyText2: getBarlowFont(),
                 bodyText1: getBarlowFont(),
                 subtitle1: getBarlowFont(),
               ),
             ),
+            //theme: ThemeData(primarySwatch: Colors.yellow),
             initialRoute: '/',
             routes: {
               // When navigating to the "/" route, build the FirstScreen widget.
