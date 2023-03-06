@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../components/floating_action_btn.dart';
 import '../components/habit_tile.dart';
-import '../components/my_habit_box.dart';
+import '../components/my_alert_box.dart';
 
 class HabitTracker extends StatefulWidget {
   const HabitTracker({Key? key}) : super(key: key);
@@ -33,10 +33,11 @@ class _HabitTrackerState extends State<HabitTracker> {
     showDialog(
         context: context,
         builder: (context) {
-          return MyHabitBox(
+          return MyAlertBox(
             habitTextController: _newHabitController,
             onSave: saveNewHabit,
             onCancel: cancelDialog,
+            hintText: "Enter a new habit",
           );
         });
   }
@@ -55,28 +56,18 @@ class _HabitTrackerState extends State<HabitTracker> {
     Navigator.of(context, rootNavigator: true).pop();
   }
 
-  //cancel new habit
-  void cancelDialog() {
-    //clear text field
-    _newHabitController.clear();
-    //pop dialog box(use the below code to pop without popping root page)
-    Navigator.of(context, rootNavigator: true).pop();
-  }
-
   //settings clicked
   void openHabitSettings(int index) {
-    MyHabitBox(
-      habitTextController: _newHabitController,
-      onSave: () => saveExistingHabit(index),
-      onCancel: cancelDialog,
-    );
-
-    Navigator.of(context, rootNavigator: true).pop();
-  }
-
-  //on delete
-  void deleteHabit(int? index) {
-    todaysHabitList.removeAt(index!);
+    showDialog(
+        context: context,
+        builder: (context) {
+          return MyAlertBox(
+            habitTextController: _newHabitController,
+            onSave: () => saveExistingHabit(index),
+            onCancel: cancelDialog,
+            hintText: todaysHabitList[index][0],
+          );
+        });
   }
 
   void saveExistingHabit(int index) {
@@ -85,6 +76,21 @@ class _HabitTrackerState extends State<HabitTracker> {
     });
 
     Navigator.of(context, rootNavigator: true).pop();
+  }
+
+  //cancel new habit
+  void cancelDialog() {
+    //clear text field
+    _newHabitController.clear();
+    //pop dialog box(use the below code to pop without popping root page)
+    Navigator.of(context, rootNavigator: true).pop();
+  }
+
+//on delete
+  void deleteHabit(int? index) {
+    setState(() {
+      todaysHabitList.removeAt(index!);
+    });
   }
 
   @override
