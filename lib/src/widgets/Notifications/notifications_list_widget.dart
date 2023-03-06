@@ -46,7 +46,7 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
 
     initPlatformState();
     initData();
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
@@ -66,8 +66,6 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      //appBar: Topbar.getTopbar(widget.title),
-      //bottomNavigationBar: BottomBar.getBottomBar(context),
       body: Container(
         height: 600,
         padding: EdgeInsets.zero,

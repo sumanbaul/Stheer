@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 // return todays date formatted as yyyymmdd
 String todaysDateFormatted() {
   // today
@@ -24,6 +26,13 @@ String todaysDateFormatted() {
   return yyyymmdd;
 }
 
+String formatDateForView(DateTime datetime) {
+  // Create a DateFormat object with the desired pattern
+  DateFormat dateFormat = DateFormat("EEE, dd MMM");
+
+  // Format the date using the format method
+  return dateFormat.format(datetime);
+}
 
 // convert string yyyymmdd to DateTime object
 DateTime createDateTimeObject(String yyyymmdd) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:notifoo/src/components/monthly_summary_heatmap.dart';
+import 'package:notifoo/src/helper/datetime/date_time.dart';
 import 'package:notifoo/src/helper/habit_database.dart';
 
 import '../components/floating_action_btn.dart';
@@ -17,21 +18,25 @@ class HabitTracker extends StatefulWidget {
 class _HabitTrackerState extends State<HabitTracker> {
   HabitDatabase db = HabitDatabase();
   final _myBox = Hive.box("Habit_Database");
+  DateTime _selectedDate = DateTime.now();
 
   @override
   void initState() {
     // if there is no current habit list, then this is the first time opening the app
     //then create default data
     if (_myBox.get("CURRENT_HABIT_LIST") == null) {
+      // _selectedDate = DateTime.now();
       db.createDefaultData();
     }
 
     // there already exists data, this is not the first time
     else {
       db.loadData();
+      //_selectedDate = todaysDateFormatted();
     }
 
     db.updateDatabase();
+
     super.initState();
   }
 
@@ -75,11 +80,20 @@ class _HabitTrackerState extends State<HabitTracker> {
     db.updateDatabase();
   }
 
+  //load previous/current data when clicked on date from Heatmap
   void loadPreviousData(DateTime dateTime) {
-    db.loadPreviousData(dateTime);
-
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(dateTime.toString())));
+
+    var _newHabitList = db.loadPreviousData(dateTime);
+    setState(() {
+      _selectedDate = dateTime;
+      if (_newHabitList != null) {
+        db.todaysHabitList = _newHabitList;
+      } else {
+        db.todaysHabitList = [];
+      }
+    });
   }
 
   //settings clicked
@@ -139,6 +153,15 @@ class _HabitTrackerState extends State<HabitTracker> {
             heatMapOnClick: (value1) => loadPreviousData(value1!),
           ),
 
+          SizedBox(
+            height: 10,
+          ),
+          Container(
+            child: Text(
+              formatDateForView(_selectedDate),
+              style: TextStyle(color: Colors.black, fontSize: 20),
+            ),
+          ),
           //List of habits
           ListView.builder(
             itemCount: db.todaysHabitList.length,

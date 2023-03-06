@@ -37,9 +37,10 @@ class HabitDatabase {
 
   loadPreviousData(DateTime? date) {
     if ((_myBox.get(convertDateTimeToString(date!))) != null) {
-      var data = _myBox.get(convertDateTimeToString(date));
-      return data;
+      todaysHabitList = _myBox.get(convertDateTimeToString(date));
+      return todaysHabitList;
     } else {
+      //TODO
       return null;
     }
   }

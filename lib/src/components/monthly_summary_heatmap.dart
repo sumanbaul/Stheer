@@ -46,19 +46,20 @@ class MonthlySummaryHeatmap extends StatelessWidget {
             )
           ]),
       child: HeatMap(
-        startDate: createDateTimeObject(startDate),
+        // startDate: DateTime.now().subtract(Duration(days: 60)), //createDateTimeObject(startDate),
         endDate: DateTime.now().add((Duration(days: 0))),
         datasets: datasets,
         colorMode: ColorMode.color,
         defaultColor: Colors.grey[200],
         fontSize: 15,
 
-        //margin: EdgeInsets.all(5),
+        //margin: EdgeInsets.all(4),
         textColor: Color.fromARGB(255, 46, 46, 46),
+
         showColorTip: false,
         showText: true,
         scrollable: true,
-        size: 25,
+        size: 35,
         colorsets: const {
           1: Color.fromARGB(20, 2, 179, 8),
           2: Color.fromARGB(40, 2, 179, 8),
