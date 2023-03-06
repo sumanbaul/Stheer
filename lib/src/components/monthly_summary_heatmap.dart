@@ -22,29 +22,29 @@ class MonthlySummaryHeatmap extends StatelessWidget {
     ];
     const List<double> _stops = [0.4, 0.99];
     return Container(
-      padding: EdgeInsets.only(top: 15, bottom: 15),
+      padding: EdgeInsets.only(top: 20, bottom: 0),
       //margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       decoration: BoxDecoration(
-          color: Colors.yellow[100],
-          borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(15),
-              bottomRight: Radius.circular(15)),
-          gradient: LinearGradient(
-              colors: _colors,
-              stops: _stops,
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter),
-          boxShadow: [
-            BoxShadow(
-              color: Color.fromARGB(255, 163, 194, 207),
-              blurRadius: 25.0, // soften the shadow
-              spreadRadius: 3.0, //extend the shadow
-              offset: Offset(
-                5.0, // Move to right 10  horizontally
-                5.0, // Move to bottom 10 Vertically
-              ),
-            )
-          ]),
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
+        // gradient: LinearGradient(
+        //     colors: _colors,
+        //     stops: _stops,
+        //     begin: Alignment.topCenter,
+        //     end: Alignment.bottomCenter),
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: Color.fromARGB(255, 163, 194, 207),
+        //     blurRadius: 25.0, // soften the shadow
+        //     spreadRadius: 3.0, //extend the shadow
+        //     offset: Offset(
+        //       5.0, // Move to right 10  horizontally
+        //       5.0, // Move to bottom 10 Vertically
+        //     ),
+        //   ),
+        // ]
+      ),
       child: HeatMap(
         // startDate: DateTime.now().subtract(Duration(days: 60)), //createDateTimeObject(startDate),
         endDate: DateTime.now().add((Duration(days: 0))),
@@ -59,7 +59,7 @@ class MonthlySummaryHeatmap extends StatelessWidget {
         showColorTip: false,
         showText: true,
         scrollable: true,
-        size: 35,
+        size: 30,
         colorsets: const {
           1: Color.fromARGB(20, 2, 179, 8),
           2: Color.fromARGB(40, 2, 179, 8),

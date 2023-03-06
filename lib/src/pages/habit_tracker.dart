@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:notifoo/src/components/monthly_summary_heatmap.dart';
 import 'package:notifoo/src/helper/datetime/date_time.dart';
@@ -129,6 +130,8 @@ class _HabitTrackerState extends State<HabitTracker> {
 
   //on delete
   void deleteHabit(int? index) {
+    //Implement Alert Dialog for asking before delete
+
     setState(() {
       db.todaysHabitList.removeAt(index!);
     });
@@ -146,6 +149,37 @@ class _HabitTrackerState extends State<HabitTracker> {
         //padding: EdgeInsets.only(top: 40, bottom: 15),
         physics: BouncingScrollPhysics(),
         children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: EdgeInsets.only(top: 20, left: 20, right: 20),
+                child: Text(
+                  "WELCOME",
+                  style: GoogleFonts.barlowCondensed(
+                    color: Color.fromARGB(255, 20, 20, 20),
+                    fontSize: 45,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              Container(
+                padding:
+                    EdgeInsets.only(top: 25, left: 20, right: 20, bottom: 0),
+                child: CircleAvatar(
+                  // Set the radius of the circle
+                  radius: 20,
+                  // Set the background color of the circle
+                  backgroundColor: Color.fromARGB(255, 123, 194, 252),
+                  // Set the foreground color of the text
+                  foregroundColor: Colors.white,
+                  // Set the text to display inside the circle
+                  child: Text('SB'),
+                ),
+              ),
+            ],
+          ),
           //monthly sumary heatmap
           MonthlySummaryHeatmap(
             datasets: db.heatMapDataSet,
@@ -153,30 +187,45 @@ class _HabitTrackerState extends State<HabitTracker> {
             heatMapOnClick: (value1) => loadPreviousData(value1!),
           ),
 
-          SizedBox(
-            height: 10,
-          ),
+          //Center Date
           Container(
+            padding: EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Text(
               formatDateForView(_selectedDate),
-              style: TextStyle(color: Colors.black, fontSize: 20),
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           //List of habits
-          ListView.builder(
-            itemCount: db.todaysHabitList.length,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: ((context, index) {
-              return HabitTile(
-                habitName: db.todaysHabitList[index][0],
-                habitCompleted: db.todaysHabitList[index][1],
-                onChanged: (value) => checkBoxTapped(value, index),
-                settingsTapped: (context) => openHabitSettings(index),
-                deleteTapped: (context) => deleteHabit(index),
-              );
-            }),
-          ),
+          db.todaysHabitList.length == 0
+              ? Padding(
+                  padding:
+                      const EdgeInsets.only(top: 0, left: 20.0, right: 20.0),
+                  child: Text(
+                    "No Habits to display. Start a Habit NOW!",
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 145, 145, 145),
+                      fontSize: 20,
+                    ),
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: db.todaysHabitList.length,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: ((context, index) {
+                    return HabitTile(
+                      habitName: db.todaysHabitList[index][0],
+                      habitCompleted: db.todaysHabitList[index][1],
+                      onChanged: (value) => checkBoxTapped(value, index),
+                      settingsTapped: (context) => openHabitSettings(index),
+                      deleteTapped: (context) => deleteHabit(index),
+                    );
+                  }),
+                ),
 
           SizedBox(
             height: 10,
