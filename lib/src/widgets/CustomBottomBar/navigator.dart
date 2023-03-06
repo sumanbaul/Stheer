@@ -115,11 +115,11 @@ class AppState extends State<App> {
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerDocked,
           extendBody: false,
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {},
-            backgroundColor: Color.fromRGBO(233, 99, 150, 1),
-            child: Icon(Icons.abc),
-          ),
+          // floatingActionButton: FloatingActionButton(
+          //   onPressed: () {},
+          //   backgroundColor: Color.fromRGBO(233, 99, 150, 1),
+          //   child: Icon(Icons.abc),
+          // ),
           //drawer: NavigationDrawerWidget(),
           body: IndexedStack(
             index: currentTab,
