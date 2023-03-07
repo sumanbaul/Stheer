@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:notifoo/src/components/monthly_summary_heatmap.dart';
 import 'package:notifoo/src/helper/datetime/date_time.dart';
 import 'package:notifoo/src/helper/habit_database.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 
 import '../components/floating_action_btn.dart';
 import '../components/habit_tile.dart';
@@ -105,8 +106,9 @@ class _HabitTrackerState extends State<HabitTracker> {
       }
     });
 
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(dateTime.toString())));
+    // for the time snackbar is not needed, but keeping the code to reuse else where
+    // ScaffoldMessenger.of(context)
+    //     .showSnackBar(SnackBar(content: Text(dateTime.toString())));
   }
 
   //settings clicked
@@ -166,16 +168,35 @@ class _HabitTrackerState extends State<HabitTracker> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: EdgeInsets.only(top: 20, left: 20, right: 20),
-                child: Text(
-                  "WELCOME",
-                  style: GoogleFonts.barlowCondensed(
-                    color: Color.fromARGB(255, 20, 20, 20),
-                    fontSize: 45,
-                    fontWeight: FontWeight.w500,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // welcome container
+                  Container(
+                    padding: EdgeInsets.only(top: 20, left: 20, right: 20),
+                    child: Text(
+                      "WELCOME",
+                      style: GoogleFonts.barlowCondensed(
+                        color: Color.fromARGB(255, 20, 20, 20),
+                        fontSize: 45,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
-                ),
+
+                  // user name
+                  Container(
+                    padding: EdgeInsets.only(top: 0, left: 20, right: 20),
+                    child: Text(
+                      "SUMAN, Good Evening!",
+                      style: GoogleFonts.barlowCondensed(
+                        color: Color.fromARGB(255, 20, 20, 20),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
               ),
               Container(
                 padding:
@@ -193,6 +214,37 @@ class _HabitTrackerState extends State<HabitTracker> {
               ),
             ],
           ),
+          //Percent complete container
+          Container(
+            height: 30,
+            padding: EdgeInsets.only(top: 20, bottom: 0, left: 20, right: 20),
+            child: LinearPercentIndicator(
+              //width: 300,
+              lineHeight: 14.0,
+              percent: db.getHabitPercentages(),
+              //backgroundColor: Colors.grey[200],
+              //progressColor: Color.fromARGB(255, 89, 208, 230),
+              barRadius: Radius.circular(10),
+              //fillColor: Colors.red,
+              animateFromLastPercent: true,
+              animation: true,
+              animationDuration: 300,
+              linearGradient: LinearGradient(colors: [
+                Color.fromARGB(255, 108, 89, 230),
+                Color.fromARGB(255, 89, 208, 230),
+              ]),
+              padding: EdgeInsets.zero,
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 0),
+            child: Text(
+              'Progress of the day',
+              style: TextStyle(
+                  color: Colors.blueGrey, fontWeight: FontWeight.bold),
+            ),
+          ),
+
           //monthly sumary heatmap
           MonthlySummaryHeatmap(
             datasets: db.heatMapDataSet,

@@ -34,6 +34,8 @@ dependencies:
   collection: ^1.15.0
   device_apps: ^2.1.1
   dio: ^5.0.1
+  percent_indicator: ^4.2.3
+
 
   flutter_slidable: ^2.0.0
   flutter_heatmap_calendar: ^1.0.5

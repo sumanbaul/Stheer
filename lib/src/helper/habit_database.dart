@@ -77,6 +77,17 @@ class HabitDatabase {
     print(_myBox.values);
   }
 
+  getHabitPercentages() {
+    DateTime startDate = createDateTimeObject(_myBox.get("START_DATE"));
+
+    String yyyymmdd = convertDateTimeToString(startDate);
+    double strengthAsPercent = double.parse(
+      _myBox.get("PERCENTAGE_SUMMARY_$yyyymmdd") ?? "0.0",
+    );
+
+    return strengthAsPercent;
+  }
+
   loadHeatMap() {
     DateTime startDate = createDateTimeObject(_myBox.get("START_DATE"));
 

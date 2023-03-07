@@ -62,12 +62,14 @@ class _MyAppState extends State<MyApp> {
         create: (context) => GoogleSignInProvider(),
         child: AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle(
-              //statusBarColor: Colors.transparent, //i like transaparent :-)
-              //systemNavigationBarColor: Color.fromARGB(235, 34, 32, 48), //Color.fromARGB(255, 33, 31, 46), // navigation bar color
-              //statusBarIconBrightness: Brightness.dark, // status bar icons' color
-              //systemNavigationBarIconBrightness: Brightness.dark, //navigation bar icons' color
-              //  systemNavigationBarDividerColor: Colors.transparent,
-              ),
+            statusBarColor: Colors.transparent, //i like transaparent :-)
+            //systemNavigationBarColor: Colors.transparent,
+            systemNavigationBarColor: Color.fromARGB(235, 34, 32,
+                48), //Color.fromARGB(255, 33, 31, 46), // navigation bar color
+            //statusBarIconBrightness: Brightness.dark, // status bar icons' color
+            //systemNavigationBarIconBrightness: Brightness.dark, //navigation bar icons' color
+            //  systemNavigationBarDividerColor: Colors.transparent,
+          ),
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
             theme: ThemeData.dark().copyWith(
