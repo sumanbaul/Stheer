@@ -28,12 +28,13 @@ class _HabitTrackerState extends State<HabitTracker> {
     if (_myBox.get("CURRENT_HABIT_LIST") == null) {
       // _selectedDate = DateTime.now();
       db.createDefaultData();
+      // _selectedDate = DateTime.now();
     }
 
     // there already exists data, this is not the first time
     else {
       db.loadData();
-      //_selectedDate = todaysDateFormatted();
+      //_selectedDate = _selectedDate = DateTime.now();
     }
 
     db.updateDatabase();
@@ -81,11 +82,19 @@ class _HabitTrackerState extends State<HabitTracker> {
     db.updateDatabase();
   }
 
+  //load data when clicked on list navigation arrow
+  void Function()? navigateToData(bool? increment) {
+    if (_selectedDate.toString() != "" && increment!) {
+      loadPreviousData(_selectedDate.add(Duration(days: 1)));
+    } else {
+      loadPreviousData(_selectedDate.subtract(Duration(days: 1)));
+    }
+
+    return null;
+  }
+
   //load previous/current data when clicked on date from Heatmap
   void loadPreviousData(DateTime dateTime) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(dateTime.toString())));
-
     var _newHabitList = db.loadPreviousData(dateTime);
     setState(() {
       _selectedDate = dateTime;
@@ -95,6 +104,9 @@ class _HabitTrackerState extends State<HabitTracker> {
         db.todaysHabitList = [];
       }
     });
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(dateTime.toString())));
   }
 
   //settings clicked
@@ -148,6 +160,7 @@ class _HabitTrackerState extends State<HabitTracker> {
       body: ListView(
         //padding: EdgeInsets.only(top: 40, bottom: 15),
         physics: BouncingScrollPhysics(),
+
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,7 +184,7 @@ class _HabitTrackerState extends State<HabitTracker> {
                   // Set the radius of the circle
                   radius: 20,
                   // Set the background color of the circle
-                  backgroundColor: Color.fromARGB(255, 123, 194, 252),
+                  backgroundColor: Color.fromARGB(255, 89, 208, 230),
                   // Set the foreground color of the text
                   foregroundColor: Colors.white,
                   // Set the text to display inside the circle
@@ -187,17 +200,62 @@ class _HabitTrackerState extends State<HabitTracker> {
             heatMapOnClick: (value1) => loadPreviousData(value1!),
           ),
 
-          //Center Date
-          Container(
-            padding: EdgeInsets.only(top: 20, left: 20, right: 20),
-            child: Text(
-              formatDateForView(_selectedDate),
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
+          //Center Date with navigator
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: EdgeInsets.only(top: 20, left: 20, right: 20),
+                child: Text(
+                  formatDateForView(_selectedDate),
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            ),
+              Container(
+                padding: EdgeInsets.only(right: 5.0, top: 10, bottom: 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    MaterialButton(
+                      onPressed: (() {
+                        if (_selectedDate == DateTime.now()) {
+                          loadPreviousData(
+                              _selectedDate.subtract(Duration(days: 1)));
+                        } else {
+                          loadPreviousData(
+                              _selectedDate.subtract(Duration(days: 1)));
+                        }
+                      }), //navigateToData(false),
+                      child: Icon(Icons.arrow_circle_left_rounded),
+                      elevation: 5,
+                      minWidth: 20,
+                      textColor: Colors.amber[900],
+                    ),
+                    MaterialButton(
+                      onPressed: () {
+                        if (_selectedDate == DateTime.now()) {
+                        } else {
+                          loadPreviousData(
+                              _selectedDate.add(Duration(days: 1)));
+                        }
+                      },
+                      child: Icon(Icons.arrow_circle_right_rounded),
+                      elevation: 5,
+                      textColor: _selectedDate == DateTime.now()
+                          ? Colors.grey
+                          : Colors.amber[900],
+                      minWidth: 20.0,
+                    ),
+                  ],
+                ),
+              )
+            ],
           ),
           //List of habits
           db.todaysHabitList.length == 0

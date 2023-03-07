@@ -12,7 +12,7 @@ class FloatingActionBtn extends StatelessWidget {
     return FloatingActionButton(
       onPressed: onPressed,
       child: Icon(Icons.my_library_add_outlined),
-      backgroundColor: Colors.greenAccent,
+      backgroundColor: Color.fromARGB(255, 89, 208, 230),
     );
   }
 }
