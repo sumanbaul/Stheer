@@ -225,13 +225,15 @@ class _HabitTrackerState extends State<HabitTracker> {
               //backgroundColor: Colors.grey[200],
               //progressColor: Color.fromARGB(255, 89, 208, 230),
               barRadius: Radius.circular(10),
-              //fillColor: Colors.red,
               animateFromLastPercent: true,
               animation: true,
               animationDuration: 300,
               linearGradient: LinearGradient(colors: [
-                Color.fromARGB(255, 108, 89, 230),
-                Color.fromARGB(255, 89, 208, 230),
+                // Color.fromARGB(255, 108, 89, 230),
+                Color.fromARGB(255, 154, 97, 218),
+
+                Color.fromARGB(255, 115, 222, 240),
+                Color.fromARGB(255, 254, 131, 146),
               ]),
               padding: EdgeInsets.zero,
             ),
@@ -269,12 +271,15 @@ class _HabitTrackerState extends State<HabitTracker> {
                 ),
               ),
               Container(
-                padding: EdgeInsets.only(right: 5.0, top: 10, bottom: 0),
+                //color: Colors.black,
+                margin: EdgeInsets.only(top: 20, bottom: 0, right: 20),
+                padding: EdgeInsets.only(right: 0.0, top: 0, bottom: 0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     MaterialButton(
+                      visualDensity: VisualDensity.compact,
                       onPressed: (() {
                         if (_selectedDate == DateTime.now()) {
                           loadPreviousData(
@@ -286,23 +291,28 @@ class _HabitTrackerState extends State<HabitTracker> {
                       }), //navigateToData(false),
                       child: Icon(Icons.arrow_circle_left_rounded),
                       elevation: 5,
-                      minWidth: 20,
-                      textColor: Colors.amber[900],
+                      minWidth: 15,
+                      textColor: Color.fromARGB(255, 65, 56, 88),
                     ),
                     MaterialButton(
-                      onPressed: () {
-                        if (_selectedDate == DateTime.now()) {
-                        } else {
-                          loadPreviousData(
-                              _selectedDate.add(Duration(days: 1)));
-                        }
-                      },
+                      visualDensity: VisualDensity.compact,
+
+                      onPressed: _selectedDate.isAfter(DateTime.now())
+                          ? null
+                          : () {
+                              if (_selectedDate == DateTime.now()) {
+                              } else {
+                                loadPreviousData(
+                                    _selectedDate.add(Duration(days: 1)));
+                              }
+                            },
                       child: Icon(Icons.arrow_circle_right_rounded),
                       elevation: 5,
-                      textColor: _selectedDate == DateTime.now()
+                      textColor: _selectedDate.isAfter(DateTime.now())
                           ? Colors.grey
-                          : Colors.amber[900],
-                      minWidth: 20.0,
+                          : Color.fromARGB(
+                              255, 65, 56, 88), // Colors.amber[900],
+                      minWidth: 15.0,
                     ),
                   ],
                 ),
@@ -315,7 +325,9 @@ class _HabitTrackerState extends State<HabitTracker> {
                   padding:
                       const EdgeInsets.only(top: 0, left: 20.0, right: 20.0),
                   child: Text(
-                    "No Habits to display. Start a Habit NOW!",
+                    _selectedDate.isAfter(DateTime.now())
+                        ? "Come back tomorrow."
+                        : "No Habits to display. Start a Habit NOW!",
                     style: TextStyle(
                       color: Color.fromARGB(255, 145, 145, 145),
                       fontSize: 20,

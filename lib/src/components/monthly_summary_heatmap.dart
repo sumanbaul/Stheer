@@ -24,45 +24,54 @@ class MonthlySummaryHeatmap extends StatelessWidget {
     return Container(
       padding: EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 0),
       //margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-      decoration: BoxDecoration(color: Colors.grey[300],
-          // borderRadius: BorderRadius.only(
-          //   bottomLeft: Radius.circular(15),
-          //   bottomRight: Radius.circular(15),
-          // ),
-          // gradient: LinearGradient(
-          //     colors: _colors,
-          //     stops: _stops,
-          //     begin: Alignment.topCenter,
-          //     end: Alignment.bottomCenter),
-          boxShadow: [
-            BoxShadow(
-              color: Color.fromARGB(57, 145, 159, 165),
-              blurRadius: 5.0, // soften the shadow
-              spreadRadius: 0.5, //extend the shadow
-              offset: Offset(
-                -5.0, // Move to right 10  horizontally
-                5.0, // Move to bottom 10 Vertically
-              ),
-            ),
-          ]),
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+        // borderRadius: BorderRadius.only(
+        //   bottomLeft: Radius.circular(15),
+        //   bottomRight: Radius.circular(15),
+        // ),
+        // gradient: LinearGradient(
+        //     colors: _colors,
+        //     stops: _stops,
+        //     begin: Alignment.topCenter,
+        //     end: Alignment.bottomCenter),
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: Color.fromARGB(57, 145, 159, 165),
+        //     blurRadius: 5.0, // soften the shadow
+        //     spreadRadius: 0.5, //extend the shadow
+        //     offset: Offset(
+        //       -5.0, // Move to right 10  horizontally
+        //       5.0, // Move to bottom 10 Vertically
+        //     ),
+        //   ),
+        // ],
+      ),
       child: HeatMap(
         startDate: createDateTimeObject(startDate)
-            .subtract(Duration(days: 45)) //createDateTimeObject(startDate),
-        ,
+            .subtract(Duration(days: 45)), //createDateTimeObject(startDate),
+        //weekTextColor: Colors.blueGrey,
+        colorTipCount: 1,
+        colorTipHelper: [
+          Text('ssssss'),
+        ],
+        //initDate: createDateTimeObject(startDate),
+
         endDate: DateTime.now().add((Duration(days: 0))),
         datasets: datasets,
         colorMode: ColorMode.color,
         defaultColor: Colors.grey[200],
         fontSize: 15,
-
+        colorTipSize: 30,
+        borderRadius: 6,
         //margin: EdgeInsets.all(4),
-        textColor: Color.fromARGB(255, 46, 46, 46),
-
+        textColor: Color.fromARGB(255, 27, 16, 82),
+        showText: true,
         showColorTip: false,
         // colorTipCount: 10,
 
-        showText: true,
-        scrollable: true,
+        // showText: true,
+        //scrollable: true,
         size: 30,
         colorsets: const {
           1: Color.fromARGB(20, 2, 179, 8),
