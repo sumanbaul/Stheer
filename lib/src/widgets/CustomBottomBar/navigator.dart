@@ -17,7 +17,8 @@ class App extends StatefulWidget {
   final List<Notifications>? notificationsFromDb;
 
   @override
-  State<StatefulWidget> createState() => AppState();
+  State<StatefulWidget> createState() =>
+      AppState(scaffoldKey: GlobalKey<ScaffoldState>());
 }
 
 class AppState extends State<App> {
@@ -25,47 +26,53 @@ class AppState extends State<App> {
   // can access it simply by AppState.currentTab
   static int currentTab = 0;
 
-  // list tabs here
-  final List<TabItem> tabs = [
-    TabItem(
-      tabName: "Home",
-      icon: Icons.home,
-      page: Homepage(
-        title: 'Stheer',
-      ),
-    ),
-    TabItem(
-      tabName: "Pomodoro",
-      icon: Icons.person,
-      page: Pomodoro(
-        title: 'Pomodoro',
-      ),
-    ),
-    // TabItem(
-    //   tabName: "Tasks",
-    //   icon: Icons.add_task_rounded,
-    //   page: TaskPage(),
-    //   // page: HabitHubPage(
-    //   //   title: 'Profile',
-    //   // ),
-    // ),
-    TabItem(
-      tabName: "Habit Tracker",
-      icon: Icons.add_task_rounded,
-      page: HabitTracker(
-          //title: 'Pomodoro Home',
-          ),
-    ),
-    // TabItem(
-    //   tabName: "Pomodoro Home",
-    //   icon: Icons.settings,
-    //   page: PomodoroHome(
-    //     title: 'Pomodoro Home',
-    //   ),
-    // ),
-  ];
+  // declare a key for scaffold
+  final GlobalKey<ScaffoldState> scaffoldKey;
 
-  AppState() {
+  // list tabs here
+  late final List<TabItem> tabs;
+
+  AppState({required this.scaffoldKey}) {
+    tabs = [
+      TabItem(
+        tabName: "Home",
+        icon: Icons.home,
+        page: Homepage(
+          title: 'Stheer',
+          openNavigationDrawer: () => scaffoldKey.currentState!.openDrawer(),
+        ),
+      ),
+      TabItem(
+        tabName: "Pomodoro",
+        icon: Icons.person,
+        page: Pomodoro(
+          title: 'Pomodoro',
+        ),
+      ),
+      // TabItem(
+      //   tabName: "Tasks",
+      //   icon: Icons.add_task_rounded,
+      //   page: TaskPage(),
+      //   // page: HabitHubPage(
+      //   //   title: 'Profile',
+      //   // ),
+      // ),
+      TabItem(
+        tabName: "Habit Tracker",
+        icon: Icons.add_task_rounded,
+        page: HabitTracker(
+            //title: 'Pomodoro Home',
+            ),
+      ),
+      // TabItem(
+      //   tabName: "Pomodoro Home",
+      //   icon: Icons.settings,
+      //   page: PomodoroHome(
+      //     title: 'Pomodoro Home',
+      //   ),
+      // ),
+    ];
+
     // indexing is necessary for proper funcationality
     // of determining which tab is active
     tabs.asMap().forEach((index, details) {
@@ -85,6 +92,10 @@ class AppState extends State<App> {
       // in order to repaint
       setState(() => currentTab = index);
     }
+  }
+
+  void openNavigationDrawer() {
+    Scaffold.of(context).openDrawer();
   }
 
   @override
@@ -111,6 +122,7 @@ class AppState extends State<App> {
       // with multiple appbars on one screen
       // eventually breaking the app
       child: Scaffold(
+          key: scaffoldKey,
           drawer: NavigationDrawerWidget(),
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerDocked,

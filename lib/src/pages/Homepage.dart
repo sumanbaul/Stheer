@@ -18,8 +18,13 @@ import '../model/Notifications.dart';
 import '../model/notificationCategory.dart';
 
 class Homepage extends StatefulWidget {
-  Homepage({Key? key, this.title}) : super(key: key);
+  Homepage({
+    Key? key,
+    this.title,
+    required this.openNavigationDrawer,
+  }) : super(key: key);
 
+  final VoidCallback? openNavigationDrawer;
   final String? title;
   //final Future<List<Notifications>>? notificationsFromDb;
 
