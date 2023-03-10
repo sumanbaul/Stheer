@@ -31,6 +31,8 @@ class HabitDatabase {
     }
     // if its not a new day, load today's list
     else {
+      // _myBox.delete(todaysDateFormatted());
+      _myBox.put("START_DATE", "20230307");
       todaysHabitList = _myBox.get(todaysDateFormatted());
     }
   }
@@ -77,14 +79,11 @@ class HabitDatabase {
     print(_myBox.values);
   }
 
-  getHabitPercentages() {
-    DateTime startDate = createDateTimeObject(_myBox.get("START_DATE"));
-
-    String yyyymmdd = convertDateTimeToString(startDate);
+  getHabitPercentages(DateTime date) {
+    //Get percentage of requested date!
     double strengthAsPercent = double.parse(
-      _myBox.get("PERCENTAGE_SUMMARY_$yyyymmdd") ?? "0.0",
-    );
-
+        _myBox.get("PERCENTAGE_SUMMARY_${convertDateTimeToString(date)}") ??
+            "0.0");
     return strengthAsPercent;
   }
 
@@ -97,7 +96,9 @@ class HabitDatabase {
     // go from start date to today and add each percentage to the dataset
     // "PERCENTAGE_SUMMARY_yyyymmdd" will be the key in the db
     for (var i = 0; i < daysInBetween + 1; i++) {
-      String yyyymmdd = convertDateTimeToString(startDate);
+      String yyyymmdd = convertDateTimeToString(
+        startDate.add(Duration(days: i)),
+      );
 
       double strengthAsPercent = double.parse(
         _myBox.get("PERCENTAGE_SUMMARY_$yyyymmdd") ?? "0.0",

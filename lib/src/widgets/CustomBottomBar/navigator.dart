@@ -132,9 +132,9 @@ class AppState extends State<App> {
               tabs: tabs,
             ),
             // notchMargin: 4.0,
-            notchMargin: 10.0,
+            // notchMargin: 10.0,
             shape: const CircularNotchedRectangle(),
-            color: Color.fromARGB(235, 34, 32, 48),
+            color: Color.fromARGB(255, 254, 254, 255),
             elevation: 0,
           )),
     );

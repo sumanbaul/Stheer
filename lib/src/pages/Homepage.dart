@@ -179,7 +179,7 @@ class _HomepageState extends State<Homepage> {
           splashColor: Color(0xff94bbe9),
           hoverColor: Color(0xffeeaeca),
           focusColor: Color(0xff94bbe9),
-          onPressed: () => {},
+          onPressed: started ? stopListening : startListening,
           tooltip: 'Start/Stop sensing',
           child: _loading
               ? Icon(Icons.hourglass_bottom_outlined)

@@ -161,7 +161,7 @@ class _HabitTrackerState extends State<HabitTracker> {
       ),
       body: ListView(
         //padding: EdgeInsets.only(top: 40, bottom: 15),
-        physics: BouncingScrollPhysics(),
+        physics: PageScrollPhysics(),
 
         children: [
           Row(
@@ -188,7 +188,7 @@ class _HabitTrackerState extends State<HabitTracker> {
                   Container(
                     padding: EdgeInsets.only(top: 0, left: 20, right: 20),
                     child: Text(
-                      "SUMAN, Good Evening!",
+                      "SUMAN, Good Day!",
                       style: GoogleFonts.barlowCondensed(
                         color: Color.fromARGB(255, 20, 20, 20),
                         fontSize: 15,
@@ -221,7 +221,7 @@ class _HabitTrackerState extends State<HabitTracker> {
             child: LinearPercentIndicator(
               //width: 300,
               lineHeight: 14.0,
-              percent: db.getHabitPercentages(),
+              percent: db.getHabitPercentages(_selectedDate),
               //backgroundColor: Colors.grey[200],
               //progressColor: Color.fromARGB(255, 89, 208, 230),
               barRadius: Radius.circular(10),
