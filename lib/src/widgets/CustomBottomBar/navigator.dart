@@ -36,7 +36,7 @@ class AppState extends State<App> {
     tabs = [
       TabItem(
         tabName: "Home",
-        icon: Icons.home,
+        icon: Icons.notifications_active_outlined,
         page: Homepage(
           title: 'Stheer',
           openNavigationDrawer: () => scaffoldKey.currentState!.openDrawer(),
@@ -44,7 +44,7 @@ class AppState extends State<App> {
       ),
       TabItem(
         tabName: "Pomodoro",
-        icon: Icons.person,
+        icon: Icons.timer_sharp,
         page: Pomodoro(
           title: 'Pomodoro',
         ),

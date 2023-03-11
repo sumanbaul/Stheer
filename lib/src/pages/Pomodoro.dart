@@ -246,7 +246,9 @@ class _PomodoroState extends State<Pomodoro> {
               padding: EdgeInsets.only(right: 5),
               child: Text(
                 ':',
-                style: TextStyle(fontSize: 70, letterSpacing: 1),
+                style: TextStyle(
+                  fontSize: 60,
+                ),
               ),
             ),
             SizedBox(
@@ -266,7 +268,10 @@ class _PomodoroState extends State<Pomodoro> {
     );
   }
 
-  Widget buildTimeCard({required String time, required String header, TextAlign? textAlign}) =>
+  Widget buildTimeCard(
+          {required String time,
+          required String header,
+          TextAlign? textAlign}) =>
       Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

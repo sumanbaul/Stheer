@@ -63,17 +63,12 @@ class _MyAppState extends State<MyApp> {
         child: AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle(
             statusBarColor: Colors.transparent, //i like transaparent :-)
-            //systemNavigationBarColor: Colors.transparent,
             systemNavigationBarColor: Color.fromARGB(235, 34, 32,
                 48), //Color.fromARGB(255, 33, 31, 46), // navigation bar color
-
-            statusBarBrightness: Brightness.light,
-            statusBarIconBrightness: Brightness.light,
-            //systemNavigationBarDividerColor: Colors.blue,
-            systemNavigationBarIconBrightness: Brightness.dark,
-            //statusBarIconBrightness: Brightness.dark, // status bar icons' color
-            //systemNavigationBarIconBrightness: Brightness.dark, //navigation bar icons' color
-            //  systemNavigationBarDividerColor: Colors.transparent,
+            statusBarBrightness: Brightness.dark,
+            statusBarIconBrightness: Brightness.dark,
+            systemNavigationBarIconBrightness: Brightness.light,
+            systemNavigationBarDividerColor: Colors.transparent,
           ),
           child: MaterialApp(
             debugShowCheckedModeBanner: false,

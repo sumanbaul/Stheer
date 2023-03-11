@@ -7,6 +7,7 @@ class HabitTile extends StatelessWidget {
   final Function(bool?)? onChanged;
   final Function(BuildContext?)? settingsTapped;
   final Function(BuildContext?)? deleteTapped;
+  final Function(BuildContext?)? habitsTapped;
 
   const HabitTile({
     Key? key,
@@ -15,6 +16,7 @@ class HabitTile extends StatelessWidget {
     required this.onChanged,
     required this.settingsTapped,
     required this.deleteTapped,
+    required this.habitsTapped,
   }) : super(key: key);
 
   @override
@@ -42,65 +44,85 @@ class HabitTile extends StatelessWidget {
             )
           ],
         ),
-        child: Container(
-          padding: EdgeInsets.all(15),
-          decoration: BoxDecoration(
-            color: Colors.grey[100],
-            borderRadius: BorderRadius.circular(15),
+        child: Stack(children: [
+          Container(
+            padding: EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    //checkbox
+                    Checkbox(
+                      value: habitCompleted,
+                      onChanged: onChanged,
+                      //shape: OutlinedBorder.lerp(a, b, t),
+                      activeColor: Color.fromARGB(255, 89, 208, 230),
+                      side: BorderSide(
+                        color: Color.fromARGB(255, 230, 175, 182),
+                        style: BorderStyle.solid,
+                        strokeAlign: StrokeAlign.center,
+                      ),
+                    ),
+                    Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          //habit name
+                          Text(
+                            habitName,
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(
+                            height: 8,
+                          ),
+                          Text(
+                            'other details',
+                            style: TextStyle(
+                                color: Colors.grey[800],
+                                fontSize: 12,
+                                fontWeight: FontWeight.normal),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Icon(
+                  Icons.arrow_back_rounded,
+                  color: Colors.grey[400],
+                )
+              ],
+            ),
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  //checkbox
-                  Checkbox(
-                    value: habitCompleted,
-                    onChanged: onChanged,
-                    //shape: OutlinedBorder.lerp(a, b, t),
-                    activeColor: Color.fromARGB(255, 89, 208, 230),
-                    side: BorderSide(
-                      color: Color.fromARGB(255, 230, 175, 182),
-                      style: BorderStyle.solid,
-                      strokeAlign: StrokeAlign.center,
+          new Positioned.fill(
+            child: new Material(
+              type: MaterialType.transparency,
+              color: Colors.transparent,
+              child: new InkWell(
+                borderRadius: BorderRadius.circular(20),
+                onTap: () => {
+                  print('tapped'),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => habitsTapped!(context),
                     ),
                   ),
-                  Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        //habit name
-                        Text(
-                          habitName,
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        Text(
-                          'other details',
-                          style: TextStyle(
-                              color: Colors.grey[800],
-                              fontSize: 12,
-                              fontWeight: FontWeight.normal),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                },
               ),
-              Icon(
-                Icons.arrow_back_rounded,
-                color: Colors.grey[400],
-              )
-            ],
+            ),
           ),
-        ),
+        ]),
       ),
     );
   }

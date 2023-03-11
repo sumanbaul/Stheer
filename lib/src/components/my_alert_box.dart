@@ -16,7 +16,7 @@ class MyAlertBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Colors.grey[900],
+      backgroundColor: Colors.grey[800],
       content: TextField(
         controller: habitTextController,
         style: const TextStyle(
@@ -43,7 +43,8 @@ class MyAlertBox extends StatelessWidget {
               color: Colors.white,
             ),
           ),
-          color: Colors.black,
+          color: Color.fromARGB(255, 183, 95, 95),
+          elevation: 5,
         ),
 
         //Save button
@@ -55,7 +56,7 @@ class MyAlertBox extends StatelessWidget {
               color: Colors.white,
             ),
           ),
-          color: Colors.black,
+          color: Color.fromARGB(255, 151, 110, 204),
         ),
       ],
     );

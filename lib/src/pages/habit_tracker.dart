@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:notifoo/src/components/monthly_summary_heatmap.dart';
 import 'package:notifoo/src/helper/datetime/date_time.dart';
 import 'package:notifoo/src/helper/habit_database.dart';
+import 'package:notifoo/src/pages/task_page.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 import '../components/floating_action_btn.dart';
@@ -123,6 +124,24 @@ class _HabitTrackerState extends State<HabitTracker> {
             hintText: db.todaysHabitList[index][0],
           );
         });
+  }
+
+  openHabitDetails(int index) {
+    return SafeArea(
+      child: Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(db.todaysHabitList[index][0]),
+            Checkbox(
+              value: db.todaysHabitList[index][1],
+              onChanged: ((value) {}),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void saveExistingHabit(int index) {
@@ -345,6 +364,7 @@ class _HabitTrackerState extends State<HabitTracker> {
                       onChanged: (value) => checkBoxTapped(value, index),
                       settingsTapped: (context) => openHabitSettings(index),
                       deleteTapped: (context) => deleteHabit(index),
+                      habitsTapped: (context) => openHabitDetails(index),
                     );
                   }),
                 ),
