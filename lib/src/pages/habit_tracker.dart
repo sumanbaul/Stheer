@@ -39,7 +39,7 @@ class _HabitTrackerState extends State<HabitTracker> {
       //_selectedDate = _selectedDate = DateTime.now();
     }
 
-    db.updateDatabase();
+    db.updateDatabase(_selectedDate);
 
     super.initState();
   }
@@ -50,7 +50,7 @@ class _HabitTrackerState extends State<HabitTracker> {
       db.todaysHabitList[index][1] = value!;
     });
 
-    db.updateDatabase();
+    db.updateDatabase(_selectedDate);
   }
 
   //create a new habit
@@ -81,7 +81,7 @@ class _HabitTrackerState extends State<HabitTracker> {
 
     //pop dialog box(use the below code to pop without popping root page)
     Navigator.of(context, rootNavigator: true).pop();
-    db.updateDatabase();
+    db.updateDatabase(_selectedDate);
   }
 
   //load data when clicked on list navigation arrow
@@ -126,22 +126,9 @@ class _HabitTrackerState extends State<HabitTracker> {
         });
   }
 
-  openHabitDetails(int index) {
-    return SafeArea(
-      child: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(db.todaysHabitList[index][0]),
-            Checkbox(
-              value: db.todaysHabitList[index][1],
-              onChanged: ((value) {}),
-            ),
-          ],
-        ),
-      ),
-    );
+  habitsTapped(int index, bool? habitCompleted) {
+    // todo calculations later on
+    checkBoxTapped(habitCompleted, index);
   }
 
   void saveExistingHabit(int index) {
@@ -150,7 +137,7 @@ class _HabitTrackerState extends State<HabitTracker> {
     });
 
     Navigator.of(context, rootNavigator: true).pop();
-    db.updateDatabase();
+    db.updateDatabase(_selectedDate);
   }
 
   //cancel new habit
@@ -168,7 +155,7 @@ class _HabitTrackerState extends State<HabitTracker> {
     setState(() {
       db.todaysHabitList.removeAt(index!);
     });
-    db.updateDatabase();
+    db.updateDatabase(_selectedDate);
   }
 
   @override
@@ -364,7 +351,8 @@ class _HabitTrackerState extends State<HabitTracker> {
                       onChanged: (value) => checkBoxTapped(value, index),
                       settingsTapped: (context) => openHabitSettings(index),
                       deleteTapped: (context) => deleteHabit(index),
-                      habitsTapped: (context) => openHabitDetails(index),
+                      habitsTapped: (context, habitCompleted) =>
+                          habitsTapped(index, habitCompleted),
                     );
                   }),
                 ),

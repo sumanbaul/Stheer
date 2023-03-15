@@ -32,7 +32,7 @@ class HabitDatabase {
     // if its not a new day, load today's list
     else {
       // _myBox.delete(todaysDateFormatted());
-      _myBox.put("START_DATE", "20230307");
+      //_myBox.put("START_DATE", "20230307");
       todaysHabitList = _myBox.get(todaysDateFormatted());
     }
   }
@@ -42,25 +42,39 @@ class HabitDatabase {
       todaysHabitList = _myBox.get(convertDateTimeToString(date));
       return todaysHabitList;
     } else {
-      //TODO
+      //(if _mybox.get(date) doesnt have data)
+      //check if date is a future date than today
+      if (!date.isAfter(DateTime.now())) {
+        todaysHabitList = _myBox.get("CURRENT_HABIT_LIST");
+        // set all habit completed to false since is a new day
+        for (var i = 0; i < todaysHabitList.length; i++) {
+          todaysHabitList[i][1] = false;
+        }
+        _myBox.put(convertDateTimeToString(date), todaysHabitList);
+
+        return todaysHabitList;
+      }
       return null;
     }
   }
 
   //update database
-  void updateDatabase() {
-    // update todays entry
-    _myBox.put(todaysDateFormatted(), todaysHabitList);
-    //update universal habit list in case it changed (new habit, edit habit, delete habit)
-    _myBox.put("CURRENT_HABIT_LIST", todaysHabitList);
-
-    // calculate habit complte percentages for each day
-    calculateHabitPercentages();
-    // load heat map
-    loadHeatMap();
+  void updateDatabase(DateTime selectedDate) {
+    if (selectedDate == DateTime.now()) {
+      // update todays entry
+      _myBox.put(todaysDateFormatted(), todaysHabitList);
+      //update universal habit list in case it changed (new habit, edit habit, delete habit)
+      _myBox.put("CURRENT_HABIT_LIST", todaysHabitList);
+      calculateHabitPercentages(selectedDate);
+      loadHeatMap();
+    } else {
+      _myBox.put(convertDateTimeToString(selectedDate), todaysHabitList);
+      calculateHabitPercentages(selectedDate);
+      loadHeatMap();
+    }
   }
 
-  calculateHabitPercentages() {
+  calculateHabitPercentages(DateTime selectedDate) {
     int countCompleted = 0;
     for (var i = 0; i < todaysHabitList.length; i++) {
       if (todaysHabitList[i][1] == true) {
@@ -74,9 +88,10 @@ class HabitDatabase {
 
     // key: "PERCENTAGE_SUMMARY_yyyymmdd"
     // value: string of 1dp number between 0.0-1.0 inclusive
-    _myBox.put("PERCENTAGE_SUMMARY_${todaysDateFormatted()}", percent);
-    print(_myBox.get("PERCENTAGE_SUMMARY_${todaysDateFormatted()}"));
-    print(_myBox.values);
+    _myBox.put(
+        "PERCENTAGE_SUMMARY_${convertDateTimeToString(selectedDate)}", percent);
+    //print(_myBox.get("PERCENTAGE_SUMMARY_${todaysDateFormatted()}"));
+    //print(_myBox.values);
   }
 
   getHabitPercentages(DateTime date) {

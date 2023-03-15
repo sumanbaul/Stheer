@@ -7,7 +7,7 @@ class HabitTile extends StatelessWidget {
   final Function(bool?)? onChanged;
   final Function(BuildContext?)? settingsTapped;
   final Function(BuildContext?)? deleteTapped;
-  final Function(BuildContext?)? habitsTapped;
+  final Function(BuildContext?, bool?)? habitsTapped;
 
   const HabitTile({
     Key? key,
@@ -60,7 +60,8 @@ class HabitTile extends StatelessWidget {
                     //checkbox
                     Checkbox(
                       value: habitCompleted,
-                      onChanged: onChanged,
+                      onChanged: (bool? newValue) =>
+                          habitsTapped!(context, newValue),
                       //shape: OutlinedBorder.lerp(a, b, t),
                       activeColor: Color.fromARGB(255, 89, 208, 230),
                       side: BorderSide(
@@ -109,16 +110,9 @@ class HabitTile extends StatelessWidget {
               type: MaterialType.transparency,
               color: Colors.transparent,
               child: new InkWell(
-                borderRadius: BorderRadius.circular(20),
-                onTap: () => {
-                  print('tapped'),
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => habitsTapped!(context),
-                    ),
-                  ),
-                },
+                borderRadius: BorderRadius.circular(15),
+                onTap: () => habitsTapped!(context, !habitCompleted),
+                splashColor: Color.fromARGB(48, 153, 97, 218),
               ),
             ),
           ),

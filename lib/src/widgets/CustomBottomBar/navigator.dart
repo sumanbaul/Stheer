@@ -58,7 +58,7 @@ class AppState extends State<App> {
       //   // ),
       // ),
       TabItem(
-        tabName: "Habit Tracker",
+        tabName: "Habits",
         icon: Icons.add_task_rounded,
         page: HabitTracker(
             //title: 'Pomodoro Home',
@@ -132,7 +132,6 @@ class AppState extends State<App> {
           //   backgroundColor: Color.fromRGBO(233, 99, 150, 1),
           //   child: Icon(Icons.abc),
           // ),
-          //drawer: NavigationDrawerWidget(),
           body: IndexedStack(
             index: currentTab,
             children: tabs.map((e) => e.page).toList(),
@@ -145,8 +144,8 @@ class AppState extends State<App> {
             ),
             // notchMargin: 4.0,
             // notchMargin: 10.0,
-            shape: const CircularNotchedRectangle(),
-            color: Color.fromARGB(255, 254, 254, 255),
+            //shape: const CircularNotchedRectangle(),
+            //color: Color.fromARGB(255, 254, 254, 255),
             elevation: 0,
           )),
     );

@@ -12,27 +12,30 @@ class BottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var _items = tabs!
+        .map(
+          (e) => _buildItem(
+            index: e.getIndex(),
+            icon: e.icon,
+            tabName: e.tabName,
+          ),
+        )
+        .toList();
     return BottomNavigationBar(
-      elevation: 0,
+      elevation: 10,
       selectedLabelStyle: TextStyle(
-        color: Colors.white,
+        color: Colors.grey,
       ),
 
       unselectedLabelStyle: TextStyle(color: Colors.grey),
       backgroundColor:
           Color.fromARGB(235, 34, 32, 48), //Color.fromARGB(255, 33, 31, 46),
       type: BottomNavigationBarType.fixed,
-      selectedItemColor: Colors.white,
+      selectedItemColor: AppState.currentTab > 0
+          ? Colors.grey
+          : Colors.white, // change this color based on selected item
 
-      items: tabs!
-          .map(
-            (e) => _buildItem(
-              index: e.getIndex(),
-              icon: e.icon,
-              tabName: e.tabName,
-            ),
-          )
-          .toList(),
+      items: _items,
       onTap: (index) => onSelectTab!(
         index,
       ),
@@ -46,9 +49,7 @@ class BottomNavigation extends StatelessWidget {
           icon,
           color: _tabColor(index: index),
         ),
-        // ignore: deprecated_member_use
         label: tabName,
-        backgroundColor: Colors.redAccent,
         tooltip: tabName);
   }
 
