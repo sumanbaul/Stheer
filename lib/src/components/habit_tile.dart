@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_iconpicker/IconPicker/icons.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 class HabitTile extends StatelessWidget {
@@ -71,7 +72,7 @@ class HabitTile extends StatelessWidget {
                       activeColor: Color.fromARGB(255, 45, 101, 110),
                       side: BorderSide(
                         color: habitCompleted
-                            ? Color.fromARGB(255, 64, 43, 141)
+                            ? Color.fromARGB(255, 209, 198, 250)
                             : Color.fromARGB(255, 230, 175, 182),
                         style: BorderStyle.solid,
                         strokeAlign: StrokeAlign.center,
@@ -86,19 +87,30 @@ class HabitTile extends StatelessWidget {
                           Text(
                             habitName,
                             style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
+                                color: habitCompleted
+                                    ? Colors.white
+                                    : Colors.black,
+                                fontSize: 22,
                                 fontWeight: FontWeight.bold),
                           ),
                           SizedBox(
                             height: 8,
                           ),
-                          Text(
-                            'other details',
-                            style: TextStyle(
-                                color: Colors.grey[800],
-                                fontSize: 12,
-                                fontWeight: FontWeight.normal),
+                          Row(
+                            children: [
+                              Text(
+                                habitCompleted
+                                    ? 'Completed'
+                                    : 'Tap to complete!',
+                                style: TextStyle(
+                                    color: habitCompleted
+                                        ? Colors.grey[100]
+                                        : Colors.grey[900],
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.normal),
+                              ),
+                              Icon(Icons.fireplace_rounded)
+                            ],
                           ),
                         ],
                       ),

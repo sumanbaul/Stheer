@@ -35,12 +35,17 @@ class AppState extends State<App> {
   AppState({required this.scaffoldKey}) {
     tabs = [
       TabItem(
-        tabName: "Home",
-        icon: Icons.notifications_active_outlined,
-        page: Homepage(
-          title: 'Stheer',
-          openNavigationDrawer: () => scaffoldKey.currentState!.openDrawer(),
-        ),
+        // tabName: "Home",
+        // icon: Icons.notifications_active_outlined,
+        // page: Homepage(
+        //   title: 'Stheer',
+        //   openNavigationDrawer: () => scaffoldKey.currentState!.openDrawer(),
+        // ),
+        tabName: "Habits",
+        icon: Icons.add_task_rounded,
+        page: HabitTracker(
+            //title: 'Habits Home',
+            ),
       ),
       TabItem(
         tabName: "Pomodoro",
@@ -56,20 +61,6 @@ class AppState extends State<App> {
       //   // page: HabitHubPage(
       //   //   title: 'Profile',
       //   // ),
-      // ),
-      TabItem(
-        tabName: "Habits",
-        icon: Icons.add_task_rounded,
-        page: HabitTracker(
-            //title: 'Pomodoro Home',
-            ),
-      ),
-      // TabItem(
-      //   tabName: "Pomodoro Home",
-      //   icon: Icons.settings,
-      //   page: PomodoroHome(
-      //     title: 'Pomodoro Home',
-      //   ),
       // ),
     ];
 
