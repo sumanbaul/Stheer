@@ -26,12 +26,12 @@ class HabitTracker extends StatefulWidget {
 class _HabitTrackerState extends State<HabitTracker>
     with SingleTickerProviderStateMixin {
   HabitDatabase db = HabitDatabase();
-  Icon? chosenIcon;
+  Icon? _chosenIcon;
   final _myBox = Hive.box("Habit_Database");
   DateTime _selectedDate = DateTime.now();
   late ConfettiController _confettiController;
-  late Animation<Color?> animation;
-  late AnimationController animationController;
+  late Animation<Color?> _animation;
+  late AnimationController _animationController;
   Color _habitColor = Colors.grey[200]!;
   @override
   void initState() {
@@ -80,7 +80,7 @@ class _HabitTrackerState extends State<HabitTracker>
             onCancel: cancelDialog,
             hintText: "Enter a new habit",
             onSelectIcon: pickIcon,
-            selectedIcon: chosenIcon ?? Icon(Icons.abc),
+            selectedIcon: _chosenIcon ?? Icon(Icons.abc),
           );
         });
   }
@@ -96,28 +96,28 @@ class _HabitTrackerState extends State<HabitTracker>
     );
 
     setState(() {
-      chosenIcon = Icon(icon);
+      _chosenIcon = Icon(icon);
     });
 
     debugPrint('Picked Icon:  $icon');
   }
 
   void initAnimation() {
-    animationController = AnimationController(
+    _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    animation = ColorTween(
+    _animation = ColorTween(
             begin: Colors.grey[200], end: Color.fromARGB(224, 105, 182, 189))
-        .animate(animationController)
+        .animate(_animationController)
       ..addListener(() {
         setState(() {
           // The state that has changed here is the animation object’s value.
-          _habitColor = animation.value!;
+          _habitColor = _animation.value!;
         });
       });
 
-    animationController.forward();
+    _animationController.forward();
   }
 
   //save new habit
@@ -186,7 +186,7 @@ class _HabitTrackerState extends State<HabitTracker>
     checkBoxTapped(habitCompleted, index);
     if (habitCompleted ?? false) {
       _confettiController.play();
-      animationController.forward();
+      _animationController.forward();
     } else {
       //animationController.reverse();
     }
@@ -199,6 +199,8 @@ class _HabitTrackerState extends State<HabitTracker>
 
     Navigator.of(context, rootNavigator: true).pop();
     db.updateDatabase(_selectedDate);
+
+    _newHabitController.clear();
   }
 
   //cancel new habit
@@ -228,7 +230,7 @@ class _HabitTrackerState extends State<HabitTracker>
   void dispose() {
     // dispose the controller
     _confettiController.dispose();
-    animationController.dispose();
+    _animationController.dispose();
     _newHabitController.dispose();
 
     super.dispose();
@@ -408,19 +410,31 @@ class _HabitTrackerState extends State<HabitTracker>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: EdgeInsets.only(top: 20, left: 20, right: 20),
-                child: Text(
-                  formatDateForView(_selectedDate),
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
+                padding: EdgeInsets.only(top: 15, left: 20, right: 20),
+                child: Container(
+                  padding:
+                      EdgeInsets.only(top: 3, left: 10, right: 10, bottom: 5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Color.fromARGB(19, 2, 170, 179),
+                  ),
+                  child: Text(
+                    formatDateForView(_selectedDate),
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(top: 20, bottom: 0, right: 20),
+                margin: EdgeInsets.only(top: 15, bottom: 0, right: 20),
                 padding: EdgeInsets.only(right: 0.0, top: 0, bottom: 0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Color.fromARGB(19, 2, 170, 179),
+                ),
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -483,13 +497,16 @@ class _HabitTrackerState extends State<HabitTracker>
               ? Padding(
                   padding:
                       const EdgeInsets.only(top: 0, left: 20.0, right: 20.0),
-                  child: Text(
-                    _selectedDate.isAfter(DateTime.now())
-                        ? "Come back tomorrow."
-                        : "No Habits to display. Start a Habit NOW!",
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 145, 145, 145),
-                      fontSize: 20,
+                  child: Center(
+                    heightFactor: 10,
+                    child: Text(
+                      _selectedDate.isAfter(DateTime.now())
+                          ? "Come back tomorrow."
+                          : "No Habits to display. Start a Habit NOW!",
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 145, 145, 145),
+                        fontSize: 22,
+                      ),
                     ),
                   ),
                 )
