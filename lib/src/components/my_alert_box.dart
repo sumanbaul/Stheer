@@ -27,7 +27,7 @@ class MyAlertBox extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Add Habit',
+              habitTextController.text == '' ? 'Add Habit' : 'Edit Habit',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
             ),
             Row(
@@ -35,7 +35,6 @@ class MyAlertBox extends StatelessWidget {
                 MaterialButton(
                   onPressed: onSelectIcon,
                   child: Text('Select Icon'),
-                  
                 ),
                 //selectedIcon != null ? Icon(selectedIcon.icon) : Text('blank'),
                 AnimatedSwitcher(
@@ -81,7 +80,7 @@ class MyAlertBox extends StatelessWidget {
         MaterialButton(
           onPressed: onSave,
           child: Text(
-            "Save",
+            habitTextController.text == "" ? 'Save' : 'Update',
             style: TextStyle(
               color: Colors.white,
             ),

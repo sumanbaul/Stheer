@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconpicker/flutter_iconpicker.dart';
@@ -12,7 +14,6 @@ import 'package:percent_indicator/percent_indicator.dart';
 import '../components/floating_action_btn.dart';
 import '../components/habit_navigator_material_button.dart';
 import '../components/habit_tile.dart';
-import '../components/monthly_summary_simpleheatmap.dart';
 import '../components/my_alert_box.dart';
 
 class HabitTracker extends StatefulWidget {
@@ -22,13 +23,16 @@ class HabitTracker extends StatefulWidget {
   State<HabitTracker> createState() => _HabitTrackerState();
 }
 
-class _HabitTrackerState extends State<HabitTracker> {
+class _HabitTrackerState extends State<HabitTracker>
+    with SingleTickerProviderStateMixin {
   HabitDatabase db = HabitDatabase();
   Icon? chosenIcon;
   final _myBox = Hive.box("Habit_Database");
   DateTime _selectedDate = DateTime.now();
-  ConfettiController confettiController =
-      ConfettiController(duration: const Duration(seconds: 1));
+  late ConfettiController _confettiController;
+  late Animation<Color?> animation;
+  late AnimationController animationController;
+  Color _habitColor = Colors.grey[200]!;
   @override
   void initState() {
     // if there is no current habit list, then this is the first time opening the app
@@ -38,7 +42,6 @@ class _HabitTrackerState extends State<HabitTracker> {
       db.createDefaultData();
       // _selectedDate = DateTime.now();
     }
-
     // there already exists data, this is not the first time
     else {
       db.loadData();
@@ -46,6 +49,11 @@ class _HabitTrackerState extends State<HabitTracker> {
     }
 
     db.updateDatabase(_selectedDate);
+    _confettiController =
+        ConfettiController(duration: const Duration(seconds: 1));
+
+    //animations
+    initAnimation();
 
     super.initState();
   }
@@ -92,6 +100,24 @@ class _HabitTrackerState extends State<HabitTracker> {
     });
 
     debugPrint('Picked Icon:  $icon');
+  }
+
+  void initAnimation() {
+    animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    animation = ColorTween(
+            begin: Colors.grey[200], end: Color.fromARGB(224, 105, 182, 189))
+        .animate(animationController)
+      ..addListener(() {
+        setState(() {
+          // The state that has changed here is the animation object’s value.
+          _habitColor = animation.value!;
+        });
+      });
+
+    animationController.forward();
   }
 
   //save new habit
@@ -150,7 +176,7 @@ class _HabitTrackerState extends State<HabitTracker> {
             onCancel: cancelDialog,
             hintText: db.todaysHabitList[index][0],
             onSelectIcon: pickIcon,
-            selectedIcon: chosenIcon!,
+            selectedIcon: Icon(Icons.abc),
           );
         });
   }
@@ -159,7 +185,10 @@ class _HabitTrackerState extends State<HabitTracker> {
     // todo calculations later on
     checkBoxTapped(habitCompleted, index);
     if (habitCompleted ?? false) {
-      confettiController.play();
+      _confettiController.play();
+      animationController.forward();
+    } else {
+      //animationController.reverse();
     }
   }
 
@@ -191,8 +220,18 @@ class _HabitTrackerState extends State<HabitTracker> {
   }
 
   void runConfetti() {
-    final ConfettiController confettiController =
-        ConfettiController(duration: const Duration(seconds: 1));
+    _confettiController =
+        ConfettiController(duration: const Duration(milliseconds: 500));
+  }
+
+  @override
+  void dispose() {
+    // dispose the controller
+    _confettiController.dispose();
+    animationController.dispose();
+    _newHabitController.dispose();
+
+    super.dispose();
   }
 
   // List<Widget> getHabitNavigatorButtons() {
@@ -419,6 +458,26 @@ class _HabitTrackerState extends State<HabitTracker> {
               )
             ],
           ),
+          new Align(
+            alignment: Alignment.center,
+
+            child: new ConfettiWidget(
+              blastDirectionality: BlastDirectionality.explosive,
+              //particleDrag: 0.3,
+              particleDrag: 0.1,
+              confettiController: _confettiController,
+              blastDirection: pi / 2,
+              maxBlastForce: 20,
+              minBlastForce: 1,
+              emissionFrequency: 0.05,
+
+              // 10 paticles will pop-up at a time
+              numberOfParticles: 10,
+              // particles will pop-up
+              gravity: 0,
+            ),
+            //: null,
+          ),
           //List of habits
           db.todaysHabitList.length == 0
               ? Padding(
@@ -447,7 +506,9 @@ class _HabitTrackerState extends State<HabitTracker> {
                       deleteTapped: (context) => deleteHabit(index),
                       habitsTapped: (context, habitCompleted) =>
                           habitsTapped(index, habitCompleted),
-                      confettiController: confettiController,
+                      habitBgColor: db.todaysHabitList[index][1]
+                          ? _habitColor
+                          : Colors.grey[200],
                     );
                   }),
                 ),

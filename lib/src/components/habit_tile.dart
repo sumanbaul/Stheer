@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:confetti/confetti.dart';
 
 class HabitTile extends StatelessWidget {
   final String habitName;
@@ -8,8 +7,8 @@ class HabitTile extends StatelessWidget {
   final Function(bool?)? onChanged;
   final Function(BuildContext?)? settingsTapped;
   final Function(BuildContext?)? deleteTapped;
+  final Color? habitBgColor;
   final Function(BuildContext?, bool?)? habitsTapped;
-  final ConfettiController confettiController;
 
   const HabitTile({
     Key? key,
@@ -19,7 +18,8 @@ class HabitTile extends StatelessWidget {
     required this.settingsTapped,
     required this.deleteTapped,
     required this.habitsTapped,
-    required this.confettiController,
+    required this.habitBgColor,
+    //required this.habitCompletedColor,
   }) : super(key: key);
 
   @override
@@ -48,10 +48,12 @@ class HabitTile extends StatelessWidget {
           ],
         ),
         child: Stack(children: [
-          Container(
+          AnimatedContainer(
+            duration: Duration(milliseconds: 300),
             padding: EdgeInsets.all(15),
             decoration: BoxDecoration(
-              color: Colors.grey[100],
+              color: habitBgColor,
+              //habitCompleted ? habitCompleteAnimation.value : Colors.white,
               borderRadius: BorderRadius.circular(15),
             ),
             child: Row(
@@ -66,9 +68,11 @@ class HabitTile extends StatelessWidget {
                       onChanged: (bool? newValue) =>
                           habitsTapped!(context, newValue),
                       //shape: OutlinedBorder.lerp(a, b, t),
-                      activeColor: Color.fromARGB(255, 89, 208, 230),
+                      activeColor: Color.fromARGB(255, 45, 101, 110),
                       side: BorderSide(
-                        color: Color.fromARGB(255, 230, 175, 182),
+                        color: habitCompleted
+                            ? Color.fromARGB(255, 64, 43, 141)
+                            : Color.fromARGB(255, 230, 175, 182),
                         style: BorderStyle.solid,
                         strokeAlign: StrokeAlign.center,
                       ),
@@ -103,7 +107,9 @@ class HabitTile extends StatelessWidget {
                 ),
                 Icon(
                   Icons.arrow_back_rounded,
-                  color: Colors.grey[400],
+                  color: habitCompleted
+                      ? Color.fromARGB(255, 45, 101, 110)
+                      : Colors.grey[400],
                 )
               ],
             ),
@@ -116,27 +122,31 @@ class HabitTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15),
                 onTap: () => habitsTapped!(context, !habitCompleted),
                 splashColor: Color.fromARGB(48, 153, 97, 218),
+                //child:
               ),
             ),
           ),
 
           // align the confetti on the screen
-          Align(
-            alignment: Alignment.center,
-            child: ConfettiWidget(
-              confettiController: confettiController,
-              //blastDirection: pi / 2,
-              maxBlastForce: 5,
-              minBlastForce: 1,
-              emissionFrequency: 0.03,
+          // Align(
+          //   alignment: Alignment.center,
+          //   child: ConfettiWidget(
+          //     blastDirectionality: BlastDirectionality.directional,
+          //     particleDrag: 0.3,
 
-              // 10 paticles will pop-up at a time
-              numberOfParticles: 10,
+          //     confettiController: confettiController,
+          //     blastDirection: pi,
+          //     maxBlastForce: 2,
+          //     minBlastForce: 1,
+          //     emissionFrequency: 0.03,
 
-              // particles will pop-up
-              gravity: 0,
-            ),
-          ),
+          //     // 10 paticles will pop-up at a time
+          //     numberOfParticles: 10,
+
+          //     // particles will pop-up
+          //     gravity: 0.2,
+          //   ),
+          // ),
           // Align(
           //   alignment: Alignment.topCenter,
           //   child: TextButton(
