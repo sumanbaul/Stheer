@@ -1,5 +1,5 @@
 import 'dart:ffi';
-import 'package:eraser/eraser.dart';
+// import 'package:eraser/eraser.dart';
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:flutter/material.dart';
@@ -52,7 +52,7 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (AppLifecycleState.resumed == state) {
-      Eraser.clearAllAppNotifications();
+      // Eraser.clearAllAppNotifications();
     }
   }
 
@@ -180,7 +180,7 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
     setState(() {
       started = false;
       _loading = false;
-      Eraser.clearAllAppNotifications();
+      //Eraser.clearAllAppNotifications();
     });
   }
 
@@ -291,7 +291,7 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
                     )),
                 onPressed: () {
                   setState(() {
-                    Eraser.clearAllAppNotifications();
+                    //Eraser.clearAllAppNotifications();
                   });
                 },
                 child: Text('History'),

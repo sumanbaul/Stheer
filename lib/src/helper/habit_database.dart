@@ -6,6 +6,7 @@ final _myBox = Hive.box("Habit_Database");
 
 class HabitDatabase {
   List todaysHabitList = [];
+  List todaysHabitListNew = [];
   Map<DateTime, int>? heatMapDataSet = {};
 
   //create initial default data
@@ -16,7 +17,13 @@ class HabitDatabase {
       ["Meditate", false],
     ];
 
+    todaysHabitListNew = [
+      ["Morning Run", false, 5],
+      ["Meditate", false, 0],
+    ];
+
     _myBox.put("START_DATE", todaysDateFormatted());
+    _myBox.put("CURRENT_HABIT_LIST", todaysHabitList);
   }
 
   // load data if it already exists
@@ -37,10 +44,10 @@ class HabitDatabase {
     }
   }
 
-  loadPreviousData(DateTime? date) {
+  void loadPreviousData(DateTime? date) {
     if ((_myBox.get(convertDateTimeToString(date!))) != null) {
       todaysHabitList = _myBox.get(convertDateTimeToString(date));
-      return todaysHabitList;
+      // todaysHabitList;
     } else {
       //(if _mybox.get(date) doesnt have data)
       //check if date is a future date than today
@@ -52,26 +59,34 @@ class HabitDatabase {
         }
         _myBox.put(convertDateTimeToString(date), todaysHabitList);
 
-        return todaysHabitList;
+        // return todaysHabitList;
+      } else {
+        todaysHabitList = [];
       }
-      return null;
     }
   }
 
   //update database
   void updateDatabase(DateTime selectedDate) {
+    var startDate = _myBox.get("START_DATE");
+
+    if (createDateTimeObject(startDate).isAfter(selectedDate)) {
+      _myBox.put("START_DATE", convertDateTimeToString(selectedDate));
+    }
+
     if (selectedDate == DateTime.now()) {
       // update todays entry
       _myBox.put(todaysDateFormatted(), todaysHabitList);
       //update universal habit list in case it changed (new habit, edit habit, delete habit)
       _myBox.put("CURRENT_HABIT_LIST", todaysHabitList);
-      calculateHabitPercentages(selectedDate);
-      loadHeatMap();
     } else {
-      _myBox.put(convertDateTimeToString(selectedDate), todaysHabitList);
-      calculateHabitPercentages(selectedDate);
-      loadHeatMap();
+      _myBox.put("${convertDateTimeToString(selectedDate)}", todaysHabitList);
+      //update universal habit list in case it changed (new habit, edit habit, delete habit)
+      _myBox.put("CURRENT_HABIT_LIST", todaysHabitList);
     }
+
+    calculateHabitPercentages(selectedDate);
+    loadHeatMap();
   }
 
   calculateHabitPercentages(DateTime selectedDate) {
@@ -135,7 +150,7 @@ class HabitDatabase {
       };
 
       heatMapDataSet?.addEntries(percentageForEachDay.entries);
-      print(heatMapDataSet);
+      //print(heatMapDataSet);
     }
   }
 }

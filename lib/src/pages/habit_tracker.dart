@@ -1,4 +1,6 @@
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:notifoo/src/components/monthly_summary_heatmap.dart';
@@ -8,7 +10,9 @@ import 'package:notifoo/src/pages/task_page.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 import '../components/floating_action_btn.dart';
+import '../components/habit_navigator_material_button.dart';
 import '../components/habit_tile.dart';
+import '../components/monthly_summary_simpleheatmap.dart';
 import '../components/my_alert_box.dart';
 
 class HabitTracker extends StatefulWidget {
@@ -20,9 +24,11 @@ class HabitTracker extends StatefulWidget {
 
 class _HabitTrackerState extends State<HabitTracker> {
   HabitDatabase db = HabitDatabase();
+  Icon? chosenIcon;
   final _myBox = Hive.box("Habit_Database");
   DateTime _selectedDate = DateTime.now();
-
+  ConfettiController confettiController =
+      ConfettiController(duration: const Duration(seconds: 1));
   @override
   void initState() {
     // if there is no current habit list, then this is the first time opening the app
@@ -65,8 +71,27 @@ class _HabitTrackerState extends State<HabitTracker> {
             onSave: saveNewHabit,
             onCancel: cancelDialog,
             hintText: "Enter a new habit",
+            onSelectIcon: pickIcon,
+            selectedIcon: chosenIcon ?? Icon(Icons.abc),
           );
         });
+  }
+
+  pickIcon() async {
+    IconData? icon = await FlutterIconPicker.showIconPicker(
+      context,
+      iconPackModes: [IconPack.lineAwesomeIcons],
+      showTooltips: true,
+      searchClearIcon: Icon(Icons.clear_outlined),
+      //adaptiveDialog: true,
+      iconColor: Colors.deepOrangeAccent[300],
+    );
+
+    setState(() {
+      chosenIcon = Icon(icon);
+    });
+
+    debugPrint('Picked Icon:  $icon');
   }
 
   //save new habit
@@ -97,11 +122,13 @@ class _HabitTrackerState extends State<HabitTracker> {
 
   //load previous/current data when clicked on date from Heatmap
   void loadPreviousData(DateTime dateTime) {
-    var _newHabitList = db.loadPreviousData(dateTime);
+    db.loadPreviousData(dateTime);
+    var _newHabitList = db.todaysHabitList;
     setState(() {
       _selectedDate = dateTime;
-      if (_newHabitList != null) {
+      if (_newHabitList.length > 0) {
         db.todaysHabitList = _newHabitList;
+        // db.updateDatabase(dateTime);
       } else {
         db.todaysHabitList = [];
       }
@@ -122,6 +149,8 @@ class _HabitTrackerState extends State<HabitTracker> {
             onSave: () => saveExistingHabit(index),
             onCancel: cancelDialog,
             hintText: db.todaysHabitList[index][0],
+            onSelectIcon: pickIcon,
+            selectedIcon: chosenIcon!,
           );
         });
   }
@@ -129,6 +158,9 @@ class _HabitTrackerState extends State<HabitTracker> {
   habitsTapped(int index, bool? habitCompleted) {
     // todo calculations later on
     checkBoxTapped(habitCompleted, index);
+    if (habitCompleted ?? false) {
+      confettiController.play();
+    }
   }
 
   void saveExistingHabit(int index) {
@@ -158,6 +190,75 @@ class _HabitTrackerState extends State<HabitTracker> {
     db.updateDatabase(_selectedDate);
   }
 
+  void runConfetti() {
+    final ConfettiController confettiController =
+        ConfettiController(duration: const Duration(seconds: 1));
+  }
+
+  // List<Widget> getHabitNavigatorButtons() {
+  //   List<Widget> _widgetList = <Widget>[];
+
+  //   if (_selectedDate == DateTime.now()) {
+  //     _widgetList.add(HabitNavigatorMaterialButton(
+  //       materialButtonOnPressed: (() {
+  //         if (_selectedDate == DateTime.now()) {
+  //           loadPreviousData(_selectedDate.subtract(Duration(days: 1)));
+  //         } else {
+  //           loadPreviousData(_selectedDate.subtract(Duration(days: 1)));
+  //         }
+  //       }),
+  //       materialButtonIcon: Icon(Icons.arrow_circle_left_rounded),
+  //       materialButtonText: "",
+  //     ));
+
+  //     _widgetList.add(HabitNavigatorMaterialButton(
+  //       materialButtonOnPressed: (() {
+  //         if (_selectedDate == DateTime.now()) {
+  //           loadPreviousData(_selectedDate.subtract(Duration(days: 1)));
+  //         } else {
+  //           loadPreviousData(_selectedDate.subtract(Duration(days: 1)));
+  //         }
+  //       }),
+  //       materialButtonIcon: Icon(Icons.arrow_circle_left_rounded),
+  //       materialButtonText: "",
+  //     ));
+  //   } else {
+  //     _widgetList.add(HabitNavigatorMaterialButton(
+  //       materialButtonOnPressed: (() {
+  //         loadPreviousData(DateTime.now());
+  //       }),
+  //       materialButtonIcon: Icon(Icons.arrow_circle_left_rounded),
+  //       materialButtonText: "Today",
+  //     ));
+
+  //     _widgetList.add(HabitNavigatorMaterialButton(
+  //       materialButtonOnPressed: (() {
+  //         if (_selectedDate == DateTime.now()) {
+  //           loadPreviousData(_selectedDate.subtract(Duration(days: 1)));
+  //         } else {
+  //           loadPreviousData(_selectedDate.subtract(Duration(days: 1)));
+  //         }
+  //       }),
+  //       materialButtonIcon: Icon(Icons.arrow_circle_left_rounded),
+  //       materialButtonText: "",
+  //     ));
+
+  //     _widgetList.add(HabitNavigatorMaterialButton(
+  //       materialButtonOnPressed: (() {
+  //         if (_selectedDate == DateTime.now()) {
+  //           loadPreviousData(_selectedDate.subtract(Duration(days: 1)));
+  //         } else {
+  //           loadPreviousData(_selectedDate.subtract(Duration(days: 1)));
+  //         }
+  //       }),
+  //       materialButtonIcon: Icon(Icons.arrow_circle_left_rounded),
+  //       materialButtonText: "",
+  //     ));
+  //   }
+
+  //   return _widgetList;
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -170,6 +271,7 @@ class _HabitTrackerState extends State<HabitTracker> {
         physics: PageScrollPhysics(),
 
         children: [
+          //TOP ROW
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -204,6 +306,7 @@ class _HabitTrackerState extends State<HabitTracker> {
                   ),
                 ],
               ),
+              //Profile container
               Container(
                 padding:
                     EdgeInsets.only(top: 25, left: 20, right: 20, bottom: 0),
@@ -211,7 +314,7 @@ class _HabitTrackerState extends State<HabitTracker> {
                   // Set the radius of the circle
                   radius: 20,
                   // Set the background color of the circle
-                  backgroundColor: Color.fromARGB(255, 89, 208, 230),
+                  backgroundColor: Color.fromARGB(195, 88, 77, 151),
                   // Set the foreground color of the text
                   foregroundColor: Colors.white,
                   // Set the text to display inside the circle
@@ -277,51 +380,42 @@ class _HabitTrackerState extends State<HabitTracker> {
                 ),
               ),
               Container(
-                //color: Colors.black,
                 margin: EdgeInsets.only(top: 20, bottom: 0, right: 20),
                 padding: EdgeInsets.only(right: 0.0, top: 0, bottom: 0),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    MaterialButton(
-                      visualDensity: VisualDensity.compact,
-                      onPressed: (() {
-                        if (_selectedDate == DateTime.now()) {
-                          loadPreviousData(
-                              _selectedDate.subtract(Duration(days: 1)));
-                        } else {
-                          loadPreviousData(
-                              _selectedDate.subtract(Duration(days: 1)));
-                        }
-                      }), //navigateToData(false),
-                      child: Icon(Icons.arrow_circle_left_rounded),
-                      elevation: 5,
-                      minWidth: 15,
-                      textColor: Color.fromARGB(255, 65, 56, 88),
-                    ),
-                    MaterialButton(
-                      visualDensity: VisualDensity.compact,
-
-                      onPressed: _selectedDate.isAfter(DateTime.now())
-                          ? null
-                          : () {
-                              if (_selectedDate == DateTime.now()) {
-                              } else {
-                                loadPreviousData(
-                                    _selectedDate.add(Duration(days: 1)));
-                              }
-                            },
-                      child: Icon(Icons.arrow_circle_right_rounded),
-                      elevation: 5,
-                      textColor: _selectedDate.isAfter(DateTime.now())
-                          ? Colors.grey
-                          : Color.fromARGB(
-                              255, 65, 56, 88), // Colors.amber[900],
-                      minWidth: 15.0,
-                    ),
-                  ],
-                ),
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      HabitNavigatorMaterialButton(
+                        materialButtonOnPressed: (() {
+                          if (_selectedDate == DateTime.now()) {
+                            loadPreviousData(
+                                _selectedDate.subtract(Duration(days: 1)));
+                          } else {
+                            loadPreviousData(
+                                _selectedDate.subtract(Duration(days: 1)));
+                          }
+                        }),
+                        materialButtonIcon:
+                            Icon(Icons.arrow_circle_left_rounded),
+                        materialButtonText: "",
+                      ),
+                      HabitNavigatorMaterialButton(
+                        materialButtonOnPressed:
+                            _selectedDate.isAfter(DateTime.now())
+                                ? null
+                                : () {
+                                    if (_selectedDate == DateTime.now()) {
+                                    } else {
+                                      loadPreviousData(
+                                          _selectedDate.add(Duration(days: 1)));
+                                    }
+                                  },
+                        materialButtonIcon:
+                            Icon(Icons.arrow_circle_right_rounded),
+                        materialButtonText: "",
+                      ),
+                    ]),
               )
             ],
           ),
@@ -353,6 +447,7 @@ class _HabitTrackerState extends State<HabitTracker> {
                       deleteTapped: (context) => deleteHabit(index),
                       habitsTapped: (context, habitCompleted) =>
                           habitsTapped(index, habitCompleted),
+                      confettiController: confettiController,
                     );
                   }),
                 ),

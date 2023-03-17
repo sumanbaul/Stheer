@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:confetti/confetti.dart';
 
 class HabitTile extends StatelessWidget {
   final String habitName;
@@ -8,6 +9,7 @@ class HabitTile extends StatelessWidget {
   final Function(BuildContext?)? settingsTapped;
   final Function(BuildContext?)? deleteTapped;
   final Function(BuildContext?, bool?)? habitsTapped;
+  final ConfettiController confettiController;
 
   const HabitTile({
     Key? key,
@@ -17,6 +19,7 @@ class HabitTile extends StatelessWidget {
     required this.settingsTapped,
     required this.deleteTapped,
     required this.habitsTapped,
+    required this.confettiController,
   }) : super(key: key);
 
   @override
@@ -116,6 +119,34 @@ class HabitTile extends StatelessWidget {
               ),
             ),
           ),
+
+          // align the confetti on the screen
+          Align(
+            alignment: Alignment.center,
+            child: ConfettiWidget(
+              confettiController: confettiController,
+              //blastDirection: pi / 2,
+              maxBlastForce: 5,
+              minBlastForce: 1,
+              emissionFrequency: 0.03,
+
+              // 10 paticles will pop-up at a time
+              numberOfParticles: 10,
+
+              // particles will pop-up
+              gravity: 0,
+            ),
+          ),
+          // Align(
+          //   alignment: Alignment.topCenter,
+          //   child: TextButton(
+          //       onPressed: () {
+          //         // invoking confettiController to come into play
+          //         confettiController.play();
+          //       },
+          //       child: Text('Center',
+          //           style: const TextStyle(color: Colors.white, fontSize: 20))),
+          // ),
         ]),
       ),
     );

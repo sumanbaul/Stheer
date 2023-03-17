@@ -51,7 +51,7 @@ class MonthlySummaryHeatmap extends StatelessWidget {
         startDate: createDateTimeObject(startDate)
             .subtract(Duration(days: 45)), //createDateTimeObject(startDate),
         //weekTextColor: Colors.blueGrey,
-        colorTipCount: 1,
+        colorTipCount: 8,
         colorTipHelper: [
           Text('ssssss'),
         ],
@@ -71,7 +71,7 @@ class MonthlySummaryHeatmap extends StatelessWidget {
         // colorTipCount: 10,
 
         // showText: true,
-        //scrollable: true,
+        scrollable: true,
         size: 30,
         colorsets: const {
           1: Color.fromARGB(19, 2, 170, 179),
