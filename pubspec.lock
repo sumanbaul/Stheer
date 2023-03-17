@@ -314,13 +314,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"
-  flutter_svg:
-    dependency: transitive
-    description:
-      name: flutter_svg
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.1.6"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -485,13 +478,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.8.0"
-  koukicons:
-    dependency: "direct main"
-    description:
-      name: koukicons
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.3"
   logging:
     dependency: transitive
     description:
@@ -548,20 +534,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.8.2"
-  path_drawing:
-    dependency: transitive
-    description:
-      name: path_drawing
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.1"
-  path_parsing:
-    dependency: transitive
-    description:
-      name: path_parsing
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.1"
   path_provider:
     dependency: transitive
     description:

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HabitTile extends StatelessWidget {
   final String habitName;
@@ -88,28 +89,51 @@ class HabitTile extends StatelessWidget {
                             style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 20,
+                                letterSpacing: 2.0,
                                 fontWeight: FontWeight.bold),
                           ),
                           SizedBox(
-                            height: 8,
+                            height: 10,
                           ),
-                          Text(
-                            'other details',
-                            style: TextStyle(
-                                color: Colors.grey[800],
-                                fontSize: 12,
-                                fontWeight: FontWeight.normal),
+                          Row(
+                            children: [
+                              Text(
+                                habitCompleted
+                                    ? 'Completed!'.toUpperCase()
+                                    : 'Tap to complete'.toUpperCase(),
+                                style: TextStyle(
+                                  color: Colors.grey[800],
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.normal,
+                                  letterSpacing: 2.0,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ),
                   ],
                 ),
-                Icon(
-                  Icons.arrow_back_rounded,
-                  color: habitCompleted
-                      ? Color.fromARGB(255, 45, 101, 110)
-                      : Colors.grey[400],
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: FaIcon(
+                        FontAwesomeIcons.fire,
+                        color: habitCompleted
+                            ? Color.fromARGB(197, 219, 56, 27)
+                            : Colors.grey[300],
+                        size: 25,
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_back_rounded,
+                      color: habitCompleted
+                          ? Color.fromARGB(255, 45, 101, 110)
+                          : Colors.grey[400],
+                    ),
+                  ],
                 )
               ],
             ),
