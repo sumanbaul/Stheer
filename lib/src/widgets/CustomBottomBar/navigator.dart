@@ -8,6 +8,7 @@ import 'package:stheer/src/widgets/CustomBottomBar/BottomNavigation.dart';
 import 'package:stheer/src/widgets/navigation/nav_drawer_widget.dart';
 
 import '../../../src/model/Notifications.dart';
+import '../../pages/Profile.dart';
 import 'TabItem.dart';
 
 class App extends StatefulWidget {
@@ -55,23 +56,23 @@ class AppState extends State<App> {
           title: 'Pomodoro',
         ),
       ),
-      // TabItem(
-      //   tabName: "Tasks",
-      //   icon: Icons.add_task_rounded,
-      //   page: TaskPage(),
-      //   // page: HabitHubPage(
-      //   //   title: 'Profile',
-      //   // ),
-      // ),
-
       TabItem(
-        tabName: "Profile",
-        icon: Icons.people,
-        page: SignIn(),
+        tabName: "Tasks",
+        icon: Icons.add_task_rounded,
+        page: TaskPage(),
         // page: HabitHubPage(
         //   title: 'Profile',
         // ),
       ),
+
+      // TabItem(
+      //   tabName: "Profile",
+      //   icon: Icons.people,
+      //   page: Profile(title: "Login"),
+      //   // page: HabitHubPage(
+      //   //   title: 'Profile',
+      //   // ),
+      // ),
     ];
 
     // indexing is necessary for proper funcationality

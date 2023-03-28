@@ -5,6 +5,13 @@ import 'package:stheer/src/helper/provider/google_sign_in.dart';
 import 'package:provider/provider.dart';
 
 class LoggedInWidget extends StatelessWidget {
+  final void Function()? logoutOnPressed;
+
+  LoggedInWidget({
+    Key? key,
+    required this.logoutOnPressed,
+  }) : super(key: key);
+
   //const LoggedInWidget({Key? key}) : super(key: key);
 
   //final FirebaseAuth firebaseAuth = FirebaseAuth.instance;

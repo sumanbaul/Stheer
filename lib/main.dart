@@ -84,7 +84,7 @@ class _MyAppState extends State<MyApp> {
               // When navigating to the "/splash" route, build the SecondScreen widget. // currently this is not in use
               //'/splash': (context) => SplashScreen(),
               '/home': (context) => HabitTracker(),
-              '/signin': (context) => SignIn(),
+              '/signin': (context) => Profile(),
               '/profile': (context) => Profile(title: "Profile"),
               //'/app': (context) => App(),
               '/pomodoro': (context) => Pomodoro(title: "Pomodoro"),

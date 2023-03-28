@@ -1,14 +1,23 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:stheer/src/helper/provider/google_sign_in.dart';
 import 'package:stheer/src/widgets/Topbar.dart';
 import 'package:provider/provider.dart';
 
 class SignIn extends StatelessWidget {
+  final GoogleSignInAccount? user;
+  final void Function()? signInOnPressed; // Good
+
   //SignIn({Key key, this.title}) : super(key: key);
 
   //final String title;
-  //const SignIn({Key? key}) : super(key: key);
+  SignIn({
+    Key? key,
+    required this.user,
+    required this.signInOnPressed,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -41,16 +50,16 @@ class SignIn extends StatelessWidget {
             ),
             Spacer(),
             ElevatedButton.icon(
-              onPressed: () {
-                final provider =
-                    Provider.of<GoogleSignInProvider>(context, listen: false);
-                provider.googleLogin();
-              },
+              onPressed: signInOnPressed,
+              // onPressed: () {
+              //   final provider =
+              //       Provider.of<GoogleSignInProvider>(context, listen: false);
+
+              //   //Navigator.pushNamedAndRemoveUntil(context, newRoute)
+              // },
               label: Text('Sign Up With Google'),
               icon: FaIcon(FontAwesomeIcons.google, color: Colors.red),
               style: ElevatedButton.styleFrom(
-                primary: Colors.white,
-                onPrimary: Colors.black,
                 minimumSize: Size(double.infinity, 50),
               ),
             )

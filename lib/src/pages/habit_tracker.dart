@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:confetti/confetti.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,6 +9,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:stheer/src/components/monthly_summary_heatmap.dart';
 import 'package:stheer/src/helper/datetime/date_time.dart';
 import 'package:stheer/src/helper/habit_database.dart';
+import 'package:stheer/src/pages/Profile.dart';
 import 'package:stheer/src/pages/task_page.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
@@ -28,6 +30,7 @@ class _HabitTrackerState extends State<HabitTracker>
   HabitDatabase db = HabitDatabase();
   Icon? _chosenIcon;
   final _myBox = Hive.box("Habit_Database");
+  final user = FirebaseAuth.instance.currentUser;
   DateTime _selectedDate = DateTime.now();
   late ConfettiController _confettiController;
   late Animation<Color?> _animation;
@@ -54,6 +57,15 @@ class _HabitTrackerState extends State<HabitTracker>
 
     //animations
     initAnimation();
+
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user == null) {
+        print('User is currently signed out!');
+        setState(() {});
+      } else {
+        print('User is signed in!');
+      }
+    });
 
     super.initState();
   }
@@ -337,7 +349,9 @@ class _HabitTrackerState extends State<HabitTracker>
                   Container(
                     padding: EdgeInsets.only(top: 0, left: 20, right: 20),
                     child: Text(
-                      "SUMAN, Good Day!",
+                      user != null
+                          ? "${user?.displayName!} Good Day!"
+                          : "Good day!",
                       style: GoogleFonts.barlowCondensed(
                         color: Color.fromARGB(255, 20, 20, 20),
                         fontSize: 15,
@@ -351,15 +365,26 @@ class _HabitTrackerState extends State<HabitTracker>
               Container(
                 padding:
                     EdgeInsets.only(top: 25, left: 20, right: 20, bottom: 0),
-                child: CircleAvatar(
-                  // Set the radius of the circle
-                  radius: 20,
-                  // Set the background color of the circle
-                  backgroundColor: Color.fromARGB(195, 88, 77, 151),
-                  // Set the foreground color of the text
-                  foregroundColor: Colors.white,
-                  // Set the text to display inside the circle
-                  child: Text('SB'),
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => Profile(
+                        title: "Profile",
+                      ),
+                    ),
+                  ),
+                  child: CircleAvatar(
+                    // Set the radius of the circle
+                    radius: 20,
+                    backgroundImage:
+                        user != null ? NetworkImage(user!.photoURL!) : null,
+                    // Set the background color of the circle
+                    backgroundColor: Color.fromARGB(195, 88, 77, 151),
+                    // Set the foreground color of the text
+                    foregroundColor: Colors.white,
+                    // Set the text to display inside the circle
+                    child: user == null ? Icon(Icons.people) : null,
+                  ),
                 ),
               ),
             ],

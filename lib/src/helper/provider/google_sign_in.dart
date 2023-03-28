@@ -23,7 +23,15 @@ class GoogleSignInProvider extends ChangeNotifier {
         idToken: googleAuth.idToken,
       );
 
-      await auth.signInWithCredential(credential);
+      UserCredential result = await auth.signInWithCredential(credential);
+      User? user = result.user;
+
+      if (result.user != null) {
+        //
+        // Navigator.push(
+        //     context, MaterialPageRoute(builder: (context) => HomePage()));
+        //return result;
+      }
     } catch (e) {
       print(e.toString());
     }
