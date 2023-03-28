@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:notifoo/src/helper/DatabaseHelper.dart';
-import 'package:notifoo/src/widgets/Topbar.dart';
+import 'package:stheer/src/helper/DatabaseHelper.dart';
+import 'package:stheer/src/widgets/Topbar.dart';
 
 class PomodoroBannerW extends StatefulWidget {
   PomodoroBannerW({Key? key}) : super(key: key);

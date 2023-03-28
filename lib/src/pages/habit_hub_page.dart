@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:notifoo/src/widgets/habits/habit_lister.dart';
-import 'package:notifoo/src/widgets/habits/show_form.dart';
-import 'package:notifoo/src/widgets/headers/subHeader.dart';
+import 'package:stheer/src/widgets/habits/habit_lister.dart';
+import 'package:stheer/src/widgets/habits/show_form.dart';
+import 'package:stheer/src/widgets/headers/subHeader.dart';
 
 import '../helper/DatabaseHelper.dart';
 import '../model/habits_model.dart';

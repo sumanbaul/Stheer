@@ -1,8 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:notifoo/src/helper/DatabaseHelper.dart';
-import 'package:notifoo/src/helper/datetime_ago.dart';
-import 'package:notifoo/src/model/list_detail_model.dart';
+import 'package:stheer/src/helper/DatabaseHelper.dart';
+import 'package:stheer/src/helper/datetime_ago.dart';
+import 'package:stheer/src/model/list_detail_model.dart';
 
 class NotificationDetailList extends StatefulWidget {
   // In the constructor, require a Todo.

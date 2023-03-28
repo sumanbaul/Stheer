@@ -1,4 +1,4 @@
-import 'package:notifoo/src/model/notificationCategory.dart';
+import 'package:stheer/src/model/notificationCategory.dart';
 
 import '../../src/model/Notifications.dart';
 import 'NotificationsHelper.dart';

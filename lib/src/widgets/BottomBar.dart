@@ -18,7 +18,7 @@ class BottomBar {
               icon: Icon(Icons.notification_add, color: Colors.white),
               onPressed: () {
                 Navigator.popAndPushNamed(context, '/'
-                    //NotificationsLog(title: "Notifoo"),
+                    //NotificationsLog(title: "stheer"),
                     );
               },
             ),

@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:notifoo/src/helper/provider/google_sign_in.dart';
-import 'package:notifoo/src/pages/Pomodoro.dart';
-import 'package:notifoo/src/pages/Profile.dart';
-import 'package:notifoo/src/pages/SignIn.dart';
-import 'package:notifoo/src/pages/habit_tracker.dart';
-import 'package:notifoo/src/widgets/CustomBottomBar/navigator.dart';
+import 'package:stheer/src/helper/provider/google_sign_in.dart';
+import 'package:stheer/src/pages/Pomodoro.dart';
+import 'package:stheer/src/pages/Profile.dart';
+import 'package:stheer/src/pages/SignIn.dart';
+import 'package:stheer/src/pages/habit_tracker.dart';
+import 'package:stheer/src/widgets/CustomBottomBar/navigator.dart';
 import 'src/helper/DatabaseHelper.dart';
 import 'package:provider/provider.dart';
 

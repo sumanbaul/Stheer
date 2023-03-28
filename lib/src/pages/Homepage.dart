@@ -4,13 +4,13 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:notifoo/src/components/notifications/notifications_banner.dart';
-import 'package:notifoo/src/widgets/Notifications/notifications_list_widget.dart';
-import 'package:notifoo/src/widgets/navigation/nav_drawer_widget.dart';
+import 'package:stheer/src/components/notifications/notifications_banner.dart';
+import 'package:stheer/src/widgets/Notifications/notifications_list_widget.dart';
+import 'package:stheer/src/widgets/navigation/nav_drawer_widget.dart';
 
-import 'package:notifoo/src/widgets/headers/subHeader.dart';
-import 'package:notifoo/src/widgets/home/home_banner_widget.dart';
-//import 'package:notifoo/widgets/navigation/nav_drawer.dart';
+import 'package:stheer/src/widgets/headers/subHeader.dart';
+import 'package:stheer/src/widgets/home/home_banner_widget.dart';
+//import 'package:stheer/widgets/navigation/nav_drawer.dart';
 import '../components/notifications/notifications_list.dart';
 import '../helper/NotificationsHelper.dart';
 import '../helper/notificationCatHelper.dart';
@@ -61,8 +61,8 @@ class _HomepageState extends State<Homepage> {
     NotificationsListener.initialize(callbackHandle: _callback);
     Notifications? _currentNotification;
     // this can fix restart<debug> can't handle error
-    IsolateNameServer.removePortNameMapping("_notifoolistener_");
-    IsolateNameServer.registerPortWithName(port.sendPort, "_notifoolistener_");
+    IsolateNameServer.removePortNameMapping("_stheerlistener_");
+    IsolateNameServer.registerPortWithName(port.sendPort, "_stheerlistener_");
 
     //IsolateNameServer.registerPortWithName(port.sendPort, "insta");
     port.listen((message) async {
@@ -102,7 +102,7 @@ class _HomepageState extends State<Homepage> {
     //   "send evt to ui: $evt",
     // );
     final SendPort? send =
-        IsolateNameServer.lookupPortByName("_notifoolistener_");
+        IsolateNameServer.lookupPortByName("_stheerlistener_");
     if (send == null) print("can't find the sender");
     send?.send(evt);
   }

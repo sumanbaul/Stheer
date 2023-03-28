@@ -5,11 +5,11 @@ import 'dart:ui';
 
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
-import 'package:notifoo/src/helper/AppListHelper.dart';
-import 'package:notifoo/src/helper/DatabaseHelper.dart';
-import 'package:notifoo/src/model/Notifications.dart';
-import 'package:notifoo/src/model/apps.dart';
-import 'package:notifoo/src/model/notification_lister_model.dart';
+import 'package:stheer/src/helper/AppListHelper.dart';
+import 'package:stheer/src/helper/DatabaseHelper.dart';
+import 'package:stheer/src/model/Notifications.dart';
+import 'package:stheer/src/model/apps.dart';
+import 'package:stheer/src/model/notification_lister_model.dart';
 
 class NotificationListerPageLogic {
   final NotificationListerModel _model;
@@ -23,8 +23,8 @@ class NotificationListerPageLogic {
     NotificationsListener.initialize(callbackHandle: _callback);
 
     // this can fix restart<debug> can't handle error
-    IsolateNameServer.removePortNameMapping("_notifoolistener_");
-    IsolateNameServer.registerPortWithName(port.sendPort, "_notifoolistener_");
+    IsolateNameServer.removePortNameMapping("_stheerlistener_");
+    IsolateNameServer.registerPortWithName(port.sendPort, "_stheerlistener_");
 
     //IsolateNameServer.registerPortWithName(port.sendPort, "insta");
     port.listen((message) => onData(message));
@@ -51,7 +51,7 @@ class NotificationListerPageLogic {
     //   "send evt to ui: $evt",
     // );
     final SendPort? send =
-        IsolateNameServer.lookupPortByName("_notifoolistener_");
+        IsolateNameServer.lookupPortByName("_stheerlistener_");
     if (send == null) print("can't find the sender");
     send?.send(evt);
   }
@@ -64,7 +64,7 @@ class NotificationListerPageLogic {
     if (event.packageName!.contains("skydrive") ||
         (event.packageName!.contains("service")) ||
         // (event.packageName.contains("android")) ||
-        (event.packageName!.contains("notifoo")) ||
+        (event.packageName!.contains("stheer")) ||
         (event.packageName!.contains("screenshot")) ||
         (event.title!.contains("WhatsApp")) ||
         (event.packageName!.contains("deskclock")) ||
@@ -192,7 +192,7 @@ class NotificationListerPageLogic {
 
     if (!isR) {
       await NotificationsListener.startService(
-        title: "Notifoo listening",
+        title: "Stheer listening",
         description: "Let's scrape the notifactions...",
         subTitle: "Service",
         //foreground: AppButtonAction(),

@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:notifoo/src/pages/SignIn.dart';
-import 'package:notifoo/src/widgets/LoggedInWidget.dart';
+import 'package:stheer/src/pages/SignIn.dart';
+import 'package:stheer/src/widgets/LoggedInWidget.dart';
 
 // class Profile extends StatefulWidget {
 //   Profile({Key key, this.title}) : super(key: key);

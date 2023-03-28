@@ -1,9 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:notifoo/src/model/habits_model.dart';
-import 'package:notifoo/src/widgets/habits/data/habit_card_menu_items.dart';
-import 'package:notifoo/src/widgets/habits/habit_card_menu_item.dart';
-import 'package:notifoo/src/widgets/habits/show_form.dart';
+import 'package:stheer/src/model/habits_model.dart';
+import 'package:stheer/src/widgets/habits/data/habit_card_menu_items.dart';
+import 'package:stheer/src/widgets/habits/habit_card_menu_item.dart';
+import 'package:stheer/src/widgets/habits/show_form.dart';
 import 'package:path/path.dart';
 
 class HabitListerWidget extends StatelessWidget {

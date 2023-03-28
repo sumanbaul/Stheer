@@ -4,9 +4,9 @@ import 'dart:isolate';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
-import 'package:notifoo/src/model/notificationCategory.dart';
-// import 'package:notifoo/pages/Homepage.dart';
-// import 'package:notifoo/widgets/home/home_banner_widget.dart';
+import 'package:stheer/src/model/notificationCategory.dart';
+// import 'package:stheer/pages/Homepage.dart';
+// import 'package:stheer/widgets/home/home_banner_widget.dart';
 
 import '../../helper/NotificationsHelper.dart';
 import '../../helper/notificationCatHelper.dart';
@@ -90,8 +90,8 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
     NotificationsListener.initialize(callbackHandle: _callback);
     Notifications? _currentNotification;
     // this can fix restart<debug> can't handle error
-    IsolateNameServer.removePortNameMapping("_notifoolistener_");
-    IsolateNameServer.registerPortWithName(port.sendPort, "_notifoolistener_");
+    IsolateNameServer.removePortNameMapping("_stheerlistener_");
+    IsolateNameServer.registerPortWithName(port.sendPort, "_stheerlistener_");
 
     //IsolateNameServer.registerPortWithName(port.sendPort, "insta");
     port.listen((message) async {
@@ -140,7 +140,7 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
     //   "send evt to ui: $evt",
     // );
     final SendPort? send =
-        IsolateNameServer.lookupPortByName("_notifoolistener_");
+        IsolateNameServer.lookupPortByName("_stheerlistener_");
     if (send == null) print("can't find the sender");
     send?.send(evt);
   }

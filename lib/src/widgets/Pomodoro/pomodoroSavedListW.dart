@@ -1,8 +1,8 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:notifoo/src/helper/DatabaseHelper.dart';
-import 'package:notifoo/src/model/pomodoro_timer.dart';
+import 'package:stheer/src/helper/DatabaseHelper.dart';
+import 'package:stheer/src/model/pomodoro_timer.dart';
 
 class PomodoroSavedListW extends StatefulWidget {
   PomodoroSavedListW({Key? key, this.screenheight}) : super(key: key);

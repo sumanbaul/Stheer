@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:notifoo/src/components/monthly_summary_heatmap.dart';
-import 'package:notifoo/src/helper/datetime/date_time.dart';
-import 'package:notifoo/src/helper/habit_database.dart';
-import 'package:notifoo/src/pages/task_page.dart';
+import 'package:stheer/src/components/monthly_summary_heatmap.dart';
+import 'package:stheer/src/helper/datetime/date_time.dart';
+import 'package:stheer/src/helper/habit_database.dart';
+import 'package:stheer/src/pages/task_page.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 import '../components/floating_action_btn.dart';

@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:notifoo/src/helper/DatabaseHelper.dart';
-import 'package:notifoo/src/model/pomodoro_timer.dart';
-import 'package:notifoo/src/widgets/Topbar.dart';
-import 'package:notifoo/src/widgets/button_widget.dart';
+import 'package:stheer/src/helper/DatabaseHelper.dart';
+import 'package:stheer/src/model/pomodoro_timer.dart';
+import 'package:stheer/src/widgets/Topbar.dart';
+import 'package:stheer/src/widgets/button_widget.dart';
 
 class Pomodoro extends StatefulWidget {
   Pomodoro({Key? key, this.title}) : super(key: key);

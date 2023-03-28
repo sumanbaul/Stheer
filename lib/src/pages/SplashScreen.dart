@@ -2,12 +2,12 @@ import 'dart:collection';
 
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
-import 'package:notifoo/src/helper/AppListHelper.dart';
-import 'package:notifoo/src/model/Notifications.dart';
+import 'package:stheer/src/helper/AppListHelper.dart';
+import 'package:stheer/src/model/Notifications.dart';
 import 'dart:async';
 
-import 'package:notifoo/src/model/apps.dart';
-import 'package:notifoo/src/services/installedApps.dart';
+import 'package:stheer/src/model/apps.dart';
+import 'package:stheer/src/services/installedApps.dart';
 
 import '../helper/DatabaseHelper.dart';
 

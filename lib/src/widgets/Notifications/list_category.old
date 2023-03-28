@@ -4,13 +4,13 @@ import 'package:collection/collection.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter/rendering.dart';
-//import 'package:notifoo/helper/AppListHelper.dart';
-import 'package:notifoo/helper/DatabaseHelper.dart';
-import 'package:notifoo/helper/datetime_ago.dart';
-import 'package:notifoo/model/Notifications.dart';
-//import 'package:notifoo/model/apps.dart';
-import 'package:notifoo/model/notificationCategory.dart';
-import 'package:notifoo/src/widgets/Notifications/list_detail.dart';
+//import 'package:stheer/helper/AppListHelper.dart';
+import 'package:stheer/helper/DatabaseHelper.dart';
+import 'package:stheer/helper/datetime_ago.dart';
+import 'package:stheer/model/Notifications.dart';
+//import 'package:stheer/model/apps.dart';
+import 'package:stheer/model/notificationCategory.dart';
+import 'package:stheer/src/widgets/Notifications/list_detail.dart';
 
 class NotificationCatgoryList extends StatefulWidget {
   NotificationCatgoryList({Key? key, this.title}) : super(key: key);

@@ -11,8 +11,13 @@ class FloatingActionBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     return FloatingActionButton(
       onPressed: onPressed,
-      child: Icon(Icons.my_library_add_outlined),
-      backgroundColor: Color.fromARGB(255, 89, 208, 230),
+      child: Icon(
+        Icons.my_library_add_outlined,
+        color: Colors.white,
+      ),
+      backgroundColor: Color.fromARGB(235, 34, 32, 48),
+      elevation: 10,
+      tooltip: 'Add New Habit', // Color.fromARGB(255, 89, 208, 230),
     );
   }
 }

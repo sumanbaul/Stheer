@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:notifoo/src/pages/Homepage.dart';
-import 'package:notifoo/src/pages/Pomodoro.dart';
-import 'package:notifoo/src/pages/habit_tracker.dart';
-import 'package:notifoo/src/pages/task_page.dart';
-import 'package:notifoo/src/widgets/CustomBottomBar/BottomNavigation.dart';
-import 'package:notifoo/src/widgets/navigation/nav_drawer_widget.dart';
+import 'package:stheer/src/pages/Homepage.dart';
+import 'package:stheer/src/pages/Pomodoro.dart';
+import 'package:stheer/src/pages/SignIn.dart';
+import 'package:stheer/src/pages/habit_tracker.dart';
+import 'package:stheer/src/pages/task_page.dart';
+import 'package:stheer/src/widgets/CustomBottomBar/BottomNavigation.dart';
+import 'package:stheer/src/widgets/navigation/nav_drawer_widget.dart';
 
 import '../../../src/model/Notifications.dart';
 import 'TabItem.dart';
@@ -62,6 +63,15 @@ class AppState extends State<App> {
       //   //   title: 'Profile',
       //   // ),
       // ),
+
+      TabItem(
+        tabName: "Profile",
+        icon: Icons.people,
+        page: SignIn(),
+        // page: HabitHubPage(
+        //   title: 'Profile',
+        // ),
+      ),
     ];
 
     // indexing is necessary for proper funcationality

@@ -1,4 +1,4 @@
-name: notifoo
+name: stheer
 description: Stheer - An app to correct phone addiction and converting a person into a better focussed human individual.
 
 # The following line prevents the package from being accidentally published to
@@ -22,6 +22,7 @@ dependencies:
 
 
   # Google Sign in
+  firebase_core: ^2.8.0
   firebase_auth: ^4.2.6
   google_sign_in: ^5.2.4
 

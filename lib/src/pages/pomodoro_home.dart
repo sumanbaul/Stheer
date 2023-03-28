@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:notifoo/src/widgets/Pomodoro/BannerPomodoro.dart';
-import 'package:notifoo/src/widgets/Pomodoro/PomodoroTaskWidget.dart';
-import 'package:notifoo/src/widgets/Pomodoro/pomodoroSavedListW.dart';
-import 'package:notifoo/src/widgets/Topbar.dart';
-import 'package:notifoo/src/widgets/headline.dart';
-import 'package:notifoo/src/widgets/home/home_banner_widget.dart';
+import 'package:stheer/src/widgets/Pomodoro/BannerPomodoro.dart';
+import 'package:stheer/src/widgets/Pomodoro/PomodoroTaskWidget.dart';
+import 'package:stheer/src/widgets/Pomodoro/pomodoroSavedListW.dart';
+import 'package:stheer/src/widgets/Topbar.dart';
+import 'package:stheer/src/widgets/headline.dart';
+import 'package:stheer/src/widgets/home/home_banner_widget.dart';
 
 class PomodoroHome extends StatefulWidget {
   PomodoroHome({Key? key, this.title}) : super(key: key);

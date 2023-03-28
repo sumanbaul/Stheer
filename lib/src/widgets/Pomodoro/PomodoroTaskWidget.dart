@@ -67,7 +67,7 @@ Widget _calendarWidget() {
                 ),
               ),
               Text(
-                'Work on Notifoo App',
+                'Work on Stheer App',
                 textAlign: TextAlign.left,
                 overflow: TextOverflow.clip,
                 style: TextStyle(
