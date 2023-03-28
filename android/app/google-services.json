@@ -1,78 +1,49 @@
 {
   "project_info": {
-    "project_number": "176666661643",
-    "project_id": "notifoo-f78f3",
-    "storage_bucket": "notifoo-f78f3.appspot.com"
+    "project_number": "1029185301301",
+    "project_id": "stheer-f46ab",
+    "storage_bucket": "stheer-f46ab.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:176666661643:android:7ad21cb30eeb9728e9480e",
+        "mobilesdk_app_id": "1:1029185301301:android:197294501a1e68fcad3a7c",
         "android_client_info": {
-          "package_name": "com.devxstudio.notifoo"
+          "package_name": "com.mindflo.stheer"
         }
       },
       "oauth_client": [
         {
-          "client_id": "176666661643-6n2kpe0bd31mtav9e2qv6rfo9o8jcker.apps.googleusercontent.com",
+          "client_id": "1029185301301-es91b8mfkk8jjhvgrgneu3qbtf57fp8r.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.devxstudio.notifoo",
-            "certificate_hash": "53d60e557884fce85b1ce2760a8854972a8dd22b"
+            "package_name": "com.mindflo.stheer",
+            "certificate_hash": "1c379f45655675a26c25cc75023352c574ac41b0"
           }
         },
         {
-          "client_id": "176666661643-3d28mf37hbm074kig62fdgtn0k9o1jl8.apps.googleusercontent.com",
+          "client_id": "1029185301301-lb8m0q5n8ouah51o7pus6gs8mq82ck8h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mindflo.stheer",
+            "certificate_hash": "6b7b6b525c2e3e821eb625a2502052ffea5eef4c"
+          }
+        },
+        {
+          "client_id": "1029185301301-7gtef0jeq2t3elgt3u1s5l70gcti6780.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyA6ytpnnAAyIpFrIv6TN1mdjnVXx2yes6E"
+          "current_key": "AIzaSyDZsRnAz5OZuio5kBT8KkAD85juUFwKFMM"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "176666661643-3d28mf37hbm074kig62fdgtn0k9o1jl8.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:176666661643:android:3079dfcc0f3924eee9480e",
-        "android_client_info": {
-          "package_name": "com.example.notifoo"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "176666661643-c6bh60fjbiddhhe8n66uasj976ja6sgb.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.notifoo",
-            "certificate_hash": "81f107cabebeb77499a20a0b36660f830f9901fa"
-          }
-        },
-        {
-          "client_id": "176666661643-3d28mf37hbm074kig62fdgtn0k9o1jl8.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyA6ytpnnAAyIpFrIv6TN1mdjnVXx2yes6E"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "176666661643-3d28mf37hbm074kig62fdgtn0k9o1jl8.apps.googleusercontent.com",
+              "client_id": "1029185301301-54paurdqpha7khiq9k93voghg3fl99jk.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
