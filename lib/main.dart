@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:stheer/src/helper/provider/google_sign_in.dart';
+import 'package:stheer/src/helper/routes/routes.dart';
 import 'package:stheer/src/pages/Pomodoro.dart';
 import 'package:stheer/src/pages/Profile.dart';
 import 'package:stheer/src/pages/SignIn.dart';
@@ -23,7 +24,7 @@ Future main() async {
   await Hive.initFlutter();
   //open a box
   await Hive.openBox("Habit_Database");
-
+  await Hive.openBox("User_Database");
   runApp(MyApp());
 }
 
@@ -33,6 +34,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final _isUserLogged = GoogleSignInProvider().isLogged();
+
   @override
   void initState() {
     super.initState();
@@ -77,18 +80,8 @@ class _MyAppState extends State<MyApp> {
               ),
             ),
             //theme: ThemeData(primarySwatch: Colors.yellow),
-            initialRoute: '/',
-            routes: {
-              // When navigating to the "/" route, build the FirstScreen widget.
-              '/': (context) => App(),
-              // When navigating to the "/splash" route, build the SecondScreen widget. // currently this is not in use
-              //'/splash': (context) => SplashScreen(),
-              '/home': (context) => HabitTracker(),
-              '/signin': (context) => Profile(),
-              '/profile': (context) => Profile(title: "Profile"),
-              //'/app': (context) => App(),
-              '/pomodoro': (context) => Pomodoro(title: "Pomodoro"),
-            },
+            initialRoute: _isUserLogged ? '/' : '/profile',
+            routes: Routes().getRoute(),
           ),
         ),
       );

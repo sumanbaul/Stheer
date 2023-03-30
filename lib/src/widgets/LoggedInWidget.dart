@@ -1,8 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:stheer/src/components/my_alert_box.dart';
 import 'package:stheer/src/helper/provider/google_sign_in.dart';
 import 'package:provider/provider.dart';
+import 'package:stheer/src/helper/routes/routes.dart';
+
+import 'CustomBottomBar/navigator.dart';
 
 class LoggedInWidget extends StatelessWidget {
   final void Function()? logoutOnPressed;

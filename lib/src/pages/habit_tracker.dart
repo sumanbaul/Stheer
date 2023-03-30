@@ -10,7 +10,6 @@ import 'package:stheer/src/components/monthly_summary_heatmap.dart';
 import 'package:stheer/src/helper/datetime/date_time.dart';
 import 'package:stheer/src/helper/habit_database.dart';
 import 'package:stheer/src/pages/Profile.dart';
-import 'package:stheer/src/pages/task_page.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 import '../components/floating_action_btn.dart';
@@ -61,9 +60,14 @@ class _HabitTrackerState extends State<HabitTracker>
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user == null) {
         print('User is currently signed out!');
-        setState(() {});
+        setState(() {
+          user;
+        });
       } else {
         print('User is signed in!');
+        setState(() {
+          user;
+        });
       }
     });
 
@@ -447,7 +451,7 @@ class _HabitTrackerState extends State<HabitTracker>
                     formatDateForView(_selectedDate),
                     style: TextStyle(
                       color: Colors.black,
-                      fontSize: 30,
+                      fontSize: 26,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
