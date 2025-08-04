@@ -1,0 +1,9 @@
+// import 'package:realm/realm.dart';
+
+// @RealmModel()
+// class Task {
+//   @PrimaryKey()
+//   late final String taskName;
+//   late String? taskType;
+//   late int? repititionCount;
+// }
