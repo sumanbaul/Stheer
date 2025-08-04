@@ -163,6 +163,7 @@ class _TaskPageState extends State<TaskPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'task_add_button',
         onPressed: () => _showAddTaskForm(),
         child: Icon(Icons.add),
         backgroundColor: Theme.of(context).colorScheme.primary,

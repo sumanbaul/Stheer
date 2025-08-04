@@ -10,6 +10,7 @@ class FloatingActionBtn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
+      heroTag: 'floating_action_btn',
       onPressed: onPressed,
       child: Icon(
         Icons.my_library_add_outlined,

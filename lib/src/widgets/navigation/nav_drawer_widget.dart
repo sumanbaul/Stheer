@@ -1,36 +1,42 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:notifoo/src/pages/Homepage.dart';
 import 'package:notifoo/src/pages/Pomodoro.dart';
 import 'package:notifoo/src/pages/Profile.dart';
-import 'package:notifoo/src/pages/TestPage.dart';
+import 'package:notifoo/src/pages/SignIn.dart';
 import 'package:notifoo/src/pages/habit_hub_page.dart';
+import 'package:notifoo/src/pages/task_page.dart';
+import 'package:notifoo/src/pages/insights_page.dart';
+import 'package:notifoo/src/pages/settings_page.dart';
+import 'package:notifoo/src/pages/pomodoro_home.dart';
 
-class NavigationDrawerWidget extends StatelessWidget {
+class NavigationDrawerWidget extends StatefulWidget {
+  @override
+  _NavigationDrawerWidgetState createState() => _NavigationDrawerWidgetState();
+}
+
+class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
   final padding = EdgeInsets.symmetric(horizontal: 20);
   final user = FirebaseAuth.instance.currentUser;
+  
   @override
   Widget build(BuildContext context) {
-    final name = user != null ? user!.displayName : '';
-    final email = user != null ? user!.email : '';
-    final backupImg =
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80';
+    final name = user != null ? user!.displayName : 'Guest User';
+    final email = user != null ? user!.email : 'Sign in to sync data';
+    final backupImg = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80';
     final urlImage = user != null ? user!.photoURL : backupImg;
-    //'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80';
 
     return Drawer(
       child: Material(
-        color: Color.fromRGBO(50, 75, 205, 1),
+        color: Theme.of(context).colorScheme.surface,
         child: ListView(
           children: <Widget>[
             buildHeader(
-                urlImage: urlImage, name: name, email: email, onClicked: () {}
-                // onClicked: () => Navigator.of(context).push(MaterialPageRoute(
-                //   builder: (context) => UserPage(
-                //     name: 'Sarah Abs',
-                //     urlImage: urlImage,
-                //   ),
-                // )),
-                ),
+              urlImage: urlImage, 
+              name: name, 
+              email: email, 
+              onClicked: () => _handleProfileTap(context, user),
+            ),
             Container(
               padding: padding,
               child: Column(
@@ -38,47 +44,135 @@ class NavigationDrawerWidget extends StatelessWidget {
                   const SizedBox(height: 12),
                   buildSearchField(),
                   const SizedBox(height: 24),
-                  buildMenuItem(
-                    text: 'Profile',
-                    icon: Icons.people,
-                    onClicked: () => selectedItem(context, 0),
-                  ),
-                  const SizedBox(height: 16),
-                  buildMenuItem(
-                    text: 'Favourites',
-                    icon: Icons.favorite_border,
-                    onClicked: () => selectedItem(context, 1),
-                  ),
-                  const SizedBox(height: 16),
-                  buildMenuItem(
-                    text: 'Workflow',
-                    icon: Icons.workspaces_outline,
-                    onClicked: () => selectedItem(context, 2),
-                  ),
-                  const SizedBox(height: 16),
-                  buildMenuItem(
-                    text: 'Updates',
-                    icon: Icons.update,
-                    onClicked: () => selectedItem(context, 3),
-                  ),
-                  const SizedBox(height: 24),
-                  Divider(color: Colors.white70),
-                  const SizedBox(height: 24),
-                  buildMenuItem(
-                    text: 'Plugins',
-                    icon: Icons.account_tree_outlined,
-                    onClicked: () => selectedItem(context, 4),
-                  ),
-                  const SizedBox(height: 16),
+                  
+                  // Main Navigation Section
+                  _buildSectionTitle('Main'),
+                  const SizedBox(height: 8),
                   buildMenuItem(
                     text: 'Alerts',
                     icon: Icons.notifications_outlined,
-                    onClicked: () => selectedItem(context, 5),
+                    onClicked: () => _navigateToPage(context, 0),
                   ),
+                  buildMenuItem(
+                    text: 'Habits',
+                    icon: Icons.track_changes_outlined,
+                    onClicked: () => _navigateToPage(context, 1),
+                  ),
+                  buildMenuItem(
+                    text: 'Timer',
+                    icon: Icons.timer_outlined,
+                    onClicked: () => _navigateToPage(context, 2),
+                  ),
+                  buildMenuItem(
+                    text: 'Tasks',
+                    icon: Icons.task_outlined,
+                    onClicked: () => _navigateToPage(context, 3),
+                  ),
+                  buildMenuItem(
+                    text: 'Stats',
+                    icon: Icons.analytics_outlined,
+                    onClicked: () => _navigateToPage(context, 4),
+                  ),
+                  
+                  const SizedBox(height: 24),
+                  Divider(color: Theme.of(context).colorScheme.outline.withOpacity(0.2)),
+                  const SizedBox(height: 16),
+                  
+                  // Account Section
+                  _buildSectionTitle('Account'),
+                  const SizedBox(height: 8),
+                  buildMenuItem(
+                    text: 'Profile',
+                    icon: Icons.person_outline,
+                    onClicked: () => _navigateToPage(context, 5),
+                  ),
+                  buildMenuItem(
+                    text: 'Settings',
+                    icon: Icons.settings_outlined,
+                    onClicked: () => _navigateToPage(context, 6),
+                  ),
+                  
+                  const SizedBox(height: 24),
+                  Divider(color: Theme.of(context).colorScheme.outline.withOpacity(0.2)),
+                  const SizedBox(height: 16),
+                  
+                  // Other Section
+                  _buildSectionTitle('Other'),
+                  const SizedBox(height: 8),
+                  buildMenuItem(
+                    text: 'Help & Support',
+                    icon: Icons.help_outline,
+                    onClicked: () => _navigateToPage(context, 7),
+                  ),
+                  buildMenuItem(
+                    text: 'About',
+                    icon: Icons.info_outline,
+                    onClicked: () => _navigateToPage(context, 8),
+                  ),
+                  
+                  const SizedBox(height: 24),
+                  
+                  // Sign In/Out Button
+                  if (user == null)
+                    _buildSignInButton(context)
+                  else
+                    _buildSignOutButton(context),
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: EdgeInsets.only(left: 4, bottom: 4),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: Colors.grey[600],
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSignInButton(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: () => _navigateToSignIn(context),
+        icon: Icon(Icons.login, size: 18),
+        label: Text('Sign In with Google'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor: Colors.white,
+          padding: EdgeInsets.symmetric(vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSignOutButton(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: () => _signOut(context),
+        icon: Icon(Icons.logout, size: 18),
+        label: Text('Sign Out'),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.red,
+          padding: EdgeInsets.symmetric(vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
         ),
       ),
     );
@@ -90,81 +184,69 @@ class NavigationDrawerWidget extends StatelessWidget {
     String? email,
     VoidCallback? onClicked,
   }) {
-    var _padding = EdgeInsets.symmetric(vertical: 40);
-    if (user == null) {
-      return InkWell(
-        onTap: onClicked,
-        child: Container(
-          padding: padding.add(_padding),
-          child: Row(
-            children: [
-              SizedBox(width: 20),
-              Text('Login'),
-              Spacer(),
-            ],
-          ),
-        ),
-      );
-    } else {
-      return InkWell(
-        onTap: onClicked,
-        child: Container(
-          padding: padding.add(EdgeInsets.symmetric(vertical: 40)),
-          child: Row(
-            children: [
-              CircleAvatar(
-                  radius: 30, backgroundImage: NetworkImage(urlImage!)),
-              SizedBox(width: 10),
-              Container(
-                width: 140,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name!,
-                      style: TextStyle(fontSize: 20, color: Colors.white),
+    return InkWell(
+      onTap: onClicked,
+      child: Container(
+        padding: padding.add(EdgeInsets.symmetric(vertical: 40)),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 30,
+              backgroundImage: NetworkImage(urlImage!),
+            ),
+            SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name!,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      email!,
-                      style: TextStyle(fontSize: 14, color: Colors.white),
-                      overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    email!,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                     ),
-                  ],
-                ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
-              Spacer(),
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: Color.fromRGBO(30, 60, 168, 1),
-                child: Icon(Icons.add_comment_outlined, color: Colors.white),
-              )
-            ],
-          ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            ),
+          ],
         ),
-      );
-    }
+      ),
+    );
   }
 
   Widget buildSearchField() {
-    final color = Colors.white;
-
     return TextField(
-      style: TextStyle(color: color),
+      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       decoration: InputDecoration(
-        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-        hintText: 'Search',
-        hintStyle: TextStyle(color: color),
-        prefixIcon: Icon(Icons.search, color: color),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        hintText: 'Search...',
+        hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
+        prefixIcon: Icon(Icons.search, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
         filled: true,
-        fillColor: Colors.white12,
+        fillColor: Theme.of(context).colorScheme.surface,
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5),
-          borderSide: BorderSide(color: color.withOpacity(0.7)),
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.2)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5),
-          borderSide: BorderSide(color: color.withOpacity(0.7)),
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
         ),
       ),
     );
@@ -175,38 +257,178 @@ class NavigationDrawerWidget extends StatelessWidget {
     IconData? icon,
     VoidCallback? onClicked,
   }) {
-    final color = Colors.white;
-    final hoverColor = Colors.white70;
-
     return ListTile(
-      leading: Icon(icon, color: color),
-      title: Text(text, style: TextStyle(color: color)),
-      hoverColor: hoverColor,
+      leading: Icon(
+        icon,
+        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+        size: 22,
+      ),
+      title: Text(
+        text,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
+          fontSize: 16,
+        ),
+      ),
       onTap: onClicked,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     );
   }
 
-  void selectedItem(BuildContext context, int index) {
+  void _handleProfileTap(BuildContext context, User? user) {
+    if (user == null) {
+      _navigateToSignIn(context);
+    } else {
+      _navigateToPage(context, 5); // Profile page
+    }
+  }
+
+  void _navigateToSignIn(BuildContext context) {
     Navigator.of(context).pop();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SignIn(),
+      ),
+    );
+  }
 
+  void _navigateToPage(BuildContext context, int index) {
+    Navigator.of(context).pop();
+    
     switch (index) {
-      case 0:
+      case 0: // Alerts
         Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Profile(
-                title: 'Profile',
-              ),
-            ));
-
-        break;
-      case 1:
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => Pomodoro(
-            title: 'Pomodoro',
+          context,
+          MaterialPageRoute(
+            builder: (context) => Homepage(
+              title: 'Alerts',
+              openNavigationDrawer: () {},
+            ),
           ),
-        ));
+        );
+        break;
+      case 1: // Habits
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HabitHubPage(
+              title: 'Habits',
+              openNavigationDrawer: () {},
+            ),
+          ),
+        );
+        break;
+      case 2: // Timer
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PomodoroHome(
+              title: 'Timer',
+              openNavigationDrawer: () {},
+            ),
+          ),
+        );
+        break;
+      case 3: // Tasks
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TaskPage(
+              openNavigationDrawer: () {},
+            ),
+          ),
+        );
+        break;
+      case 4: // Stats
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => InsightsPage(
+              openNavigationDrawer: () {},
+            ),
+          ),
+        );
+        break;
+      case 5: // Profile
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Profile(
+              title: 'Profile',
+            ),
+          ),
+        );
+        break;
+      case 6: // Settings
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SettingsPage(),
+          ),
+        );
+        break;
+      case 7: // Help & Support
+        _showHelpDialog(context);
+        break;
+      case 8: // About
+        _showAboutDialog(context);
         break;
     }
+  }
+
+  void _signOut(BuildContext context) async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Signed out successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error signing out: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _showHelpDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Help & Support'),
+        content: Text('Need help? Contact us at support@notifoo.com'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAboutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('About Notifoo'),
+        content: Text('Version 1.0.0\n\nA productivity app to help you stay focused and organized.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 }

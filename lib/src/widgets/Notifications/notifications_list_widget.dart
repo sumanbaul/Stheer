@@ -66,6 +66,7 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
         child: _buildContainer(context),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'notification_listener_button',
         onPressed: started ? stopListening : startListening,
         icon: _loading
             ? SizedBox(

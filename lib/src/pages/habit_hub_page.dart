@@ -161,6 +161,7 @@ class _HabitHubPage extends State<HabitHubPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'habit_add_button',
         onPressed: () => _showAddHabitForm(),
         child: Icon(Icons.add),
         backgroundColor: Theme.of(context).colorScheme.primary,

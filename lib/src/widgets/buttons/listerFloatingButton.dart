@@ -8,6 +8,7 @@ class ListerFloatingButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
+      heroTag: 'lister_floating_button',
       //backgroundColor: Color(0xffeeaeca),
       splashColor: Color(0xff94bbe9),
       hoverColor: Color(0xffeeaeca),
