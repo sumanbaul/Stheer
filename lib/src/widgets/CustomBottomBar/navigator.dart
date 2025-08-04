@@ -6,7 +6,9 @@ import 'package:notifoo/src/pages/SignIn.dart';
 import 'package:notifoo/src/pages/habit_tracker.dart';
 import 'package:notifoo/src/pages/habit_hub_page.dart';
 import 'package:notifoo/src/pages/task_page.dart';
+import 'package:notifoo/src/pages/insights_page.dart';
 import 'package:notifoo/src/widgets/CustomBottomBar/BottomNavigation.dart';
+import 'package:notifoo/src/widgets/CustomBottomBar/responsive_helper.dart';
 import 'package:notifoo/src/widgets/navigation/nav_drawer_widget.dart';
 
 import '../../../src/model/Notifications.dart';
@@ -33,7 +35,7 @@ class AppState extends State<App> {
   AppState({required this.scaffoldKey}) {
     tabs = [
       TabItem(
-        tabName: "Notifications",
+        tabName: "Alerts",
         icon: Icons.notifications_outlined,
         activeIcon: Icons.notifications,
         page: Homepage(
@@ -51,7 +53,7 @@ class AppState extends State<App> {
         ),
       ),
       TabItem(
-        tabName: "Pomodoro",
+        tabName: "Timer",
         icon: Icons.timer_outlined,
         activeIcon: Icons.timer,
         page: PomodoroHome(
@@ -64,6 +66,14 @@ class AppState extends State<App> {
         icon: Icons.task_outlined,
         activeIcon: Icons.task,
         page: TaskPage(
+          openNavigationDrawer: () => scaffoldKey.currentState!.openDrawer(),
+        ),
+      ),
+      TabItem(
+        tabName: "Stats",
+        icon: Icons.analytics_outlined,
+        activeIcon: Icons.analytics,
+        page: InsightsPage(
           openNavigationDrawer: () => scaffoldKey.currentState!.openDrawer(),
         ),
       ),
@@ -108,10 +118,10 @@ class AppState extends State<App> {
         ),
         child: SafeArea(
           child: Container(
-            height: 80,
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            height: ResponsiveHelper.getBottomNavHeight(context),
+            padding: ResponsiveHelper.getPadding(context),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: tabs.map((tab) {
                 return _buildTabItem(tab);
               }).toList(),
@@ -125,37 +135,47 @@ class AppState extends State<App> {
   Widget _buildTabItem(TabItem tab) {
     bool isSelected = currentTab == tab.index;
     
-    return GestureDetector(
-      onTap: () => _selectTab(tab.index!),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected 
-              ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              isSelected ? tab.activeIcon : tab.icon,
-              color: isSelected 
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-              size: 24,
-            ),
-            SizedBox(height: 4),
-            Text(
-              tab.tabName!,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => _selectTab(tab.index!),
+        child: Container(
+          padding: ResponsiveHelper.getPadding(context),
+          margin: ResponsiveHelper.getItemMargin(context),
+          decoration: BoxDecoration(
+            color: isSelected 
+                ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                isSelected ? tab.activeIcon : tab.icon,
                 color: isSelected 
                     ? Theme.of(context).colorScheme.primary
                     : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                size: ResponsiveHelper.getIconSize(context),
               ),
-            ),
-          ],
+              SizedBox(height: 2),
+              Flexible(
+                child: Text(
+                  tab.tabName!,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: isSelected 
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    fontSize: ResponsiveHelper.getFontSize(context),
+                  ),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

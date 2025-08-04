@@ -18,6 +18,8 @@ class PomodoroHome extends StatefulWidget {
 class _PomodoroHomeState extends State<PomodoroHome> with TickerProviderStateMixin {
   late AnimationController _timerController;
   late AnimationController _pulseController;
+  late AnimationController _glowController;
+  late AnimationController _breathingController;
   
   int _workDuration = 25; // minutes
   int _breakDuration = 5; // minutes
@@ -38,18 +40,31 @@ class _PomodoroHomeState extends State<PomodoroHome> with TickerProviderStateMix
       duration: Duration(seconds: 1),
       vsync: this,
     );
+    _glowController = AnimationController(
+      duration: Duration(seconds: 2),
+      vsync: this,
+    );
+    _breathingController = AnimationController(
+      duration: Duration(seconds: 3),
+      vsync: this,
+    );
     
     _timerController.addListener(() {
       setState(() {
         _currentTime = (_timerController.value * _workDuration * 60).round();
       });
     });
+
+    // Start breathing animation
+    _breathingController.repeat(reverse: true);
   }
 
   @override
   void dispose() {
     _timerController.dispose();
     _pulseController.dispose();
+    _glowController.dispose();
+    _breathingController.dispose();
     super.dispose();
   }
 
@@ -60,6 +75,7 @@ class _PomodoroHomeState extends State<PomodoroHome> with TickerProviderStateMix
       });
       _timerController.forward();
       _pulseController.repeat();
+      _glowController.repeat();
     }
   }
 
@@ -70,6 +86,7 @@ class _PomodoroHomeState extends State<PomodoroHome> with TickerProviderStateMix
       });
       _timerController.stop();
       _pulseController.stop();
+      _glowController.stop();
     }
   }
 
@@ -81,6 +98,7 @@ class _PomodoroHomeState extends State<PomodoroHome> with TickerProviderStateMix
     });
     _timerController.reset();
     _pulseController.stop();
+    _glowController.stop();
   }
 
   void _completePomodoro() {
@@ -128,249 +146,281 @@ class _PomodoroHomeState extends State<PomodoroHome> with TickerProviderStateMix
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Header Section
-          Container(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Focus Timer',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Stay focused with the Pomodoro technique',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                  ),
-                ),
-                SizedBox(height: 16),
-                
-                // Stats Card
-                Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Header Section
+            Container(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Focus Timer',
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.timer,
-                          color: Colors.white,
-                          size: 24,
-                        ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Stay focused with the Pomodoro technique',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  
+                  // Stats Card
+                  Container(
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
                       ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.timer,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                        SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Today\'s Progress',
+                                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                '$_completedPomodoros pomodoros • $_totalFocusTime min focused',
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Timer Section
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Column(
+                children: [
+                  // Timer Display
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    child: Column(
+                      children: [
+                        // Timer Circle with Glow Effect
+                        AnimatedBuilder(
+                          animation: _breathingController,
+                          builder: (context, child) {
+                            return Container(
+                              width: 280,
+                              height: 280,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  // Glow Effect
+                                  if (_isRunning)
+                                    Container(
+                                      width: 280 + (_breathingController.value * 20),
+                                      height: 280 + (_breathingController.value * 20),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: (_isWorkTime 
+                                                ? Theme.of(context).colorScheme.primary
+                                                : Theme.of(context).colorScheme.secondary)
+                                                .withOpacity(0.3 + (_glowController.value * 0.2)),
+                                            blurRadius: 30 + (_breathingController.value * 10),
+                                            spreadRadius: 5 + (_breathingController.value * 5),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  
+                                  // Progress Circle
+                                  Container(
+                                    width: 280,
+                                    height: 280,
+                                    child: CircularProgressIndicator(
+                                      value: _isRunning ? _timerController.value : 0,
+                                      strokeWidth: 12,
+                                      backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        _isWorkTime 
+                                            ? Theme.of(context).colorScheme.primary
+                                            : Theme.of(context).colorScheme.secondary,
+                                      ),
+                                    ),
+                                  ),
+                                  
+                                  // Time Display
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        _formatTime(_currentTime),
+                                        style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: _isWorkTime 
+                                              ? Theme.of(context).colorScheme.primary
+                                              : Theme.of(context).colorScheme.secondary,
+                                        ),
+                                      ),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        _isWorkTime ? 'Focus Time' : 'Break Time',
+                                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                        SizedBox(height: 32),
+                        
+                        // Timer Controls
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text(
-                              'Today\'s Progress',
-                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: Theme.of(context).colorScheme.primary,
+                            ElevatedButton.icon(
+                              onPressed: _isRunning ? _pauseTimer : _startTimer,
+                              icon: Icon(_isRunning ? Icons.pause : Icons.play_arrow),
+                              label: Text(_isRunning ? 'Pause' : 'Start'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _isRunning 
+                                    ? Theme.of(context).colorScheme.error
+                                    : Theme.of(context).colorScheme.primary,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                               ),
                             ),
-                            SizedBox(height: 4),
-                            Text(
-                              '$_completedPomodoros pomodoros • $_totalFocusTime min focused',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                            ElevatedButton.icon(
+                              onPressed: _resetTimer,
+                              icon: Icon(Icons.refresh),
+                              label: Text('Reset'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context).colorScheme.surface,
+                                foregroundColor: Theme.of(context).colorScheme.onSurface,
+                                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          
-          // Timer Section
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Timer Display
-                Container(
-                  padding: EdgeInsets.all(32),
-                  child: Column(
-                    children: [
-                      // Timer Circle
-                      Container(
-                        width: 200,
-                        height: 200,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            // Progress Circle
-                            CircularProgressIndicator(
-                              value: _isRunning ? _timerController.value : 0,
-                              strokeWidth: 8,
-                              backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                _isWorkTime 
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Theme.of(context).colorScheme.secondary,
-                              ),
-                            ),
-                            // Time Display
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  _formatTime(_currentTime),
-                                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: _isWorkTime 
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Theme.of(context).colorScheme.secondary,
-                                  ),
+                  
+                  // Quick Actions
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Card(
+                            child: InkWell(
+                              onTap: () => _startQuickSession(25),
+                              borderRadius: BorderRadius.circular(12),
+                              child: Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Column(
+                                  children: [
+                                    Icon(
+                                      Icons.work,
+                                      color: Theme.of(context).colorScheme.primary,
+                                      size: 32,
+                                    ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      '25 min',
+                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Focus',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                SizedBox(height: 8),
-                                Text(
-                                  _isWorkTime ? 'Focus Time' : 'Break Time',
-                                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                                  ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Card(
+                            child: InkWell(
+                              onTap: () => _startQuickSession(5),
+                              borderRadius: BorderRadius.circular(12),
+                              child: Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Column(
+                                  children: [
+                                    Icon(
+                                      Icons.coffee,
+                                      color: Theme.of(context).colorScheme.secondary,
+                                      size: 32,
+                                    ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      '5 min',
+                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Break',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 32),
-                      
-                      // Timer Controls
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ElevatedButton.icon(
-                            onPressed: _isRunning ? _pauseTimer : _startTimer,
-                            icon: Icon(_isRunning ? Icons.pause : Icons.play_arrow),
-                            label: Text(_isRunning ? 'Pause' : 'Start'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _isRunning 
-                                  ? Theme.of(context).colorScheme.error
-                                  : Theme.of(context).colorScheme.primary,
-                              foregroundColor: Colors.white,
-                              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                            ),
-                          ),
-                          ElevatedButton.icon(
-                            onPressed: _resetTimer,
-                            icon: Icon(Icons.refresh),
-                            label: Text('Reset'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).colorScheme.surface,
-                              foregroundColor: Theme.of(context).colorScheme.onSurface,
-                              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                
-                // Quick Actions
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Card(
-                          child: InkWell(
-                            onTap: () => _startQuickSession(25),
-                            borderRadius: BorderRadius.circular(12),
-                            child: Padding(
-                              padding: EdgeInsets.all(16),
-                              child: Column(
-                                children: [
-                                  Icon(
-                                    Icons.work,
-                                    color: Theme.of(context).colorScheme.primary,
-                                    size: 32,
-                                  ),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    '25 min',
-                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Focus',
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                                    ),
-                                  ),
-                                ],
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Card(
-                          child: InkWell(
-                            onTap: () => _startQuickSession(5),
-                            borderRadius: BorderRadius.circular(12),
-                            child: Padding(
-                              padding: EdgeInsets.all(16),
-                              child: Column(
-                                children: [
-                                  Icon(
-                                    Icons.coffee,
-                                    color: Theme.of(context).colorScheme.secondary,
-                                    size: 32,
-                                  ),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    '5 min',
-                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Break',
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

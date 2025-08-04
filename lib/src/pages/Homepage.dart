@@ -176,7 +176,7 @@ class _HomepageState extends State<Homepage> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: Text('Notifoo'),
+        title: Text('Alerts'),
         leading: IconButton(
           icon: Icon(Icons.menu),
           onPressed: widget.openNavigationDrawer,
@@ -198,7 +198,7 @@ class _HomepageState extends State<Homepage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Notification Manager',
+                  'Alert Manager',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.onSurface,
