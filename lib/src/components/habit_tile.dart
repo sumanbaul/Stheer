@@ -76,7 +76,6 @@ class HabitTile extends StatelessWidget {
                             ? Color.fromARGB(255, 209, 198, 250)
                             : Color.fromARGB(255, 230, 175, 182),
                         style: BorderStyle.solid,
-                        strokeAlign: StrokeAlign.center,
                       ),
                     ),
                     Container(

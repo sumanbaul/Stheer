@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:stheer/src/components/monthly_summary_heatmap.dart';
-import 'package:stheer/src/helper/datetime/date_time.dart';
-import 'package:stheer/src/helper/habit_database.dart';
-import 'package:stheer/src/pages/Profile.dart';
+import 'package:notifoo/src/components/monthly_summary_heatmap.dart';
+import 'package:notifoo/src/helper/datetime/date_time.dart';
+import 'package:notifoo/src/helper/habit_database.dart';
+import 'package:notifoo/src/pages/Profile.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 import '../components/floating_action_btn.dart';
@@ -96,26 +96,34 @@ class _HabitTrackerState extends State<HabitTracker>
             onCancel: cancelDialog,
             hintText: "Enter a new habit",
             onSelectIcon: pickIcon,
-            selectedIcon: _chosenIcon ?? Icon(Icons.abc),
+            selectedIcon: _chosenIcon!,
           );
         });
   }
 
   pickIcon() async {
-    IconData? icon = await FlutterIconPicker.showIconPicker(
-      context,
-      iconPackModes: [IconPack.lineAwesomeIcons],
-      showTooltips: true,
-      searchClearIcon: Icon(Icons.clear_outlined),
-      //adaptiveDialog: true,
-      iconColor: Colors.deepOrangeAccent[300],
+    // IconData? icon = await FlutterIconPicker.showIconPicker(
+    //   context,
+    //   iconPackModes: [IconPack.lineAwesomeIcons],
+    //   showTooltips: true,
+    //   searchClearIcon: Icon(Icons.clear_outlined),
+    //   //adaptiveDialog: true,
+    //   iconColor: Colors.deepOrangeAccent[300],
+    // );
+
+    // setState(() {
+    //   _chosenIcon = Icon(icon);
+    // });
+
+    // debugPrint('Picked Icon:  $icon');
+    
+    // For sandbox, just show a message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Icon picker not available in sandbox mode'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+      ),
     );
-
-    setState(() {
-      _chosenIcon = Icon(icon);
-    });
-
-    debugPrint('Picked Icon:  $icon');
   }
 
   void initAnimation() {

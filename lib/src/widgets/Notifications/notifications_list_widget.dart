@@ -1,30 +1,27 @@
-import 'dart:ffi';
-// import 'package:eraser/eraser.dart';
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
-import 'package:stheer/src/model/notificationCategory.dart';
-// import 'package:stheer/pages/Homepage.dart';
-// import 'package:stheer/widgets/home/home_banner_widget.dart';
+import 'package:notifoo/src/model/notificationCategory.dart';
 
 import '../../helper/NotificationsHelper.dart';
 import '../../helper/notificationCatHelper.dart';
 import '../../../src/model/Notifications.dart';
 import 'notification_card.dart';
-
-// Callback
-//typedef void DetailsCallback(HomeBannerWidget val);
+import 'dart:async';
 
 class NotificationsListWidget extends StatefulWidget {
   final Function(Future<int>)? onCountChange;
   final VoidCallback? onCountAdded;
-  NotificationsListWidget({Key? key, this.onCountAdded, this.onCountChange})
-      : super(key: key);
+  
+  NotificationsListWidget({
+    Key? key, 
+    this.onCountAdded, 
+    this.onCountChange
+  }) : super(key: key);
 
   @override
-  State<NotificationsListWidget> createState() =>
-      _NotificationsListWidgetState();
+  State<NotificationsListWidget> createState() => _NotificationsListWidgetState();
 }
 
 class _NotificationsListWidgetState extends State<NotificationsListWidget>
@@ -35,15 +32,11 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
   bool _loading = false;
   bool isToday = true;
   ReceivePort port = ReceivePort();
+  Timer? _mockNotificationTimer;
 
-  //Theme
-  List<Color> _colors = [Color.fromRGBO(94, 109, 145, 1.0), Colors.transparent];
-  String? flagEntry; //this variable need to check later,
-  //after notfications logic is cleaned
   @override
   void initState() {
     super.initState();
-
     initPlatformState();
     initData();
     WidgetsBinding.instance.addObserver(this);
@@ -52,13 +45,14 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (AppLifecycleState.resumed == state) {
-      // Eraser.clearAllAppNotifications();
+      // Handle app resume
     }
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
+    _mockNotificationTimer?.cancel();
     super.dispose();
   }
 
@@ -71,51 +65,32 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
         padding: EdgeInsets.zero,
         child: _buildContainer(context),
       ),
-      floatingActionButton: FloatingActionButton(
-        //backgroundColor: Color(0xffeeaeca),
-        splashColor: Color(0xff94bbe9),
-        hoverColor: Color(0xffeeaeca),
-        focusColor: Color(0xff94bbe9),
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: started ? stopListening : startListening,
-        tooltip: 'Start/Stop sensing',
-        child: _loading
-            ? Icon(Icons.hourglass_bottom_outlined)
-            : (started ? Icon(Icons.close) : Icon(Icons.play_arrow)),
+        icon: _loading
+            ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Icon(started ? Icons.stop : Icons.play_arrow),
+        label: Text(started ? 'Stop' : 'Start'),
+        backgroundColor: started 
+            ? Theme.of(context).colorScheme.error
+            : Theme.of(context).colorScheme.primary,
       ),
     );
   }
 
-// Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    NotificationsListener.initialize(callbackHandle: _callback);
-    Notifications? _currentNotification;
-    // this can fix restart<debug> can't handle error
-    IsolateNameServer.removePortNameMapping("_stheerlistener_");
-    IsolateNameServer.registerPortWithName(port.sendPort, "_stheerlistener_");
-
-    //IsolateNameServer.registerPortWithName(port.sendPort, "insta");
-    port.listen((message) async {
-      _currentNotification = await NotificationsHelper.onData(message);
-      // don't use the default receivePort
-      // NotificationsListener.receivePort.listen((evt) => onData(evt));
-
-      //started = isServiceRunning;
-      if (_currentNotification != null &&
-          _currentNotification?.appTitle != null) {
-        final _notifications =
-            appendElements(notificationsOfTheDay!, _currentNotification!);
-        var _notificationsByCat = _notifications.then((value) =>
-            NotificationCatHelper.getNotificationsByCat(value, isToday));
-        setState(() {
-          //notificationsOfTheDay = _notifications;
-          notificationsByCatFuture = _notificationsByCat;
-        });
-      }
-    }); //onData(message, flagEntry!));
-    // don't use the default receivePort
-    // NotificationsListener.receivePort.listen((evt) => onData(evt));
-    var isServiceRunning = await (NotificationsListener.isRunning);
-    print("""Service is ${!isServiceRunning! ? "not " : ""}aleary running""");
+    // For sandbox, we'll use mock notifications
+    print("Initializing sandbox notification listener");
+    
+    var isServiceRunning = false; // Mock service state
+    print("Service is ${!isServiceRunning ? "not " : ""}already running");
     if (!isServiceRunning) {
       startListening();
     }
@@ -125,238 +100,215 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
     });
   }
 
-  Future<List<Notifications>> appendElements(
-      Future<List<Notifications>> listFuture,
-      Notifications elementToAdd) async {
-    final list = await listFuture;
-    list.add(elementToAdd);
-
-    return list;
-  }
-
-  // we must use static method, to handle in background
   static void _callback(NotificationEvent evt) {
-    // print(
-    //   "send evt to ui: $evt",
-    // );
-    final SendPort? send =
-        IsolateNameServer.lookupPortByName("_stheerlistener_");
+    final SendPort? send = IsolateNameServer.lookupPortByName("_notifoolistener_");
     if (send == null) print("can't find the sender");
     send?.send(evt);
   }
 
-  void startListening() async {
-    print("start listening");
-
-    var hasPermission = await (NotificationsListener.hasPermission);
-    if (!hasPermission!) {
-      print("no permission, so open settings");
-      NotificationsListener.openPermissionSettings();
-      return;
-    }
-
-    var isR = await (NotificationsListener.isRunning);
-
-    if (!isR!) {
-      await NotificationsListener.startService(
-          title: "Stheer listening",
-          description: "Let's scrape the notifactions...",
-          subTitle: "Service",
-          showWhen: true
-          //foreground: AppButtonAction(),
-          );
-    }
-    setState(() {
-      started = true;
-      _loading = false;
-      //this.widget.getNotificationsOfToday;
-    });
+  Future<List<Notifications>> appendElements(
+      Future<List<Notifications>>? notifications, Notifications notification) async {
+    List<Notifications> _notifications = await notifications!;
+    _notifications.add(notification);
+    return _notifications;
   }
 
-  void stopListening() async {
-    print("stop listening");
-    await NotificationsListener.stopService();
-
-    setState(() {
-      started = false;
-      _loading = false;
-      //Eraser.clearAllAppNotifications();
-    });
+  void initData() {
+    notificationsOfTheDay = NotificationsHelper.initializeDbGetNotificationsToday(0);
+    notificationsByCatFuture = notificationsOfTheDay!.then((value) =>
+        NotificationCatHelper.getNotificationsByCat(value, isToday));
   }
 
-  Future<void> initData() async {
-    final _notificationsOfTheDay =
-        NotificationsHelper.initializeDbGetNotificationsToday(isToday ? 0 : 1);
-
-    final _notificationsByCatFuture = _notificationsOfTheDay.then(
-        (value) => NotificationCatHelper.getNotificationsByCat(value, isToday));
-    final _onCountChange = _notificationsOfTheDay.then((value) => value.length);
+  Future<void> startListening() async {
     setState(() {
-      notificationsOfTheDay = _notificationsOfTheDay;
-      notificationsByCatFuture = _notificationsByCatFuture;
-      this.widget.onCountChange!(_onCountChange);
+      _loading = true;
     });
+
+    try {
+      // Mock service start for sandbox
+      print("Starting sandbox notification listener");
+      
+      // Start mock notification timer
+      _mockNotificationTimer = Timer.periodic(Duration(seconds: 5), (timer) {
+        if (started) {
+          _addMockNotification();
+        }
+      });
+      
+      setState(() {
+        started = true;
+        _loading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _loading = false;
+      });
+      print('Error starting listener: $e');
+    }
+  }
+
+  void _addMockNotification() {
+    final mockNotifications = [
+      Notifications(
+        title: "Mock Message",
+        appTitle: "WhatsApp",
+        text: "New message received at ${DateTime.now().toString()}",
+        message: "New message",
+        packageName: "com.whatsapp",
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+        createAt: DateTime.now().toString(),
+      ),
+      Notifications(
+        title: "Mock Email",
+        appTitle: "Gmail",
+        text: "New email in your inbox",
+        message: "New email",
+        packageName: "com.google.android.gm",
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+        createAt: DateTime.now().toString(),
+      ),
+    ];
+
+    final randomNotification = mockNotifications[DateTime.now().millisecond % mockNotifications.length];
+    
+    if (notificationsOfTheDay != null) {
+      final _notifications = appendElements(notificationsOfTheDay!, randomNotification);
+      var _notificationsByCat = _notifications.then((value) =>
+          NotificationCatHelper.getNotificationsByCat(value, isToday));
+      setState(() {
+        notificationsByCatFuture = _notificationsByCat;
+      });
+    }
+  }
+
+  Future<void> stopListening() async {
+    setState(() {
+      _loading = true;
+    });
+
+    try {
+      // Mock service stop for sandbox
+      print("Stopping sandbox notification listener");
+      _mockNotificationTimer?.cancel();
+      
+      setState(() {
+        started = false;
+        _loading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _loading = false;
+      });
+      print('Error stopping listener: $e');
+    }
   }
 
   Widget _buildContainer(BuildContext context) {
-    return Container(
-      height: 700,
-      padding: EdgeInsets.only(top: 15.0),
-      decoration: BoxDecoration(
-        shape: BoxShape.rectangle,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(30.0),
-          topRight: Radius.circular(30.0),
-        ),
-        gradient: LinearGradient(
-          colors: _colors,
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          //stops: _stops
-        ),
-      ),
-      child: getNotificationListBody(context),
-    );
-  }
+    return FutureBuilder<List<NotificationCategory>>(
+      future: notificationsByCatFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                SizedBox(height: 16),
+                Text(
+                  'Loading notifications...',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
 
-  Widget getNotificationListBody(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          height: 30,
-          margin: EdgeInsets.only(bottom: 10.0),
-          padding: EdgeInsets.symmetric(horizontal: 30.0),
-          //color: Colors.blueAccent,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    onPrimary: isToday ? Colors.black87 : Colors.white24,
-                    primary: isToday ? Colors.grey[300] : Colors.grey[600],
-                    //minimumSize: Size(88, 36),
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                    )),
-                onPressed: () async {
-                  //  await getCategoryList(0);
-                  if (isToday == false) {
-                    isToday = true;
-                    //notificationsOfTheDay = initializeData(isToday);
-                    var _ntCat =
-                        NotificationCatHelper.getNotificationsByCategoryInit(
-                            isToday);
-                    setState(() {
-                      isToday = true;
-                      notificationsByCatFuture = _ntCat;
-                    });
-                  }
-                },
-                child: Text('Today'),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    onPrimary: isToday ? Colors.white24 : Colors.black87,
-                    primary: isToday ? Colors.grey[600] : Colors.grey[300],
-                    //minimumSize: Size(88, 36),
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                    )),
-                onPressed: () async {
-                  //  await getCategoryList(1);
-                  if (isToday == true) {
-                    isToday = false;
-                    var _ntCat =
-                        NotificationCatHelper.getNotificationsByCategoryInit(
-                            isToday);
-                    setState(() {
-                      isToday = false;
-                      notificationsByCatFuture = _ntCat;
-                      //notificationsOfTheDay = initializeData(isToday);
-                    });
-                  }
-                },
-                child: Text('Yesterday'),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    onPrimary: Colors.white24,
-                    primary: Colors.grey[600],
-                    //minimumSize: Size(88, 36),
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                    )),
-                onPressed: () {
-                  setState(() {
-                    //Eraser.clearAllAppNotifications();
-                  });
-                },
-                child: Text('History'),
-              )
-            ],
-          ),
-        ),
-        Flexible(
-          flex: 1,
-          fit: FlexFit.tight,
-          child: Container(
-            //height: 200,
-            // decoration: BoxDecoration(color: Colors.brown),
-            margin: EdgeInsets.only(top: 0.0),
-            child: FutureBuilder<List<NotificationCategory>>(
-                future: notificationsByCatFuture,
-                builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.none:
-                    case ConnectionState.waiting:
-                    case ConnectionState.active:
-                      return NotificationsHelper.buildLoader();
-                    case ConnectionState.done:
-                      if (snapshot.hasError) {
-                        return NotificationsHelper.buildError(
-                            snapshot.error.toString());
-                      }
-                      if (snapshot.hasData) {
-                        var data = snapshot.data;
-                        print(
-                            "Snapshot.length -> NotificationsWidget:${snapshot.data!.length}");
-                        return MediaQuery.removePadding(
-                          context: context,
-                          removeTop: true,
-                          child: RefreshIndicator(
-                            onRefresh: () => initData(),
-                            child: ListView.builder(
-                              itemCount: data!.length,
-                              itemBuilder: (context, index) {
-                                if (data.length > 0) {
-                                  return NotificationsCard(
-                                    notificationsCategory: data[index],
-                                    //index: index,
-                                    key: GlobalKey(),
-                                    // key: UniqueKey(), //widget.key,
-                                  );
-                                } else {
-                                  return Text(
-                                      "You don't have any notifications today.");
-                                }
-                              },
-                              physics: BouncingScrollPhysics(
-                                parent: AlwaysScrollableScrollPhysics(),
-                              ),
-                            ),
-                          ),
-                        );
-                      } else {
-                        return NotificationsHelper.buildNoData();
-                      }
-                  }
-                }),
-          ),
-        ),
-      ],
+        if (snapshot.hasError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                SizedBox(height: 16),
+                Text(
+                  'Error loading notifications',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Please try again',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        List<NotificationCategory>? notifications = snapshot.data;
+        
+        if (notifications == null || notifications.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  child: Icon(
+                    Icons.notifications_none,
+                    size: 40,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Text(
+                  'No notifications yet',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Start listening to capture notifications',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          );
+        }
+
+        return ListView.builder(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          itemCount: notifications.length,
+          itemBuilder: (context, index) {
+            return NotificationsCard(
+              index: index,
+              notificationsCategory: notifications[index],
+            );
+          },
+        );
+      },
     );
   }
 }

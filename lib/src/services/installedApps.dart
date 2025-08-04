@@ -1,7 +1,7 @@
 import 'package:device_apps/device_apps.dart';
-import 'package:stheer/src/helper/AppListHelper.dart';
-import 'package:stheer/src/helper/DatabaseHelper.dart';
-import 'package:stheer/src/model/apps.dart';
+import 'package:notifoo/src/helper/AppListHelper.dart';
+import 'package:notifoo/src/helper/DatabaseHelper.dart';
+import 'package:notifoo/src/model/apps.dart';
 
 class InstalledApps {
   late List<Apps> listOfApps;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
-import 'package:stheer/src/helper/datetime/date_time.dart';
+import 'package:notifoo/src/helper/datetime/date_time.dart';
 
 class MonthlySummaryHeatmap extends StatelessWidget {
   final Map<DateTime, int>? datasets;

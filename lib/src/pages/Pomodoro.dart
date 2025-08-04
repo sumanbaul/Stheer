@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:stheer/src/helper/DatabaseHelper.dart';
-import 'package:stheer/src/model/pomodoro_timer.dart';
-import 'package:stheer/src/widgets/Topbar.dart';
-import 'package:stheer/src/widgets/button_widget.dart';
+import 'package:notifoo/src/helper/DatabaseHelper.dart';
+import 'package:notifoo/src/model/pomodoro_timer.dart';
+import 'package:notifoo/src/widgets/Topbar.dart';
+import 'package:notifoo/src/widgets/button_widget.dart';
 
 class Pomodoro extends StatefulWidget {
   Pomodoro({Key? key, this.title}) : super(key: key);
@@ -168,26 +168,26 @@ class _PomodoroState extends State<Pomodoro> {
               Flexible(
                 child: ButtonWidget(
                   text: isRunning ? 'Pause' : 'Resume',
-                  color: Colors.black,
-                  backgroundColor: Colors.red,
-                  onClicked: () {
+                  onPressed: () {
                     if (isRunning) {
                       stopTimer(reset: false);
                     } else {
                       startTimer(reset: false);
                     }
                   },
+                  backgroundColor: Colors.red,
+                  textColor: Colors.black,
                 ),
               ),
               const SizedBox(width: 12),
               Flexible(
                 child: ButtonWidget(
                   text: 'Cancel',
-                  color: Colors.black,
-                  backgroundColor: Colors.red,
-                  onClicked: () {
+                  onPressed: () {
                     stopTimer();
                   },
+                  backgroundColor: Colors.red,
+                  textColor: Colors.black,
                 ),
               ),
             ],
@@ -195,11 +195,11 @@ class _PomodoroState extends State<Pomodoro> {
         : Flexible(
             child: ButtonWidget(
               text: 'Start Pomodoro',
-              color: Colors.white,
-              backgroundColor: Colors.pink,
-              onClicked: () {
+              onPressed: () {
                 startTimer();
               },
+              backgroundColor: Colors.pink,
+              textColor: Colors.white,
             ),
           );
   }

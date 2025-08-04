@@ -1,7 +1,7 @@
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
-import 'package:stheer/src/logic/notification_lister_logic.dart';
+import 'package:notifoo/src/logic/notification_lister_logic.dart';
 
 class NotificationListerModel extends ChangeNotifier {
   late NotificationListerPageLogic logic;

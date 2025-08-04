@@ -2,13 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:stheer/src/helper/provider/google_sign_in.dart';
-import 'package:stheer/src/helper/routes/routes.dart';
-import 'package:stheer/src/pages/Pomodoro.dart';
-import 'package:stheer/src/pages/Profile.dart';
-import 'package:stheer/src/pages/SignIn.dart';
-import 'package:stheer/src/pages/habit_tracker.dart';
-import 'package:stheer/src/widgets/CustomBottomBar/navigator.dart';
+import 'package:notifoo/src/helper/provider/google_sign_in.dart';
+import 'package:notifoo/src/helper/routes/routes.dart';
 import 'src/helper/DatabaseHelper.dart';
 import 'package:provider/provider.dart';
 
@@ -17,7 +12,25 @@ import 'package:firebase_core/firebase_core.dart';
 Future main() async {
   //Init all required async components
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  
+  // Initialize Firebase with error handling
+  try {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: "sandbox-api-key",
+        authDomain: "sandbox-project.firebaseapp.com",
+        projectId: "sandbox-project",
+        storageBucket: "sandbox-project.appspot.com",
+        messagingSenderId: "123456789",
+        appId: "1:123456789:web:sandbox-app-id",
+      ),
+    );
+    print('Firebase initialized successfully');
+  } catch (e) {
+    print('Firebase initialization failed (sandbox mode): $e');
+    // Continue without Firebase for sandbox mode
+  }
+  
   await DatabaseHelper.instance.initializeDatabase();
 
   //Initialize Hive
@@ -34,22 +47,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final _isUserLogged = GoogleSignInProvider().isLogged();
-
   @override
   void initState() {
     super.initState();
-  }
-
-  TextStyle getBarlowFont() {
-    return GoogleFonts.barlowSemiCondensed(
-      textStyle: TextStyle(
-        letterSpacing: 1.2,
-        //fontSize: 20.0,
-        // fontWeight: FontWeight.bold,
-        //color: Colors.white,
-      ),
-    );
   }
 
   @override
@@ -57,30 +57,71 @@ class _MyAppState extends State<MyApp> {
         create: (context) => GoogleSignInProvider(),
         child: AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle(
-            statusBarColor: Colors.transparent, //i like transaparent :-)
-            systemNavigationBarColor: Color.fromARGB(235, 34, 32,
-                48), //Color.fromARGB(255, 33, 31, 46), // navigation bar color
+            statusBarColor: Colors.transparent,
+            systemNavigationBarColor: Color(0xFF1A1A1A),
             statusBarBrightness: Brightness.dark,
-            statusBarIconBrightness: Brightness.dark,
+            statusBarIconBrightness: Brightness.light,
             systemNavigationBarIconBrightness: Brightness.light,
             systemNavigationBarDividerColor: Colors.transparent,
           ),
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
-            theme: ThemeData.dark().copyWith(
-              // primaryColor:
-              //     Color.fromARGB(115, 20, 20, 20), //Color(0xff0A0E21),
-              scaffoldBackgroundColor: Color.fromARGB(
-                  235, 63, 43, 194), // Color.fromARGB(235, 34, 32, 48),
-              // brightness: Brightness.dark,
-              textTheme: TextTheme(
-                bodyText2: getBarlowFont(),
-                bodyText1: getBarlowFont(),
-                subtitle1: getBarlowFont(),
+            title: 'Notifoo',
+            theme: ThemeData(
+              useMaterial3: true,
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: Color(0xFF6366F1),
+                brightness: Brightness.dark,
+                surface: Color(0xFF1A1A1A),
+                primary: Color(0xFF6366F1),
+                secondary: Color(0xFF8B5CF6),
+                tertiary: Color(0xFF06B6D4),
+                error: Color(0xFFEF4444),
+                onPrimary: Colors.white,
+                onSecondary: Colors.white,
+                onSurface: Colors.white,
+              ),
+              textTheme: GoogleFonts.interTextTheme(
+                ThemeData.dark().textTheme,
+              ),
+              cardTheme: CardTheme(
+                color: Color(0xFF1F1F1F),
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF6366F1),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+              floatingActionButtonTheme: FloatingActionButtonThemeData(
+                backgroundColor: Color(0xFF6366F1),
+                foregroundColor: Colors.white,
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              appBarTheme: AppBarTheme(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                centerTitle: true,
+                titleTextStyle: GoogleFonts.inter(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
               ),
             ),
-            //theme: ThemeData(primarySwatch: Colors.yellow),
-            initialRoute: _isUserLogged ? '/' : '/profile',
+            initialRoute: '/',
             routes: Routes().getRoute(),
           ),
         ),

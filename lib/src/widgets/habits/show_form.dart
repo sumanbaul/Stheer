@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stheer/src/model/habits_model.dart';
+import 'package:notifoo/src/model/habits_model.dart';
 
 class ShowForm {
   final List<HabitsModel> habits;

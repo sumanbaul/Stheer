@@ -22,7 +22,7 @@ class MyAlertBox extends StatelessWidget {
     return AlertDialog(
       backgroundColor: Colors.grey[800],
       content: Container(
-        height: 130,
+        height: 150,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -39,7 +39,7 @@ class MyAlertBox extends StatelessWidget {
                 //selectedIcon != null ? Icon(selectedIcon.icon) : Text('blank'),
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
-                  child: selectedIcon ?? Container(),
+                  child: selectedIcon,
                 ),
               ],
             ),

@@ -1,16 +1,15 @@
 import 'dart:isolate';
 import 'dart:ui';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:stheer/src/components/notifications/notifications_banner.dart';
-import 'package:stheer/src/widgets/Notifications/notifications_list_widget.dart';
-import 'package:stheer/src/widgets/navigation/nav_drawer_widget.dart';
-
-import 'package:stheer/src/widgets/headers/subHeader.dart';
-import 'package:stheer/src/widgets/home/home_banner_widget.dart';
-//import 'package:stheer/widgets/navigation/nav_drawer.dart';
+import 'package:notifoo/src/components/notifications/notifications_banner.dart';
+import 'package:notifoo/src/widgets/Notifications/notifications_list_widget.dart';
+import 'package:notifoo/src/widgets/navigation/nav_drawer_widget.dart';
+import 'package:notifoo/src/widgets/headers/subHeader.dart';
+import 'package:notifoo/src/widgets/home/home_banner_widget.dart';
 import '../components/notifications/notifications_list.dart';
 import '../helper/NotificationsHelper.dart';
 import '../helper/notificationCatHelper.dart';
@@ -26,15 +25,12 @@ class Homepage extends StatefulWidget {
 
   final VoidCallback? openNavigationDrawer;
   final String? title;
-  //final Future<List<Notifications>>? notificationsFromDb;
 
   @override
   _HomepageState createState() => _HomepageState();
 }
 
 class _HomepageState extends State<Homepage> {
-  //List<Notifications> _getNotificationsOfToday = [];
-  //Future<List<Notifications>>? notificationsOfTheDay;
   Future<List<Notifications>>? notificationsOfTheDay;
   Future<List<NotificationCategory>>? notificationsByCatFuture;
   int _notificationsCount = 0;
@@ -42,51 +38,21 @@ class _HomepageState extends State<Homepage> {
   bool _loading = false;
   bool isToday = true;
   ReceivePort port = ReceivePort();
-
-  //Theme
-  List<Color> _colors = [Color.fromRGBO(94, 109, 145, 1.0), Colors.transparent];
-  String? flagEntry; //this variable need to check later,
+  Timer? _mockNotificationTimer;
 
   @override
   void initState() {
     super.initState();
-
     initPlatformState();
     initData();
-    //WidgetsBinding.instance.addObserver(this);
   }
 
-// Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    NotificationsListener.initialize(callbackHandle: _callback);
-    Notifications? _currentNotification;
-    // this can fix restart<debug> can't handle error
-    IsolateNameServer.removePortNameMapping("_stheerlistener_");
-    IsolateNameServer.registerPortWithName(port.sendPort, "_stheerlistener_");
-
-    //IsolateNameServer.registerPortWithName(port.sendPort, "insta");
-    port.listen((message) async {
-      _currentNotification = await NotificationsHelper.onData(message);
-      // don't use the default receivePort
-      // NotificationsListener.receivePort.listen((evt) => onData(evt));
-
-      //started = isServiceRunning;
-      if (_currentNotification != null &&
-          _currentNotification?.appTitle != null) {
-        final _notifications =
-            appendElements(notificationsOfTheDay!, _currentNotification!);
-        var _notificationsByCat = _notifications.then((value) =>
-            NotificationCatHelper.getNotificationsByCat(value, isToday));
-        setState(() {
-          //notificationsOfTheDay = _notifications;
-          notificationsByCatFuture = _notificationsByCat;
-        });
-      }
-    }); //onData(message, flagEntry!));
-    // don't use the default receivePort
-    // NotificationsListener.receivePort.listen((evt) => onData(evt));
-    var isServiceRunning = await (NotificationsListener.isRunning);
-    print("""Service is ${!isServiceRunning! ? "not " : ""}aleary running""");
+    // For sandbox, we'll use mock notifications
+    print("Initializing sandbox notification listener");
+    
+    var isServiceRunning = false; // Mock service state
+    print("Service is ${!isServiceRunning ? "not " : ""}already running");
     if (!isServiceRunning) {
       startListening();
     }
@@ -96,151 +62,220 @@ class _HomepageState extends State<Homepage> {
     });
   }
 
-  // we must use static method, to handle in background
   static void _callback(NotificationEvent evt) {
-    // print(
-    //   "send evt to ui: $evt",
-    // );
-    final SendPort? send =
-        IsolateNameServer.lookupPortByName("_stheerlistener_");
+    final SendPort? send = IsolateNameServer.lookupPortByName("_notifoolistener_");
     if (send == null) print("can't find the sender");
     send?.send(evt);
   }
 
-  void startListening() async {
-    print("start listening");
-
-    var hasPermission = await (NotificationsListener.hasPermission);
-    if (!hasPermission!) {
-      print("no permission, so open settings");
-      NotificationsListener.openPermissionSettings();
-      return;
-    }
-
-    var isR = await (NotificationsListener.isRunning);
-
-    if (!isR!) {
-      await NotificationsListener.startService(
-          title: "Stheer listening",
-          description: "Let's scrape the notifactions...",
-          subTitle: "Service",
-          showWhen: true
-          //foreground: AppButtonAction(),
-          );
-    }
-    setState(() {
-      started = true;
-      _loading = false;
-      //this.widget.getNotificationsOfToday;
-    });
-  }
-
-  void stopListening() async {
-    print("stop listening");
-    await NotificationsListener.stopService();
-
-    setState(() {
-      started = false;
-      _loading = false;
-      //Eraser.clearAllAppNotifications();
-    });
-  }
-
   Future<List<Notifications>> appendElements(
-      Future<List<Notifications>> listFuture,
-      Notifications elementToAdd) async {
-    final list = await listFuture;
-    list.add(elementToAdd);
-
-    return list;
+      Future<List<Notifications>>? notifications, Notifications notification) async {
+    List<Notifications> _notifications = await notifications!;
+    _notifications.add(notification);
+    return _notifications;
   }
 
-  Future<void> initData() async {
-    final _notificationsOfTheDay =
-        NotificationsHelper.initializeDbGetNotificationsToday(isToday ? 0 : 1);
+  void initData() {
+    notificationsOfTheDay = NotificationsHelper.initializeDbGetNotificationsToday(0);
+    notificationsByCatFuture = notificationsOfTheDay!.then((value) =>
+        NotificationCatHelper.getNotificationsByCat(value, isToday));
+  }
 
-    final _notificationsByCatFuture = _notificationsOfTheDay.then(
-        (value) => NotificationCatHelper.getNotificationsByCat(value, isToday));
-    final _onCountChange = _notificationsOfTheDay.then((value) => value.length);
-
-    //this.widget.onCountChange!(_onCountChange);
-    _onCountChange.then((value) {
-      setState(() {
-        _notificationsCount = value;
-        notificationsOfTheDay = _notificationsOfTheDay;
-        notificationsByCatFuture = _notificationsByCatFuture;
-      });
+  Future<void> startListening() async {
+    setState(() {
+      _loading = true;
     });
+
+    try {
+      // Mock service start for sandbox
+      print("Starting sandbox notification listener");
+      
+      // Start mock notification timer
+      _mockNotificationTimer = Timer.periodic(Duration(seconds: 5), (timer) {
+        if (started) {
+          _addMockNotification();
+        }
+      });
+      
+      setState(() {
+        started = true;
+        _loading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _loading = false;
+      });
+      print('Error starting listener: $e');
+    }
+  }
+
+  void _addMockNotification() {
+    final mockNotifications = [
+      Notifications(
+        title: "Mock Message",
+        appTitle: "WhatsApp",
+        text: "New message received at ${DateTime.now().toString()}",
+        message: "New message",
+        packageName: "com.whatsapp",
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+        createAt: DateTime.now().toString(),
+      ),
+      Notifications(
+        title: "Mock Email",
+        appTitle: "Gmail",
+        text: "New email in your inbox",
+        message: "New email",
+        packageName: "com.google.android.gm",
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+        createAt: DateTime.now().toString(),
+      ),
+    ];
+
+    final randomNotification = mockNotifications[DateTime.now().millisecond % mockNotifications.length];
+    
+    if (notificationsOfTheDay != null) {
+      final _notifications = appendElements(notificationsOfTheDay!, randomNotification);
+      var _notificationsByCat = _notifications.then((value) =>
+          NotificationCatHelper.getNotificationsByCat(value, isToday));
+      setState(() {
+        notificationsByCatFuture = _notificationsByCat;
+      });
+    }
+  }
+
+  Future<void> stopListening() async {
+    setState(() {
+      _loading = true;
+    });
+
+    try {
+      // Mock service stop for sandbox
+      print("Stopping sandbox notification listener");
+      _mockNotificationTimer?.cancel();
+      
+      setState(() {
+        started = false;
+        _loading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _loading = false;
+      });
+      print('Error stopping listener: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    _mockNotificationTimer?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    print("Notifications Count in Homepage => $_notificationsCount");
     return Scaffold(
-        backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-        drawer: NavigationDrawerWidget(),
-        floatingActionButton: FloatingActionButton(
-          //backgroundColor: Color(0xffeeaeca),
-          splashColor: Color(0xff94bbe9),
-          hoverColor: Color(0xffeeaeca),
-          focusColor: Color(0xff94bbe9),
-          onPressed: started ? stopListening : startListening,
-          tooltip: 'Start/Stop sensing',
-          child: _loading
-              ? Icon(Icons.hourglass_bottom_outlined)
-              : (started ? Icon(Icons.close) : Icon(Icons.play_arrow)),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      appBar: AppBar(
+        title: Text('Notifoo'),
+        leading: IconButton(
+          icon: Icon(Icons.menu),
+          onPressed: widget.openNavigationDrawer,
         ),
-        body: Builder(
-          builder: (context) => SafeArea(
-            maintainBottomViewPadding: true,
-            top: false,
-            bottom: false,
-            child: Container(
-              child: Column(
-                children: [
-                  NotificationsBanner(
-                      notificationBannerTitle: "Stheer1",
-                      notificationCount: _notificationsCount,
-                      onClicked: () => Scaffold.of(context).openDrawer()),
-                  // HomeBannerWidget(
-                  //   key: UniqueKey(),
-                  //   onClicked: () => Scaffold.of(context).openDrawer(),
-                  //   notificationCount: _notificationsCount,
-                  //   //notifications: notificationsOfTheDay!,
-                  // ),
-                  SubHeader(title: "Today's Notifications"),
-                  Container(
-                    child: Expanded(
-                      // child: NotificationsListWidget(
-                      //   onCountChange: (count) async {
-                      //     var _count = await count;
-                      //     setState(() {
-                      //       _notificationsCount = _count;
-                      //     });
-                      //   },
-                      // ),
-
-                      child: NotificationsList(
-                        // notificationsOfTheDay: notificationsOfTheDay,
-                        notificationsByCatFuture: notificationsByCatFuture,
-                        notificationsCount: _notificationsCount,
-                        refreshData: initData,
-                        colors: _colors,
-                      ),
-
-                      //child: NotificationsListerTest(),
-
-                      // child: NotificationsLister(
-                      //   getNotificationsOfToday: _getNotificationsOfToday,
-                      // ),
+        actions: [
+          IconButton(
+            icon: Icon(started ? Icons.stop : Icons.play_arrow),
+            onPressed: started ? stopListening : startListening,
+            tooltip: started ? 'Stop Listening' : 'Start Listening',
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          // Header Section
+          Container(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Notification Manager',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Batch and read your notifications later',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
                     ),
-                  )
-                ],
-              ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        started ? Icons.notifications_active : Icons.notifications_off,
+                        color: started 
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              started ? 'Listening for notifications' : 'Not listening',
+                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: started 
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                              ),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              started 
+                                  ? 'Capturing notifications in the background'
+                                  : 'Tap the play button to start',
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-        )
-        // NotificationsLister(),
-        );
+          
+          // Notifications List
+          Expanded(
+            child: NotificationsListWidget(
+              onCountChange: (count) {
+                count.then((value) {
+                  setState(() {
+                    _notificationsCount = value;
+                  });
+                });
+              },
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

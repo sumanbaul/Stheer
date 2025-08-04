@@ -5,11 +5,11 @@ import 'dart:ui';
 
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
-import 'package:stheer/src/helper/AppListHelper.dart';
-import 'package:stheer/src/helper/DatabaseHelper.dart';
-import 'package:stheer/src/model/Notifications.dart';
-import 'package:stheer/src/model/apps.dart';
-import 'package:stheer/src/model/notification_lister_model.dart';
+import 'package:notifoo/src/helper/AppListHelper.dart';
+import 'package:notifoo/src/helper/DatabaseHelper.dart';
+import 'package:notifoo/src/model/Notifications.dart';
+import 'package:notifoo/src/model/apps.dart';
+import 'package:notifoo/src/model/notification_lister_model.dart';
 
 class NotificationListerPageLogic {
   final NotificationListerModel _model;

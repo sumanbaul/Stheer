@@ -1,129 +1,187 @@
-import 'dart:collection';
-
-import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
-import 'package:stheer/src/helper/AppListHelper.dart';
-import 'package:stheer/src/model/Notifications.dart';
-import 'dart:async';
-
-import 'package:stheer/src/model/apps.dart';
-import 'package:stheer/src/services/installedApps.dart';
-
-import '../helper/DatabaseHelper.dart';
-
-Future<List<Application>>? apps;
+import 'package:google_fonts/google_fonts.dart';
+import 'package:notifoo/src/helper/provider/google_sign_in.dart';
+import 'package:notifoo/src/widgets/CustomBottomBar/navigator.dart';
+import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
-  bool _loading = true;
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
-    //DatabaseHelper.instance.initializeDatabase();
-    //apps = AppListHelper.getListOfApps(); //appListHelper.appsData;
-
-    // @override
-    //checkIfDataAvaiable();
-
     super.initState();
-    initializeData();
-    getAppsData(context);
+    _animationController = AnimationController(
+      duration: Duration(seconds: 2),
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Interval(0.0, 0.6, curve: Curves.easeIn),
+    ));
+
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Interval(0.2, 0.8, curve: Curves.elasticOut),
+    ));
+
+    _animationController.forward();
+
+    Future.delayed(Duration(seconds: 3), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChangeNotifierProvider(
+            create: (context) => GoogleSignInProvider(),
+            child: App(),
+          ),
+        ),
+      );
+    });
   }
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   if (_apps.length > 0) {
-  //     appListHelper.setStateAuthUrl(_apps);
-  //     Timer(
-  //         Duration(seconds: 0),
-  //         () => Navigator.of(context).pushNamedAndRemoveUntil(
-  //             '/app', (Route<dynamic> route) => false));
-  //   } else {
-  //     return Center(child: CircularProgressIndicator());
-  //   }
-  //   return Center(child: CircularProgressIndicator());
-  // }
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    //getAppsData(context);
     return Scaffold(
-      body: Center(
-        child: CircularProgressIndicator(),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              Theme.of(context).colorScheme.surface,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                flex: 2,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedBuilder(
+                      animation: _scaleAnimation,
+                      builder: (context, child) {
+                        return Transform.scale(
+                          scale: _scaleAnimation.value,
+                          child: Container(
+                            width: 120,
+                            height: 120,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primary,
+                              borderRadius: BorderRadius.circular(30),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                                  blurRadius: 20,
+                                  spreadRadius: 5,
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.notifications_active,
+                              size: 60,
+                              color: Colors.white,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    SizedBox(height: 24),
+                    AnimatedBuilder(
+                      animation: _fadeAnimation,
+                      builder: (context, child) {
+                        return FadeTransition(
+                          opacity: _fadeAnimation,
+                          child: Column(
+                            children: [
+                              Text(
+                                'Notifoo',
+                                style: GoogleFonts.inter(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).colorScheme.onSurface,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Smart Notification Management',
+                                style: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    AnimatedBuilder(
+                      animation: _fadeAnimation,
+                      builder: (context, child) {
+                        return FadeTransition(
+                          opacity: _fadeAnimation,
+                          child: Column(
+                            children: [
+                              CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                'Loading...',
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                                ),
+                              ),
+                              SizedBox(height: 32),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      // future: _appsListNew,
-      // builder: (context, snapshot) {
-      //   if (snapshot.hasData) {
-      //     // appListHelper.setStateAuthUrl(snapshot.data);
-      //     Timer(
-      //         Duration(seconds: 0),
-      //         () => Navigator.of(context).pushNamedAndRemoveUntil(
-      //             '/app', (Route<dynamic> route) => false));
-      //   } else if (snapshot.hasError) {
-      //     // return Center(child: Text('Some error occured'));
-      //     Future.microtask(() => Navigator.of(context)
-      //         .pushNamedAndRemoveUntil(
-      //             '/app', (Route<dynamic> route) => false));
-      //     //return Center();
-      //   }
-
-      // else {
-      //   Timer(
-      //       Duration(seconds: 0),
-      //       () => Navigator.of(context).pushNamedAndRemoveUntil(
-      //           '/app', (Route<dynamic> route) => false));
-      // }
-      //   return Center(
-      //     child: Text('Empty'),
-      //   );
-      // });
-
-      // if (_apps.length > 0) {
-      //   Future.microtask(() => Navigator.of(context)
-      //       .pushNamedAndRemoveUntil('/app', (Route<dynamic> route) => false));
-      //   return Center();
-      // } else {
-      //   Center(child: CircularProgressIndicator());
-      // }
     );
-  }
-
-  Future<List<Notifications>> initializeData() async {
-    DatabaseHelper.instance.initializeDatabase();
-    var notificationFromDatabase =
-        await DatabaseHelper.instance.getNotifications(0);
-    return notificationFromDatabase;
-  }
-
-  //Get set apps data
-  Future<void> getAppsData(BuildContext context) async {
-    //InstalledApps _installedApps = new InstalledApps();
-    //await _installedApps.getAppsList();
-    // _appsListNew = _installedApps.listOfApps;
-
-    //sets app data to singleton object
-    //  _appsListNew ?? setAppData(_installedApps.listOfApps);
-
-    Timer(
-        Duration(seconds: 2),
-        () => Navigator.of(context)
-            .pushNamedAndRemoveUntil('/app', (Route<dynamic> route) => false));
-
-    // Navigator.of(context)
-    //     .pushNamedAndRemoveUntil('/app', (Route<dynamic> route) => false);
-    //return _appsListNew;
-  }
-
-  loadAndRedirectToApp(BuildContext context) {
-    Navigator.of(context)
-        .pushNamedAndRemoveUntil('/app', (Route<dynamic> route) => false);
-  }
-
-  void setAppData(List<Apps> apps) {
-    AppListHelper().setStateAuthUrl(apps);
   }
 }

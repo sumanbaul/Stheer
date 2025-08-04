@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:stheer/src/helper/provider/google_sign_in.dart';
-import 'package:stheer/src/widgets/Topbar.dart';
+import 'package:notifoo/src/helper/provider/google_sign_in.dart';
+import 'package:notifoo/src/widgets/Topbar.dart';
 import 'package:provider/provider.dart';
 
 class SignIn extends StatelessWidget {

@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:isolate';
 import 'dart:ui';
+import 'dart:convert';
 import 'package:collection/collection.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
@@ -13,69 +13,105 @@ import 'DatabaseHelper.dart';
 import 'datetime_ago.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+// Mock Application class for sandbox
+class MockApplication {
+  final String appName;
+  final String packageName;
+  final String versionName;
+  final int versionCode;
+  final String dataDir;
+  final bool systemApp;
+  final String apkFilePath;
+  final int size;
+  final Image? icon;
+
+  MockApplication({
+    required this.appName,
+    required this.packageName,
+    required this.versionName,
+    required this.versionCode,
+    required this.dataDir,
+    required this.systemApp,
+    required this.apkFilePath,
+    required this.size,
+    this.icon,
+  });
+}
+
 class NotificationsHelper {
   static bool started = false;
   static ReceivePort port = ReceivePort();
   static List<NotificationEvent?>? notificationEvent;
 
-  // static Future<void> initPlatformState() async {
-  //   NotificationsListener.initialize(callbackHandle: _callback);
-
-  //   // this can fix restart<debug> can't handle error
-  //   IsolateNameServer.removePortNameMapping("_listener_");
-  //   IsolateNameServer.registerPortWithName(port.sendPort, "_listener_");
-  //   //IsolateNameServer.registerPortWithName(port.sendPort, "insta");
-  //   port.listen((message) => onData(message));
-
-  //   // don't use the default receivePort
-  //   // NotificationsListener.receivePort.listen((evt) => onData(evt));
-
-  //   var isR = await (NotificationsListener.isRunning as Future<bool>);
-  //   print("""Service is ${!isR ? "not " : ""}aleary running""");
-  // }
-
-  // we must use static method, to handle in background
   static void _callback(NotificationEvent evt) {
-    print(
-      "send evt to ui: $evt",
-    );
+    print("send evt to ui: $evt");
     final SendPort? send = IsolateNameServer.lookupPortByName("_listener_");
     if (send == null) print("can't find the sender");
     send?.send(evt);
   }
 
-  // static List<NotificationEvent?>? onData(NotificationEvent? event) {
-  //   print("Print Notification: $event");
-  //   notificationEvent!.add(event);
-  //   return notificationEvent;
-  // }
-
   static Future<List<Notifications>> initializeDbGetNotificationsToday(
       int day) async {
-    // DatabaseHelper.instance.initializeDatabase();
-    return await DatabaseHelper.instance.getNotifications(day);
+    // For sandbox, return mock data
+    return [
+      Notifications(
+        title: "Mock WhatsApp Message",
+        appTitle: "WhatsApp",
+        text: "Hello from sandbox! This is a test notification.",
+        message: "New message received",
+        packageName: "com.whatsapp",
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+        createAt: DateTime.now().toString(),
+      ),
+      Notifications(
+        title: "Mock Email",
+        appTitle: "Gmail",
+        text: "You have a new email in your inbox.",
+        message: "New email received",
+        packageName: "com.google.android.gm",
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+        createAt: DateTime.now().toString(),
+      ),
+      Notifications(
+        title: "Mock Instagram Like",
+        appTitle: "Instagram",
+        text: "Someone liked your post!",
+        message: "New activity",
+        packageName: "com.instagram.android",
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+        createAt: DateTime.now().toString(),
+      ),
+    ];
   }
 
-  static Future<Application?> getCurrentAppWithIcon(String packageName) async {
-    return await DeviceApps.getApp(packageName, true);
+  static Future<MockApplication?> getCurrentAppWithIcon(String packageName) async {
+    // Mock app data for sandbox
+    return MockApplication(
+      appName: packageName.contains("whatsapp") ? "WhatsApp" : 
+               packageName.contains("gmail") ? "Gmail" : 
+               packageName.contains("instagram") ? "Instagram" : "Unknown App",
+      packageName: packageName,
+      versionName: "1.0.0",
+      versionCode: 1,
+      dataDir: "/mock/data",
+      systemApp: false,
+      apkFilePath: "/mock/app.apk",
+      size: 1000000,
+      icon: null, // Mock icon
+    );
   }
 
-  //critical function below
-//This function is triggered on receiving of data from port
-  //static Future<Notifications> onData(
   static Future<Notifications> onData(NotificationEvent event) async {
     final _event = event;
     final eventAppWithIcon = await (getCurrentAppWithIcon(event.packageName!));
-    print(event); // this is needed for later
-    final Notifications _notification;
+    print(event);
+    
     if (eventAppWithIcon != null) {
       if (!eventAppWithIcon.systemApp) {
         if (event.packageName!.contains("skydrive") ||
             (event.packageName!.contains("service")) ||
-            // (event.packageName.contains("android")) ||
             (event.packageName!.contains("notifoo")) ||
             (event.packageName!.contains("screenshot")) ||
-            // (event.title ??  event.title!.contains("WhatsApp")) ||  //needs to be checked
             (event.packageName!.contains("deskclock")) ||
             (event.packageName!.contains("wellbeing")) ||
             (event.packageName!.contains("weather2")) ||
@@ -90,7 +126,6 @@ class NotificationsHelper {
 
           if (!jsonresponse.containsKey('summaryText') &&
               event.createAt!.day >= today) {
-            // if ((event.text != flagEntry) && event.text != null) {
             if (event.text != null) {
               final currentNotification = Notifications(
                 title: _event.title,
@@ -99,56 +134,28 @@ class NotificationsHelper {
                 message: _event.message,
                 packageName: _event.packageName,
                 timestamp: _event.timestamp,
-                createAt: _event.createAt!.millisecondsSinceEpoch.toString(),
-                eventJson: _event.toString(),
-                createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
-                isDeleted: 0,
+                createAt: _event.createAt!.toString(),
               );
 
-              _notification = currentNotification;
-
-              await DatabaseHelper.instance
-                  .insertNotification(currentNotification);
-              // flagEntry = event.text.toString();
-              print("$_notification.appTitle");
+              // Save to database
+              await DatabaseHelper.instance.insertNotification(currentNotification);
               return currentNotification;
-            } else {
-              // # TODO: Change for cleaning notifications better
-
-              // var titleLength = jsonresponse["textLines"].length;
-
-              final currentNotification = Notifications(
-                  title: jsonresponse["textLines"] ??
-                      jsonresponse["textLines"] as String?,
-                  text: event.text,
-                  message: event.message,
-                  packageName: event.packageName,
-                  timestamp: event.timestamp,
-                  createAt: event.createAt!.millisecondsSinceEpoch.toString(),
-                  eventJson: event.toString(),
-                  createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
-                  isDeleted: 0
-                  // infoText: jsonData["text"],
-                  // showWhen: 1,
-                  // subText: jsonData["text"],
-                  // timestamp: event.timestamp.toString(),
-                  // packageName: jsonData["packageName"],
-                  // text: jsonData["text"],
-                  // summaryText: jsonData["summaryText"] ?? ""
-                  );
-
-              _notification = currentNotification;
-              await DatabaseHelper.instance
-                  .insertNotification(currentNotification);
-              return _notification;
             }
           }
         }
       }
     }
 
-    _notification = new Notifications();
-    return _notification;
+    // Return mock notification if no real data
+    return Notifications(
+      title: "Sandbox Notification",
+      appTitle: "Sandbox App",
+      text: "This is a sandbox notification for testing",
+      message: "Test message",
+      packageName: "com.sandbox.app",
+      timestamp: DateTime.now().millisecondsSinceEpoch,
+      createAt: DateTime.now().toString(),
+    );
   }
 
   static Future<List<NotificationCategory>> getCategoryListFuture(
@@ -165,7 +172,7 @@ class NotificationsHelper {
         listByPackageName.forEach((key, value) async {
           // print(value[value.length - 1].createdDate);
           // if (value != null) {
-          final Application? _app =
+          final MockApplication? _app =
               await (getCurrentAppWithIcon(value[0].packageName));
           //final _length = value.length;
           var dt =
@@ -173,8 +180,7 @@ class NotificationsHelper {
           NotificationCategory nc = NotificationCategory(
               packageName: _app?.packageName,
               appTitle: _app?.appName,
-              appIcon:
-                  _app is ApplicationWithIcon ? Image.memory(_app.icon) : null,
+              appIcon: null, // Remove icon for sandbox
               //tempIcon: Image.memory(_currentApp.icon),
               timestamp: timeago.format(dt),
               message: "You have " +

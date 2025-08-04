@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:stheer/src/model/apps.dart';
-import 'package:stheer/src/model/habits_model.dart';
-import 'package:stheer/src/model/pomodoro_timer.dart';
+import 'package:flutter/foundation.dart';
+import 'package:notifoo/src/model/apps.dart';
+import 'package:notifoo/src/model/habits_model.dart';
+import 'package:notifoo/src/model/pomodoro_timer.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
@@ -59,42 +60,42 @@ class DatabaseHelper {
   }
 
   initializeDatabase() async {
-    //Directory appDocDir = await getApplicationDocumentsDirectory();
+    // For web platform, return null and use mock data
+    if (kIsWeb) {
+      print('Running on web platform - using mock database');
+      return null;
+    }
 
-    //String appDocPath = appDocDir.path;
-    // String path = join(await getDatabasesPath(), databaseName);
-    // print("Path: $path");
-    // final db = await database;
-    //print("Version: $db.getVersion()");
-
-    //Tasks
-    // Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    //final path = join(documentsDirectory.path, 'tasks.db');
-
-    return await openDatabase(
-      join(await getDatabasesPath(), databaseName),
-      version: 8,
-      onCreate: _onCreate,
-      onUpgrade: (db, oldVersion, newVersion) => {
-        //BELOW CODE IS CURRENTLY NOT IN USE
-        if (oldVersion == 2)
-          {
-            // db.execute(_deviceAppsTable),
-            db.execute(_deviceAppsAlterTableV3),
-          }
-        else if (oldVersion == 3)
-          {
-            db.execute(_deviceAppsAlterTableV3),
-            db.close(),
-          }
-        else if (oldVersion == 7)
-          {
-            db.execute(_deviceAppsAlterTableV3),
-            db.execute(_createTasksTable),
-            db.close(),
-          }
-      },
-    );
+    // For mobile platforms, use SQLite
+    try {
+      return await openDatabase(
+        join(await getDatabasesPath(), databaseName),
+        version: 8,
+        onCreate: _onCreate,
+        onUpgrade: (db, oldVersion, newVersion) => {
+          //BELOW CODE IS CURRENTLY NOT IN USE
+          if (oldVersion == 2)
+            {
+              // db.execute(_deviceAppsTable),
+              db.execute(_deviceAppsAlterTableV3),
+            }
+          else if (oldVersion == 3)
+            {
+              db.execute(_deviceAppsAlterTableV3),
+              db.close(),
+            }
+          else if (oldVersion == 7)
+            {
+              db.execute(_deviceAppsAlterTableV3),
+              db.execute(_createTasksTable),
+              db.close(),
+            }
+        },
+      );
+    } catch (e) {
+      print('Database initialization failed: $e');
+      return null;
+    }
   }
 
   Future _onCreate(Database db, int version) async {
@@ -115,47 +116,84 @@ class DatabaseHelper {
   }
 
   Future close() async {
-    final db = await (instance.database as Future<Database>);
-    db.close();
+    final db = await (instance.database as Future<Database?>);
+    if (db != null) {
+      db.close();
+    }
   }
 
   insertNotification(Notifications notifications) async {
     final db = await (database);
-    var res = await db?.insert(Notifications.TABLENAME, notifications.toMapDb(),
+    if (db == null) {
+      // For web platform, just print the notification
+      print('Web platform: Would insert notification: ${notifications.title}');
+      return 1;
+    }
+    var res = await db.insert(Notifications.TABLENAME, notifications.toMapDb(),
         conflictAlgorithm: ConflictAlgorithm.ignore);
     return res;
   }
 
   Future<List<Notifications>> getNotifications(int selectedDay) async {
     final db = await (database);
+    
+    // For web platform, return mock data
+    if (db == null) {
+      return [
+        Notifications(
+          title: "Mock WhatsApp Message",
+          appTitle: "WhatsApp",
+          text: "Hello from sandbox! This is a test notification.",
+          message: "New message received",
+          packageName: "com.whatsapp",
+          timestamp: DateTime.now().millisecondsSinceEpoch,
+          createAt: DateTime.now().toString(),
+          createdDate: DateTime.now().toString(),
+          isDeleted: 0,
+        ),
+        Notifications(
+          title: "Mock Email",
+          appTitle: "Gmail",
+          text: "You have a new email in your inbox.",
+          message: "New email received",
+          packageName: "com.google.android.gm",
+          timestamp: DateTime.now().millisecondsSinceEpoch,
+          createAt: DateTime.now().toString(),
+          createdDate: DateTime.now().toString(),
+          isDeleted: 0,
+        ),
+        Notifications(
+          title: "Mock Instagram Like",
+          appTitle: "Instagram",
+          text: "Someone liked your post!",
+          message: "New activity",
+          packageName: "com.instagram.android",
+          timestamp: DateTime.now().millisecondsSinceEpoch,
+          createAt: DateTime.now().toString(),
+          createdDate: DateTime.now().toString(),
+          isDeleted: 0,
+        ),
+      ];
+    }
+
     var yesterday = DateTime.now().subtract(Duration(days: 1));
     var now = selectedDay == 0 ? DateTime.now() : yesterday;
 
     var lastMidnight =
         DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
     print("Now in DB:${now.day}");
-    //var today = new DateTime.now().millisecondsSinceEpoch;
-    //print('Date from Db: $lastMidnight');
 
     String whereString = 'timestamp >= ?';
     List<dynamic> whereArguments = [lastMidnight];
 
-    final List<Map<String, dynamic>> maps = await db!.query(
+    final List<Map<String, dynamic>> maps = await db.query(
         Notifications.TABLENAME,
         orderBy: 'createdDate DESC',
         where: whereString,
         whereArgs: whereArguments);
 
-    // raw query
-    // List<Map<String, dynamic>> maps = await db.rawQuery(
-    //     'SELECT * FROM ${Notifications.TABLENAME} timestamp >=? and timestamp <',
-    //     [
-    //       '$lastMidnight',
-    //     ]);
-
     return List.generate(maps.length, (i) {
       return Notifications(
-        //  id: maps[i]['id'],
         title: maps[i]['title'],
         text: maps[i]['text'],
         message: maps[i]['message'],
@@ -165,16 +203,6 @@ class DatabaseHelper {
         appTitle: maps[i]['appTitle'],
         createdDate: maps[i]['createdDate'],
         isDeleted: maps[i]['isDeleted'],
-        // eventJson: maps[i]['eventJson'],
-        // signature: maps[i]['signature'],
-
-        // infoText: maps[i]['infoText'],
-        // summaryText: maps[i]['summaryText'],
-        // showWhen: maps[i]['showWhen'],
-        // package_name: maps[i]['package_name'],
-        // text: maps[i]['text'],
-        // subText: maps[i]['subText'],
-        // timestamp: maps[i]['timestamp'],
       );
     });
   }
@@ -183,6 +211,23 @@ class DatabaseHelper {
       String? package) async {
     final db = await (database);
 
+    // For web platform, return mock data
+    if (db == null) {
+      return [
+        Notifications(
+          title: "Mock ${package?.contains('whatsapp') == true ? 'WhatsApp' : 'App'} Message",
+          appTitle: package?.contains('whatsapp') == true ? "WhatsApp" : "Unknown App",
+          text: "Mock notification for $package",
+          message: "Mock message",
+          packageName: package,
+          timestamp: DateTime.now().millisecondsSinceEpoch,
+          createAt: DateTime.now().toString(),
+          createdDate: DateTime.now().toString(),
+          isDeleted: 0,
+        ),
+      ];
+    }
+
     var now = DateTime.now();
     var lastMidnight =
         DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
@@ -190,7 +235,7 @@ class DatabaseHelper {
     String whereString = 'timestamp >= ? and packageName = ?';
     List<dynamic> whereArguments = [lastMidnight, package];
 
-    final List<Map<String, dynamic>> maps = await db!.query(
+    final List<Map<String, dynamic>> maps = await db.query(
         Notifications.TABLENAME,
         orderBy: 'createAt DESC',
         where: whereString,
@@ -198,25 +243,16 @@ class DatabaseHelper {
 
     return List.generate(maps.length, (i) {
       return Notifications(
-          //  id: maps[i]['id'],
           title: maps[i]['title'],
           text: maps[i]['text'],
           message: maps[i]['message'],
           packageName: maps[i]['packageName'],
           timestamp: maps[i]['timestamp'],
           createAt: maps[i]['createAt'],
-          appTitle: maps[i]['appTitle']
-          // eventJson: maps[i]['eventJson'],
-          // signature: maps[i]['signature'],
-
-          // infoText: maps[i]['infoText'],
-          // summaryText: maps[i]['summaryText'],
-          // showWhen: maps[i]['showWhen'],
-          // package_name: maps[i]['package_name'],
-          // text: maps[i]['text'],
-          // subText: maps[i]['subText'],
-          // timestamp: maps[i]['timestamp'],
-          );
+          appTitle: maps[i]['appTitle'],
+          createdDate: maps[i]['createdDate'],
+          isDeleted: maps[i]['isDeleted'],
+      );
     });
   }
 
@@ -230,13 +266,21 @@ class DatabaseHelper {
   // }
 
   deleteTodo(int id) async {
-    var db = await (database as Future<Database>);
+    final db = await (database);
+    if (db == null) {
+      print('Web platform: Would delete notification with id: $id');
+      return;
+    }
     db.delete(Notifications.TABLENAME, where: 'id = ?', whereArgs: [id]);
   }
 
   //Pomodoro
   insertPomodoroTimer(PomodoroTimer pomodoroTimer) async {
-    final db = await (database as Future<Database>);
+    final db = await (database);
+    if (db == null) {
+      print('Web platform: Would insert pomodoro timer: ${pomodoroTimer.taskName}');
+      return 1;
+    }
     var res = await db.insert(PomodoroTimer.TABLENAME, pomodoroTimer.toMap(),
         conflictAlgorithm: ConflictAlgorithm.ignore);
     return res;
@@ -245,6 +289,19 @@ class DatabaseHelper {
   Future<List<PomodoroTimer>> getPomodoroTimer() async {
     final db = await (database);
 
+    // For web platform, return mock data
+    if (db == null) {
+      return [
+        PomodoroTimer(
+          taskName: "Mock Pomodoro Task",
+          duration: "25:00",
+          isCompleted: 1,
+          createdDate: DateTime.now().toString(),
+          isDeleted: 0,
+        ),
+      ];
+    }
+
     var now = DateTime.now();
     var lastMidnight =
         DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
@@ -252,7 +309,7 @@ class DatabaseHelper {
     String whereString = 'createdDate >= ?';
     List<dynamic> whereArguments = [lastMidnight];
 
-    final List<Map<String, dynamic>> maps = await db!.query(
+    final List<Map<String, dynamic>> maps = await db.query(
         PomodoroTimer.TABLENAME,
         orderBy: 'createdDate DESC',
         where: whereString,
@@ -272,7 +329,11 @@ class DatabaseHelper {
 // Device Apps
   insertDeviceApps(Apps application) async {
     final db = await (database);
-    var res = await db!.insert(Apps.TABLENAME, application.toMap(),
+    if (db == null) {
+      print('Web platform: Would insert device app: ${application.appName}');
+      return 1;
+    }
+    var res = await db.insert(Apps.TABLENAME, application.toMap(),
         conflictAlgorithm: ConflictAlgorithm.ignore);
     return res;
   }
@@ -280,7 +341,37 @@ class DatabaseHelper {
   Future<List<Apps>> getInstalledApps() async {
     final db = await (database);
 
-    final List<Map<String, dynamic>> maps = await db!.query(Apps.TABLENAME);
+    // For web platform, return mock data
+    if (db == null) {
+      return [
+        Apps(
+          appName: "Mock App 1",
+          apkFilePath: "/mock/path/app1.apk",
+          packageName: "com.mock.app1",
+          versionName: "1.0.0",
+          versionCode: "1",
+          dataDir: "/mock/data/app1",
+          systemApp: 0,
+          installTimeMillis: DateTime.now().millisecondsSinceEpoch,
+          category: "productivity",
+          enabled: 1,
+        ),
+        Apps(
+          appName: "Mock App 2",
+          apkFilePath: "/mock/path/app2.apk",
+          packageName: "com.mock.app2",
+          versionName: "2.0.0",
+          versionCode: "2",
+          dataDir: "/mock/data/app2",
+          systemApp: 0,
+          installTimeMillis: DateTime.now().millisecondsSinceEpoch,
+          category: "social",
+          enabled: 1,
+        ),
+      ];
+    }
+
+    final List<Map<String, dynamic>> maps = await db.query(Apps.TABLENAME);
 
     return List.generate(maps.length, (i) {
       return Apps(
@@ -301,16 +392,41 @@ class DatabaseHelper {
   // Create new Habit
   Future<int> createHabit(HabitsModel habitsItem) async {
     final db = await (database);
-    final id = await db?.insert(HabitsModel.TABLENAME, habitsItem.toMap(),
+    if (db == null) {
+      print('Web platform: Would create habit: ${habitsItem.habitTitle}');
+      return 1;
+    }
+    final id = await db.insert(HabitsModel.TABLENAME, habitsItem.toMap(),
         conflictAlgorithm: ConflictAlgorithm.ignore);
-    return id!;
+    return id;
   }
 
   // Read all items (habits)
   Future<List<HabitsModel>> getHabits() async {
     final db = await (database);
+    
+    // For web platform, return mock data
+    if (db == null) {
+      return [
+        HabitsModel(
+          id: 1,
+          habitTitle: "Mock Habit 1",
+          color: "#FF6B6B",
+          habitType: "daily",
+          isCompleted: 0,
+        ),
+        HabitsModel(
+          id: 2,
+          habitTitle: "Mock Habit 2",
+          color: "#4ECDC4",
+          habitType: "weekly",
+          isCompleted: 1,
+        ),
+      ];
+    }
+    
     final List<Map<String, dynamic>> maps =
-        await db!.query(HabitsModel.TABLENAME, orderBy: "id");
+        await db.query(HabitsModel.TABLENAME, orderBy: "id");
 
     return List.generate(maps.length, (i) {
       return HabitsModel(
@@ -327,12 +443,20 @@ class DatabaseHelper {
   // Currently this is not in use, but put here for referrence
   Future<List<Map<String, dynamic>>> getItem(int id) async {
     final db = await (database);
-    return db!.query('tblhabits', where: "id = ?", whereArgs: [id], limit: 1);
+    if (db == null) {
+      print('Web platform: Would get item with id: $id');
+      return [];
+    }
+    return db.query('tblhabits', where: "id = ?", whereArgs: [id], limit: 1);
   }
 
   // Update an item by id(need to update)
   Future<int> updateHabitItem(int id, String title, String? descrption) async {
     final db = await (database);
+    if (db == null) {
+      print('Web platform: Would update habit item with id: $id');
+      return 1;
+    }
 
     final data = {
       'title': title,
@@ -341,15 +465,19 @@ class DatabaseHelper {
     };
 
     final result =
-        await db?.update('tblhabits', data, where: "id = ?", whereArgs: [id]);
-    return result!;
+        await db.update('tblhabits', data, where: "id = ?", whereArgs: [id]);
+    return result;
   }
 
   // Delete(will need to update)
   Future<void> deleteHabitItem(int id) async {
     final db = await (database);
+    if (db == null) {
+      print('Web platform: Would delete habit item with id: $id');
+      return;
+    }
     try {
-      await db?.delete("items", where: "id = ?", whereArgs: [id]);
+      await db.delete("items", where: "id = ?", whereArgs: [id]);
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
     }
@@ -359,32 +487,68 @@ class DatabaseHelper {
   createTask(Tasks newTask) async {
     //await deleteAllTasks();
     final db = await database;
-    final res = await db?.insert('Tasks', newTask.toJson());
-
+    if (db == null) {
+      print('Web platform: Would create task: ${newTask.title}');
+      return 1;
+    }
+    final res = await db.insert('Tasks', newTask.toJson());
     return res;
   }
 
   insertTask(Tasks newTask) async {
     final db = await database;
-    final res = await db?.insert('Tasks', newTask.toJson());
-
+    if (db == null) {
+      print('Web platform: Would insert task: ${newTask.title}');
+      return 1;
+    }
+    final res = await db.insert('Tasks', newTask.toJson());
     return res;
   }
 
   // Delete all employees
   Future<int> deleteAllTasks() async {
     final db = await database;
-    final res = await db?.rawDelete('DELETE FROM Tasks');
-
-    return res!;
+    if (db == null) {
+      print('Web platform: Would delete all tasks');
+      return 0;
+    }
+    final res = await db.rawDelete('DELETE FROM Tasks');
+    return res;
   }
 
   Future<List<Tasks>> getAllTasks() async {
     final db = await database;
-    final res = await db?.rawQuery("SELECT * FROM Tasks");
+    
+    // For web platform, return mock data
+    if (db == null) {
+      return [
+        Tasks(
+          id: 1,
+          title: "Mock Task 1",
+          isCompleted: 0,
+          taskType: "personal",
+          color: "#FF6B6B",
+          createdDate: DateTime.now(),
+          modifiedDate: DateTime.now(),
+          repeatitions: 1,
+        ),
+        Tasks(
+          id: 2,
+          title: "Mock Task 2",
+          isCompleted: 1,
+          taskType: "work",
+          color: "#4ECDC4",
+          createdDate: DateTime.now(),
+          modifiedDate: DateTime.now(),
+          repeatitions: 2,
+        ),
+      ];
+    }
+    
+    final res = await db.rawQuery("SELECT * FROM Tasks");
 
     List<Tasks> list =
-        res!.isNotEmpty ? res.map((c) => Tasks.fromJson(c)).toList() : [];
+        res.isNotEmpty ? res.map((c) => Tasks.fromJson(c)).toList() : [];
 
     return list;
   }

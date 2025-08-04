@@ -1,5 +1,5 @@
-name: stheer
-description: Stheer - An app to correct phone addiction and converting a person into a better focussed human individual.
+name: notifoo
+description: Notifoo - A modern notification management app that helps you batch and read notifications later, improving focus and productivity.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -12,7 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  intl: ^0.17.0
+  intl: ^0.18.1
 
   # Database
   sqflite: ^2.0.2
@@ -37,9 +37,9 @@ dependencies:
   dio: ^5.0.1
   percent_indicator: ^4.2.3
   confetti: ^0.7.0
-  flutter_iconpicker: ^3.2.2
+  flutter_iconpicker: ^3.4.4
 
-  flutter_slidable: ^2.0.0
+  flutter_slidable: ^3.0.1
   flutter_heatmap_calendar: ^1.0.5
   fl_heatmap: ^0.2.0
   
@@ -51,6 +51,9 @@ dependencies:
 
   # State Management
   provider: ^6.0.2
+
+  # URL Launcher
+  url_launcher: ^6.1.14
 
  
 

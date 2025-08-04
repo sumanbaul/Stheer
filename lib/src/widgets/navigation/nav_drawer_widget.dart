@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:stheer/src/pages/Pomodoro.dart';
-import 'package:stheer/src/pages/Profile.dart';
-import 'package:stheer/src/pages/TestPage.dart';
-import 'package:stheer/src/pages/habit_hub_page.dart';
+import 'package:notifoo/src/pages/Pomodoro.dart';
+import 'package:notifoo/src/pages/Profile.dart';
+import 'package:notifoo/src/pages/TestPage.dart';
+import 'package:notifoo/src/pages/habit_hub_page.dart';
 
 class NavigationDrawerWidget extends StatelessWidget {
   final padding = EdgeInsets.symmetric(horizontal: 20);

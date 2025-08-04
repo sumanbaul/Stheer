@@ -1,11 +1,12 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:stheer/src/helper/DatabaseHelper.dart';
-import 'package:stheer/src/helper/datetime_ago.dart';
-import 'package:stheer/src/model/list_detail_model.dart';
+import 'package:device_apps/device_apps.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:notifoo/src/helper/DatabaseHelper.dart';
+import 'package:notifoo/src/helper/datetime_ago.dart' show readTimestamp;
+import 'package:notifoo/src/model/list_detail_model.dart';
 
 class NotificationDetailList extends StatefulWidget {
-  // In the constructor, require a Todo.
   NotificationDetailList({
     Key? key,
     this.packageName,
@@ -14,8 +15,6 @@ class NotificationDetailList extends StatefulWidget {
     this.appTitle,
     this.notification,
   }) : super(key: key);
-  //NotificationCatgoryList({Key key, this.title}) : super(key: key);
-  //final AppListHelper appsListHelper = new AppListHelper();
 
   final String? title;
   final String? packageName;
@@ -24,61 +23,63 @@ class NotificationDetailList extends StatefulWidget {
   final Notification? notification;
 
   @override
-  _NotificationCatgoryListState createState() =>
-      _NotificationCatgoryListState();
+  _NotificationCatgoryListState createState() => _NotificationCatgoryListState();
 }
 
 class _NotificationCatgoryListState extends State<NotificationDetailList> {
   ScrollController _controller = new ScrollController();
-  final List<Color> _cardColors = [
-    Color.fromRGBO(59, 66, 84, 1),
-    Color.fromRGBO(41, 47, 61, 1)
-  ];
-
   List<NotificationModel> _notificationsList = [];
-  // final List<Application> _apps = AppListHelper().appListData;
-  // ApplicationWithIcon _currentApp;
 
   @override
   void initState() {
     DatabaseHelper.instance.initializeDatabase();
-
     super.initState();
-
     getNotificationList();
   }
 
-  // Application getCurrentApp(String packageName) {
-  //   if (_currentApp == null) {}
-  //   // getListOfApps().whenComplete(() => _apps);
-  //   for (var app in _apps) {
-  //     if (app.packageName == packageName) {
-  //       _currentApp = app;
-  //     }
-  //   }
-  //   return _currentApp;
-  // }
+  Future<void> _launchApp(String packageName) async {
+    try {
+      // For sandbox, just show a dialog
+      print('Sandbox: Would launch app $packageName');
+      
+      // In a real app, this would launch the actual app
+      // For now, we'll just show a success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Sandbox: Would launch $packageName'),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+        ),
+      );
+    } catch (e) {
+      print('Error launching app: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    //debugPaintSizeEnabled = true;
     return Scaffold(
-      //appBar: Topbar.getTopbar(widget.title),
-      // backgroundColor: Colors.transparent,
-      body: getNotificationListBody(),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      appBar: AppBar(
+        title: Text(widget.appTitle ?? 'Notifications'),
+        actions: [
+          if (widget.packageName != null)
+            IconButton(
+              onPressed: () => _launchApp(widget.packageName!),
+              icon: Icon(Icons.open_in_new),
+              tooltip: 'Open App',
+            ),
+        ],
+      ),
+      body: _buildNotificationList(),
     );
   }
 
   Future<List<NotificationModel>> getNotificationList() async {
-    var getNotificationModel =
-        await DatabaseHelper.instance.getNotifications(0);
-
+    var getNotificationModel = await DatabaseHelper.instance.getNotifications(0);
     List<NotificationModel> notificationList = [];
 
     getNotificationModel.forEach((key) {
       if (key.packageName!.contains(widget.packageName!)) {
-        // print(key.text);
-        // print(key.title);
         var _notification = NotificationModel(
           title: key.title,
           text: key.text,
@@ -94,241 +95,159 @@ class _NotificationCatgoryListState extends State<NotificationDetailList> {
         );
         notificationList.add(_notification);
       }
-
-      //notificationsByCategory.add(nc);
     });
 
-    // notificationList.sort(
-    //     (a, b) => a.appTitle.toLowerCase().compareTo(b.appTitle.toLowerCase()));
-    _notificationsList = notificationList;
-    // setState(
-    //     () {}); //this line is responsible for updating the view instantaneously
+    setState(() {
+      _notificationsList = notificationList;
+    });
 
     return notificationList;
-    //print(listByPackageName);
   }
 
-  // getNotificationListBody() {
-  //   return FutureBuilder<List<NotificationModel>>(
-  //       future: DatabaseHelper.instance.getNotifications(),
-  //       builder: (context, snapshot) {
-  //         if (snapshot.hasData) {
-  //           return new ListView.builder(
-  //               itemBuilder: buildNotificationCard,
-  //               physics: BouncingScrollPhysics(
-  //                 parent: AlwaysScrollableScrollPhysics(),
-  //               ));
-  //         }
-
-  //         else {
-
-  //         }
-  //       });
-  // }
-
-  getNotificationListBody() {
-    return FutureBuilder<List<NotificationModel>>(
-        future: getNotificationList(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return new ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: buildNotificationCard,
-              physics: BouncingScrollPhysics(
-                parent: AlwaysScrollableScrollPhysics(),
+  Widget _buildNotificationList() {
+    if (_notificationsList.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(40),
               ),
-            );
-          } else {
-            return Container();
-          }
-        });
-  }
+              child: Icon(
+                Icons.notifications_none,
+                size: 40,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+              ),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'No notifications found',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Notifications from this app will appear here',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
 
-  getTagButton() {
-    return Container(
-      height: 40.0,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20.0),
-          color: Colors.blueAccent, //Color.fromRGBO(84, 98, 117, 0.9),
-          boxShadow: [
-            BoxShadow(
-                color: Color.fromRGBO(84, 98, 117, 1),
-                blurRadius: 6,
-                spreadRadius: 1,
-                offset: Offset(-3, -3)),
-            BoxShadow(
-                color: Color.fromRGBO(40, 48, 59, 1),
-                blurRadius: 6,
-                spreadRadius: 1,
-                offset: Offset(3, 3)),
-          ]),
-      margin: EdgeInsets.fromLTRB(7, 10, 5, 10),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 5.0),
-        child: Text('#social'),
-      ),
+    return ListView.builder(
+      padding: EdgeInsets.all(16),
+      itemCount: _notificationsList.length,
+      itemBuilder: (context, index) {
+        final notification = _notificationsList[index];
+        return _buildNotificationCard(notification, index);
+      },
     );
   }
 
-  Widget buildNotificationCard(BuildContext context, int index) {
-    var size = MediaQuery.of(context).size;
-    final item = _notificationsList[index];
-
-    return Dismissible(
-// Each Dismissible must contain a Key. Keys allow Flutter to
-      // uniquely identify widgets.
-      key: ObjectKey(item),
-      // Provide a function that tells the app
-      // what to do after an item has been swiped away.
-      onDismissed: (direction) {
-        //#TODO
-        // Remove the item from the data source.
-        // setState(() {
-        //   _notificationsList.removeAt(index);
-        // });
-      },
-      // Show a red background as the item is swiped away.
-      background: Container(color: Colors.red),
-
+  Widget _buildNotificationCard(NotificationModel notification, int index) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 12),
       child: Card(
-        elevation: 0.0,
-        color: Colors.transparent,
-        margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-        child: Column(
-          children: <Widget>[
-            Container(
-              // height: 165,
-              padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 12.0),
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: _cardColors,
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Color.fromRGBO(84, 98, 117, 1),
-                        blurRadius: 8,
-                        spreadRadius: 2,
-                        offset: Offset(-4, -4)),
-                    BoxShadow(
-                        color: Color.fromRGBO(40, 48, 59, 1),
-                        blurRadius: 8,
-                        spreadRadius: 2,
-                        offset: Offset(4, 4)),
-                  ]),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
+        elevation: 2,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () => _launchApp(notification.packageName!),
+          child: Container(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    if (notification.appIcon != null) ...[
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: Theme.of(context).colorScheme.surface,
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: notification.appIcon,
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                    ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CircleAvatar(
-                            //radius: 25.0,
-                            //backgroundImage: _nc[index].appIcon,
-                            child: item.appIcon,
-                            // child: ClipRRect(
-                            //   child: _nc[index].appIcon,
-                            //   borderRadius: BorderRadius.circular(100.0),
-                            // ),
-                            backgroundColor: Colors.white10,
-                          ),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: size.width - 130,
-                                child: new Text(
-                                  item.title ?? item.appTitle!,
-                                  //overflow: TextOverflow.clip,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18.0,
-                                      overflow: TextOverflow.ellipsis),
-                                ),
+                          if (notification.title != null && notification.title!.isNotEmpty)
+                            Text(
+                              notification.title!,
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
-                              SizedBox(
-                                height: 3.0,
-                              ),
-                              Container(
-                                child: item.createdDate != null
-                                    ? Text(
-                                        readTimestamp(
-                                          int.parse(item.createdDate!),
-                                        ),
-                                        style: TextStyle(
-                                            color: Color.fromRGBO(
-                                                196, 196, 196, 1)),
-                                      )
-                                    : Text("null"), // TODO
-                              )
-                            ],
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          SizedBox(height: 4),
+                          Text(
+                            readTimestamp(notification.timestamp!),
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                            ),
                           ),
                         ],
                       ),
-                      Icon(Icons.keyboard_arrow_right)
-                    ],
+                    ),
+                    Icon(
+                      Icons.chevron_right,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                    ),
+                  ],
+                ),
+                if (notification.text != null && notification.text!.isNotEmpty) ...[
+                  SizedBox(height: 12),
+                  Text(
+                    notification.text!,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: new SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          dragStartBehavior: DragStartBehavior.start,
-                          child: Container(
-                            padding: const EdgeInsets.only(top: 10.0),
-                            width: size.width * 0.87,
-                            //height: 45.0,
-                            child: Text(item.text ?? "No text to display"),
+                ],
+                SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _launchApp(notification.packageName!),
+                        icon: Icon(Icons.open_in_new, size: 18),
+                        label: Text('Open App'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Theme.of(context).colorScheme.primary,
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                       ),
-                      // Padding(
-                      //   padding: const EdgeInsets.only(top: 10.0),
-                      //   child: Text(
-                      //     '2 minutes ago',
-                      //     style: TextStyle(
-                      //       color: Color.fromRGBO(196, 196, 196, 1),
-                      //       fontWeight: FontWeight.bold,
-                      //     ),
-                      //   ),
-                      // ),
-                    ],
-                  ),
-                  Container(
-                    color: Colors.transparent,
-                    width: size.width,
-                    height: 45,
-                    child: ListView(
-                      physics: const AlwaysScrollableScrollPhysics(), // new
-                      controller: _controller,
-                      scrollDirection: Axis.horizontal,
-                      children: [
-                        getTagButton(),
-                        getTagButton(),
-                        getTagButton(),
-                        getTagButton(),
-                        getTagButton(),
-                        getTagButton(),
-                        getTagButton(),
-                      ],
                     ),
-                  )
-                ],
-              ),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

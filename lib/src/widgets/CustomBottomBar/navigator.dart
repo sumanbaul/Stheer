@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:stheer/src/pages/Homepage.dart';
-import 'package:stheer/src/pages/Pomodoro.dart';
-import 'package:stheer/src/pages/SignIn.dart';
-import 'package:stheer/src/pages/habit_tracker.dart';
-import 'package:stheer/src/pages/task_page.dart';
-import 'package:stheer/src/widgets/CustomBottomBar/BottomNavigation.dart';
-import 'package:stheer/src/widgets/navigation/nav_drawer_widget.dart';
+import 'package:notifoo/src/pages/Homepage.dart';
+import 'package:notifoo/src/pages/Pomodoro.dart';
+import 'package:notifoo/src/pages/SignIn.dart';
+import 'package:notifoo/src/pages/habit_tracker.dart';
+import 'package:notifoo/src/pages/task_page.dart';
+import 'package:notifoo/src/widgets/CustomBottomBar/BottomNavigation.dart';
+import 'package:notifoo/src/widgets/navigation/nav_drawer_widget.dart';
 
 import '../../../src/model/Notifications.dart';
 import '../../pages/Profile.dart';
@@ -24,74 +24,52 @@ class App extends StatefulWidget {
 }
 
 class AppState extends State<App> {
-  // this is static property so other widget throughout the app
-  // can access it simply by AppState.currentTab
   static int currentTab = 0;
-
-  // declare a key for scaffold
   final GlobalKey<ScaffoldState> scaffoldKey;
-
-  // list tabs here
   late final List<TabItem> tabs;
 
   AppState({required this.scaffoldKey}) {
     tabs = [
       TabItem(
-        // tabName: "Home",
-        // icon: Icons.notifications_active_outlined,
-        // page: Homepage(
-        //   title: 'Stheer',
-        //   openNavigationDrawer: () => scaffoldKey.currentState!.openDrawer(),
-        // ),
+        tabName: "Notifications",
+        icon: Icons.notifications_outlined,
+        activeIcon: Icons.notifications,
+        page: Homepage(
+          title: 'Notifoo',
+          openNavigationDrawer: () => scaffoldKey.currentState!.openDrawer(),
+        ),
+      ),
+      TabItem(
         tabName: "Habits",
-        icon: Icons.add_task_rounded,
-        page: HabitTracker(
-            //title: 'Habits Home',
-            ),
+        icon: Icons.track_changes_outlined,
+        activeIcon: Icons.track_changes,
+        page: HabitTracker(),
       ),
       TabItem(
         tabName: "Pomodoro",
-        icon: Icons.timer_sharp,
+        icon: Icons.timer_outlined,
+        activeIcon: Icons.timer,
         page: Pomodoro(
           title: 'Pomodoro',
         ),
       ),
       TabItem(
         tabName: "Tasks",
-        icon: Icons.add_task_rounded,
+        icon: Icons.task_outlined,
+        activeIcon: Icons.task,
         page: TaskPage(),
-        // page: HabitHubPage(
-        //   title: 'Profile',
-        // ),
       ),
-
-      // TabItem(
-      //   tabName: "Profile",
-      //   icon: Icons.people,
-      //   page: Profile(title: "Login"),
-      //   // page: HabitHubPage(
-      //   //   title: 'Profile',
-      //   // ),
-      // ),
     ];
 
-    // indexing is necessary for proper funcationality
-    // of determining which tab is active
     tabs.asMap().forEach((index, details) {
       details.setIndex(index);
     });
   }
 
-  // sets current tab index
-  // and update state
   void _selectTab(int index) {
     if (index == currentTab) {
-      // pop to first route
-      // if the user taps on the active tab
       tabs[index].key.currentState!.popUntil((route) => route.isFirst);
     } else {
-      // update the state
-      // in order to repaint
       setState(() => currentTab = index);
     }
   }
@@ -102,54 +80,76 @@ class AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    // WillPopScope handle android back btn
-    return WillPopScope(
-      onWillPop: () async {
-        final isFirstRouteInCurrentTab =
-            !await tabs[currentTab].key.currentState!.maybePop();
-        if (isFirstRouteInCurrentTab) {
-          // if not on the 'main' tab
-          if (currentTab != 0) {
-            // select 'main' tab
-            _selectTab(0);
-            // back button handled by app
-            return false;
-          }
-        }
-        // let system handle back button if we're on the first route
-        return isFirstRouteInCurrentTab;
-      },
-      // this is the base scaffold
-      // don't put appbar in here otherwise you might end up
-      // with multiple appbars on one screen
-      // eventually breaking the app
-      child: Scaffold(
-          key: scaffoldKey,
-          drawer: NavigationDrawerWidget(),
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerDocked,
-          extendBody: false,
-          // floatingActionButton: FloatingActionButton(
-          //   onPressed: () {},
-          //   backgroundColor: Color.fromRGBO(233, 99, 150, 1),
-          //   child: Icon(Icons.abc),
-          // ),
-          body: IndexedStack(
-            index: currentTab,
-            children: tabs.map((e) => e.page).toList(),
-          ),
-          // Bottom navigation
-          bottomNavigationBar: BottomAppBar(
-            child: BottomNavigation(
-              onSelectTab: _selectTab,
-              tabs: tabs,
+    return Scaffold(
+      key: scaffoldKey,
+      drawer: NavigationDrawerWidget(),
+      body: IndexedStack(
+        index: currentTab,
+        children: tabs.map((tab) => tab.page).toList(),
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: Offset(0, -2),
             ),
-            // notchMargin: 4.0,
-            // notchMargin: 10.0,
-            //shape: const CircularNotchedRectangle(),
-            //color: Color.fromARGB(255, 254, 254, 255),
-            elevation: 0,
-          )),
+          ],
+        ),
+        child: SafeArea(
+          child: Container(
+            height: 80,
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: tabs.map((tab) {
+                return _buildTabItem(tab);
+              }).toList(),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabItem(TabItem tab) {
+    bool isSelected = currentTab == tab.index;
+    
+    return GestureDetector(
+      onTap: () => _selectTab(tab.index!),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected 
+              ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isSelected ? tab.activeIcon : tab.icon,
+              color: isSelected 
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              size: 24,
+            ),
+            SizedBox(height: 4),
+            Text(
+              tab.tabName!,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: isSelected 
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

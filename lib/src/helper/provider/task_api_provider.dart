@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:stheer/src/helper/DatabaseHelper.dart';
+import 'package:notifoo/src/helper/DatabaseHelper.dart';
 import '../../model/tasks.dart';
 
 class TasksApiProvider {

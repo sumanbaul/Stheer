@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:stheer/src/helper/DatabaseHelper.dart';
-import 'package:stheer/src/helper/provider/task_api_provider.dart';
-import 'package:stheer/src/model/tasks.dart';
-import 'package:stheer/src/pages/add_task.dart';
+import 'package:notifoo/src/helper/DatabaseHelper.dart';
+import 'package:notifoo/src/helper/provider/task_api_provider.dart';
+import 'package:notifoo/src/model/tasks.dart';
+import 'package:notifoo/src/pages/add_task.dart';
 
 String _selectedValue = "";
 

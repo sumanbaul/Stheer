@@ -1,9 +1,9 @@
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
-import 'package:stheer/src/helper/DatabaseHelper.dart';
+import 'package:notifoo/src/helper/DatabaseHelper.dart';
 import 'dart:async';
 
-import 'package:stheer/src/model/apps.dart';
+import 'package:notifoo/src/model/apps.dart';
 
 // class AppsList {
 //   static List<Application> _apps;

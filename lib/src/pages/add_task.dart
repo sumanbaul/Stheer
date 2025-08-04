@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:stheer/src/model/tasks.dart';
+import 'package:notifoo/src/model/tasks.dart';
 
 //import 'package:realm/realm.dart';
 var _taskType = ["Growth", "Daily", "Projects", "Shopping", "Timer"];

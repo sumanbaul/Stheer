@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:stheer/src/widgets/Topbar.dart';
+import 'package:notifoo/src/widgets/Topbar.dart';
 
 class HomeBannerWidget extends StatefulWidget {
   final String? title;

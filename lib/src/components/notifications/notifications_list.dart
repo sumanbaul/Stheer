@@ -105,8 +105,8 @@ class NotificationsList extends StatelessWidget {
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    onPrimary: Colors.white24,
-                    primary: Colors.grey[600],
+                    foregroundColor: Colors.white24,
+                    backgroundColor: Colors.grey[600],
                     //minimumSize: Size(88, 36),
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     shape: const RoundedRectangleBorder(

@@ -1,35 +1,43 @@
 import 'package:flutter/material.dart';
 
 class ButtonWidget extends StatelessWidget {
-  final String? text;
-  final VoidCallback? onClicked;
-  final Color color;
-  final Color backgroundColor;
+  final String text;
+  final VoidCallback onPressed;
+  final Color? backgroundColor;
+  final Color? textColor;
+  final double? width;
+  final double? height;
+  final double? borderRadius;
+  final EdgeInsets? padding;
 
   const ButtonWidget({
     Key? key,
-    this.text,
-    this.onClicked,
-    this.color = Colors.white,
-    this.backgroundColor = Colors.black,
+    required this.text,
+    required this.onPressed,
+    this.backgroundColor,
+    this.textColor,
+    this.width,
+    this.height,
+    this.borderRadius,
+    this.padding,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(18.0),
+    return SizedBox(
+      width: width,
+      height: height,
       child: ElevatedButton(
+        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          primary: backgroundColor,
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          elevation: 18,
-          shape: StadiumBorder(),
+          backgroundColor: backgroundColor,
+          foregroundColor: textColor,
+          padding: padding ?? EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadius ?? 12),
+          ),
         ),
-        child: Text(
-          text!,
-          style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-        ),
-        onPressed: onClicked,
+        child: Text(text),
       ),
     );
   }

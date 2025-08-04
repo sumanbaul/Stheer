@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
-import 'package:stheer/main.dart';
-import 'package:stheer/src/pages/SignIn.dart';
-import 'package:stheer/src/pages/habit_tracker.dart';
-import 'package:stheer/src/widgets/LoggedInWidget.dart';
+import 'package:notifoo/main.dart';
+import 'package:notifoo/src/pages/SignIn.dart';
+import 'package:notifoo/src/pages/habit_tracker.dart';
+import 'package:notifoo/src/widgets/LoggedInWidget.dart';
 import '../helper/provider/google_sign_in.dart';
 import '../helper/user_database.dart';
 

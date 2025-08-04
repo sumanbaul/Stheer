@@ -1,165 +1,176 @@
 import 'package:flutter/material.dart';
+import 'package:device_apps/device_apps.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../src/model/notificationCategory.dart';
 import 'list_detail.dart';
 
 class NotificationsCard extends StatelessWidget {
-  const NotificationsCard(
-      {Key? key,
-      this.index,
-      required this.notificationsCategory,
-      this.notification})
-      : super(key: key);
+  const NotificationsCard({
+    Key? key,
+    this.index,
+    required this.notificationsCategory,
+    this.notification,
+  }) : super(key: key);
+  
   final int? index;
   final NotificationCategory? notificationsCategory;
   final Notification? notification;
 
-  buildNotificationCard(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 10, top: 5),
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-      child: Card(
-        elevation: 0.0,
-        margin: EdgeInsets.only(top: 0.0),
-        color: Colors.transparent,
-        child: Stack(children: [
-          Column(
-            // crossAxisAlignment: CrossAxisAlignment.stretch,
-            // mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                //  margin: EdgeInsets.only(bottom: 10),
-                height: 100,
-                padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 12.0),
-                decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Color.fromRGBO(59, 66, 84, 1),
-                        Color.fromRGBO(41, 47, 61, 1)
-                      ],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
-                    //color: Color.fromRGBO(40, 48, 59, 1),
-                    // color: Color.fromRGBO(58, 66, 86, 1.0),
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Color.fromRGBO(84, 98, 117, 1),
-                          blurRadius: 8,
-                          spreadRadius: 2,
-                          offset: Offset(-3, -3)),
-                      BoxShadow(
-                          color: Color.fromRGBO(40, 48, 59, 1),
-                          blurRadius: 8,
-                          spreadRadius: 2,
-                          offset: Offset(3, 3)),
-                    ]),
-                child: Container(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              // ClipOval(
-                              //   child: notificationsCategory!.appIcon,
-                              // ),
-                              CircleAvatar(
-                                radius: 25.0,
-                                child: notificationsCategory!.appIcon,
-                                backgroundColor: Colors.black12,
-                              ),
-
-                              SizedBox(
-                                width: 8,
-                              ),
-                              Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    notificationsCategory!.appTitle!,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18.0),
-                                  ),
-                                  SizedBox(
-                                    height: 3.0,
-                                  ),
-                                  Text(
-                                    'Tap to view details',
-                                    style: TextStyle(
-                                        color:
-                                            Color.fromRGBO(196, 196, 196, 1)),
-                                  )
-                                ],
-                              ),
-                            ],
-                          ),
-                          Icon(Icons.keyboard_arrow_right)
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              notificationsCategory!.message!,
-                              style: TextStyle(
-                                fontSize: 13.0,
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              notificationsCategory!.timestamp.toString(),
-                              style: TextStyle(
-                                  color: Colors.white54, fontSize: 13),
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          new Positioned.fill(
-              child: new Material(
-                  type: MaterialType.transparency,
-                  color: Colors.transparent,
-                  child: new InkWell(
-                    borderRadius: BorderRadius.circular(20),
-                    onTap: () => {
-                      print('tapped'),
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => NotificationDetailList(
-                            packageName: notificationsCategory!.packageName,
-                            title: notificationsCategory!.appTitle,
-                            appIcon: notificationsCategory!.appIcon,
-                            appTitle: notificationsCategory!.appTitle,
-                            notification: notification,
-                          ),
-                        ),
-                      ),
-                    },
-                  )))
-        ]),
-      ),
-    );
+  Future<void> _launchApp(BuildContext context, String packageName) async {
+    try {
+      // For sandbox, just show a dialog
+      print('Sandbox: Would launch app $packageName');
+      
+      // In a real app, this would launch the actual app
+      // For now, we'll just show a success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Sandbox: Would launch $packageName'),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+        ),
+      );
+    } catch (e) {
+      print('Error launching app: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return buildNotificationCard(context);
+    return Container(
+      margin: EdgeInsets.only(bottom: 12, top: 4),
+      child: Card(
+        elevation: 2,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => NotificationDetailList(
+                  packageName: notificationsCategory!.packageName,
+                  title: notificationsCategory!.appTitle,
+                  appIcon: notificationsCategory!.appIcon,
+                  appTitle: notificationsCategory!.appTitle,
+                  notification: notification,
+                ),
+              ),
+            );
+          },
+          child: Container(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Theme.of(context).colorScheme.surface,
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: notificationsCategory!.appIcon,
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            notificationsCategory!.appTitle!,
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            notificationsCategory!.timestamp.toString(),
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.chevron_right,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                    ),
+                  ],
+                ),
+                if (notificationsCategory!.message != null) ...[
+                  SizedBox(height: 12),
+                  Text(
+                    notificationsCategory!.message!,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+                SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => NotificationDetailList(
+                                packageName: notificationsCategory!.packageName,
+                                title: notificationsCategory!.appTitle,
+                                appIcon: notificationsCategory!.appIcon,
+                                appTitle: notificationsCategory!.appTitle,
+                                notification: notification,
+                              ),
+                            ),
+                          );
+                        },
+                        icon: Icon(Icons.list_alt, size: 18),
+                        label: Text('View Details'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Theme.of(context).colorScheme.primary,
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () => _launchApp(context, notificationsCategory!.packageName!),
+                        icon: Icon(Icons.open_in_new, size: 18),
+                        label: Text('Open App'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
