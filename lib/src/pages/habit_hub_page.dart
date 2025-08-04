@@ -10,11 +10,10 @@ import '../widgets/habits/data/habit_card_menu_items.dart';
 import '../widgets/habits/habit_card_menu_item.dart';
 import '../widgets/navigation/nav_drawer_widget.dart';
 
-List<double> _stopsCircle = [0.0, 0.7];
-
 class HabitHubPage extends StatefulWidget {
-  HabitHubPage({Key? key, this.title}) : super(key: key);
+  HabitHubPage({Key? key, this.title, this.openNavigationDrawer}) : super(key: key);
   final String? title;
+  final VoidCallback? openNavigationDrawer;
 
   @override
   State<HabitHubPage> createState() => _HabitHubPage();
@@ -22,11 +21,13 @@ class HabitHubPage extends StatefulWidget {
 
 class _HabitHubPage extends State<HabitHubPage> {
   bool _isLoading = true;
+  int _completedHabits = 0;
+  int _totalHabits = 0;
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
-  // All journals
+  // All habits
   List<HabitsModel> _habits = [];
 
   // This function is used to fetch all data from the database
@@ -34,6 +35,8 @@ class _HabitHubPage extends State<HabitHubPage> {
     final data = await DatabaseHelper.instance.getHabits();
     setState(() {
       _habits = data;
+      _totalHabits = data.length;
+      _completedHabits = data.where((habit) => habit.isCompleted == 1).length;
       _isLoading = false;
     });
   }
@@ -41,251 +44,346 @@ class _HabitHubPage extends State<HabitHubPage> {
   @override
   void initState() {
     super.initState();
-    _refreshHabits(); // Loading the diary when the app starts
+    _refreshHabits();
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Color> _colors = [
-      // Color(0xffD8E0BB),
-      Color(0xff7268A6),
-      Color(0xff86A3C3),
-      //Color(0xffB6CEC7),
-    ];
-
-    List<Color> _pageColors = [
-      // Color(0xffD8E0BB),
-      Color.fromARGB(255, 236, 236, 236),
-      Color.fromARGB(255, 235, 235, 235),
-      //Color(0xffB6CEC7),
-    ];
-
-    //final VoidCallback showform;
-
     return Scaffold(
-        drawer: NavigationDrawerWidget(),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => ShowForm(
-                  habits: _habits,
-                  context: context,
-                  onCreate: (String title, String type) => {
-                        _titleController.text = title,
-                        _descriptionController.text = type,
-                        _addItem(),
-                      },
-                  onEdit: (String title, String type) => {
-                        print("on edit pressed: $title"),
-                      },
-                  id: null)
-              .showForm(null, 'Add new habit'), //_showForm(null),
-          child: Icon(
-            Icons.add,
-            color: Colors.white70,
-          ),
-          splashColor: Colors.blueGrey,
-          backgroundColor: Colors.blueAccent,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      appBar: AppBar(
+        title: Text('Habits'),
+        leading: IconButton(
+          icon: Icon(Icons.menu),
+          onPressed: widget.openNavigationDrawer,
         ),
-        body: Builder(
-          builder: (context) => Container(
-            //color: Color.fromARGB(255, 61, 58, 59),
-            decoration: BoxDecoration(
-              //border: Border.all(width: 3),
-              color: Color(0xFFEFEEEE),
-              // image: DecorationImage(
-              //     image: AssetImage("assets/images/welcome-one.png"),
-              //     fit: BoxFit.cover,
-              //     alignment: Alignment.bottomCenter),
-              // gradient: LinearGradient(
-              //   //begin: Alignment.topLeft,
-              //   colors: _pageColors,
-              //   begin: Alignment.topLeft,
-              //   end: Alignment.bottomRight,
-              //   //stops: _stopsCircle,
-              // ),
-              //shape: BoxShape.circle,
-            ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () => _showAddHabitForm(),
+            tooltip: 'Add New Habit',
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          // Header Section
+          Container(
+            padding: EdgeInsets.all(20),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(
+                  'Habit Tracker',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Build positive habits and track your progress',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  ),
+                ),
+                SizedBox(height: 16),
+                
+                // Progress Card
                 Container(
-                  //header
-                  height: 200,
-                  padding: EdgeInsets.only(top: 15),
+                  padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(25),
-                        bottomRight: Radius.circular(25)),
-                    gradient: LinearGradient(
-                      colors: _colors,
-
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      //stops: _stops
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
                     ),
-                    boxShadow: [
-                      //color: Colors.white, //background color of box
-                      BoxShadow(
-                        color: Color.fromARGB(255, 190, 190, 190),
-                        blurRadius: 25.0, // soften the shadow
-                        spreadRadius: 3.0, //extend the shadow
-                        offset: Offset(
-                          5.0, // Move to right 10  horizontally
-                          5.0, // Move to bottom 10 Vertically
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary,
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      )
+                        child: Icon(
+                          Icons.track_changes,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Today\'s Progress',
+                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              '$_completedHabits of $_totalHabits habits completed',
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            LinearProgressIndicator(
+                              value: _totalHabits > 0 ? _completedHabits / _totalHabits : 0,
+                              backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
-                  child: SafeArea(
-                    child: Column(
-                      children: [
-                        // Topbar(
-                        //   title: this.title!,
-                        //   onClicked: () => Scaffold.of(context).openDrawer(),
-                        // ),
-                        bottomHeader(context),
-                      ],
-                    ),
-                    // bottom: false,
-                  ),
-                ),
-                SizedBox(
-                  height: 20.0,
-                ),
-                SubHeader(title: "Today's Habits"),
-                HabitListerWidget(
-                  listOfHabits: _habits,
-                  // onHabitMenuClick: habitMenuItemClick(context, 2),
                 ),
               ],
             ),
           ),
-        ));
+          
+          // Habits List
+          Expanded(
+            child: _isLoading
+                ? Center(child: CircularProgressIndicator())
+                : _habits.isEmpty
+                    ? _buildEmptyState()
+                    : _buildHabitsList(),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddHabitForm(),
+        child: Icon(Icons.add),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
+      ),
+    );
   }
 
-  // habitMenuItemClick(BuildContext context, int id) {
-  //   print('habitMenuItemClick is clicked');
-  //   print('ID of Habit:$id');
-  //   ShowForm(
-  //           habits: _habits,
-  //           context: context,
-  //           onCreate: (String title, String type) => {
-  //                 // _titleController.text = title,
-  //                 // _descriptionController.text = type,
-  //                 // _updateItem(id),
-  //               },
-  //           onEdit: (String title, String type) => {
-  //                 _titleController.text = title,
-  //                 _descriptionController.text = type,
-  //                 _updateItem(id),
-  //               },
-  //           id: id)
-  //       .showForm(null, 'Edit habit');
-  // }
-
-  void onMenuClick(
-      BuildContext context, List<HabitsModel> habits, HabitsModel habit) {
-    ShowForm(
-      context: context,
-      habits: habits,
-      id: habit.id,
-      onCreate: (String title, String type) => {},
-      onEdit: (String title, String type) => {},
-    ).showForm(habit, 'Edit habit');
-  }
-
-  PopupMenuItem<HabitCardMenuItem> buildHabitMenuItem(HabitCardMenuItem item) =>
-      PopupMenuItem(
-        child: Text(item.text),
-      );
-
-  //Responsible for Banner Header bottom part
-  Widget bottomHeader(BuildContext context) {
-    return Container(
+  Widget _buildEmptyState() {
+    return Center(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            width: MediaQuery.of(context).size.width,
-            height: 70.0,
-            padding: EdgeInsets.only(
-                bottom: 10.0, left: 15.0, right: 15.0, top: 10.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  'Hi, ', //'$_totalNotifications',
-                  style: GoogleFonts.comfortaa(
-                    textStyle: TextStyle(
-                      letterSpacing: 0.5,
-                      fontSize: 32.0,
-                      wordSpacing: 8.0,
-                      fontWeight: FontWeight.w200,
-                      color: Color.fromRGBO(223, 223, 223, 1),
-                      shadows: [
-                        Shadow(
-                          blurRadius: 1.0,
-                          color: Color(0xffe2adc4),
-                          offset: Offset(-1.0, 1.0),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Text(
-                  'Suman',
-                  style: GoogleFonts.comfortaa(
-                    textStyle: TextStyle(
-                      letterSpacing: 0.5,
-                      fontSize: 32.0,
-                      fontWeight: FontWeight.normal,
-                      color: Colors.white,
-                      shadows: [
-                        Shadow(
-                          blurRadius: 1.0,
-                          color: Color(0xffe2adc4),
-                          offset: Offset(-1.0, 1.0),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+          Icon(
+            Icons.track_changes_outlined,
+            size: 64,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+          ),
+          SizedBox(height: 16),
+          Text(
+            'No habits yet',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
             ),
           ),
-          Container(
-            width: MediaQuery.of(context).size.width,
-            height: 60.0,
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15.0),
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    'You have 5 pending habits 👇',
-                    style: GoogleFonts.nunito(
-                      textStyle: TextStyle(
-                        //letterSpacing: 1.2,
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.normal,
-                        color: Colors.white,
-                        shadows: [
-                          Shadow(
-                            blurRadius: 1.0,
-                            color: Color(0xffe2adc4),
-                            offset: Offset(-1.0, 1.0),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ]),
+          SizedBox(height: 8),
+          Text(
+            'Start building positive habits by adding your first one',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: () => _showAddHabitForm(),
+            icon: Icon(Icons.add),
+            label: Text('Add First Habit'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Colors.white,
+            ),
           ),
         ],
       ),
     );
   }
 
-  // Insert a new journal to the database
+  Widget _buildHabitsList() {
+    return ListView.builder(
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      itemCount: _habits.length,
+      itemBuilder: (context, index) {
+        final habit = _habits[index];
+        return Card(
+          margin: EdgeInsets.only(bottom: 12),
+          child: ListTile(
+            leading: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: habit.isCompleted == 1 
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: habit.isCompleted == 1 
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                ),
+              ),
+              child: Icon(
+                habit.isCompleted == 1 ? Icons.check : Icons.circle_outlined,
+                color: habit.isCompleted == 1 
+                    ? Colors.white
+                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+              ),
+            ),
+            title: Text(
+              habit.habitTitle ?? '',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                decoration: habit.isCompleted == 1 
+                    ? TextDecoration.lineThrough
+                    : null,
+              ),
+            ),
+            subtitle: Text(
+              habit.habitType ?? '',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              ),
+            ),
+            trailing: PopupMenuButton<String>(
+              onSelected: (value) => _handleHabitAction(value, habit),
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'toggle',
+                  child: Row(
+                    children: [
+                      Icon(
+                        habit.isCompleted == 1 ? Icons.undo : Icons.check,
+                        size: 18,
+                      ),
+                      SizedBox(width: 8),
+                      Text(habit.isCompleted == 1 ? 'Mark Incomplete' : 'Mark Complete'),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'edit',
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit, size: 18),
+                      SizedBox(width: 8),
+                      Text('Edit'),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete, size: 18, color: Colors.red),
+                      SizedBox(width: 8),
+                      Text('Delete', style: TextStyle(color: Colors.red)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            onTap: () => _toggleHabitCompletion(habit),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showAddHabitForm() {
+    ShowForm(
+      habits: _habits,
+      context: context,
+      onCreate: (String title, String type) {
+        _titleController.text = title;
+        _descriptionController.text = type;
+        _addItem();
+      },
+      onEdit: (String title, String type) {
+        print("on edit pressed: $title");
+      },
+      id: null,
+    ).showForm(null, 'Add New Habit');
+  }
+
+  void _handleHabitAction(String action, HabitsModel habit) {
+    switch (action) {
+      case 'toggle':
+        _toggleHabitCompletion(habit);
+        break;
+      case 'edit':
+        _editHabit(habit);
+        break;
+      case 'delete':
+        _deleteHabit(habit);
+        break;
+    }
+  }
+
+  void _toggleHabitCompletion(HabitsModel habit) async {
+    final updatedHabit = HabitsModel(
+      id: habit.id,
+      habitTitle: habit.habitTitle,
+      habitType: habit.habitType,
+      isCompleted: habit.isCompleted == 1 ? 0 : 1,
+      color: habit.color,
+    );
+    
+    await DatabaseHelper.instance.updateHabitItem(
+      habit.id!,
+      habit.habitTitle!,
+      habit.habitType!,
+    );
+    _refreshHabits();
+  }
+
+  void _editHabit(HabitsModel habit) {
+    ShowForm(
+      context: context,
+      habits: _habits,
+      id: habit.id,
+      onCreate: (String title, String type) {},
+      onEdit: (String title, String type) {
+        _titleController.text = title;
+        _descriptionController.text = type;
+        _updateItem(habit.id!);
+      },
+    ).showForm(habit, 'Edit Habit');
+  }
+
+  void _deleteHabit(HabitsModel habit) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Delete Habit'),
+        content: Text('Are you sure you want to delete "${habit.habitTitle}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _deleteItem(habit.id!);
+            },
+            child: Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Insert a new habit to the database
   Future<void> _addItem() async {
     HabitsModel _habit = new HabitsModel(
         habitTitle: _titleController.text,
@@ -296,7 +394,7 @@ class _HabitHubPage extends State<HabitHubPage> {
     _refreshHabits();
   }
 
-  // Update an existing journal
+  // Update an existing habit
   Future<void> _updateItem(int id) async {
     await DatabaseHelper.instance.updateHabitItem(
         id, _titleController.text, _descriptionController.text);
@@ -307,7 +405,7 @@ class _HabitHubPage extends State<HabitHubPage> {
   void _deleteItem(int id) async {
     await DatabaseHelper.instance.deleteHabitItem(id);
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Successfully deleted a journal!'),
+      content: Text('Habit deleted successfully!'),
     ));
     _refreshHabits();
   }

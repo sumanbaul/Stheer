@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:notifoo/src/pages/Homepage.dart';
 import 'package:notifoo/src/pages/Pomodoro.dart';
+import 'package:notifoo/src/pages/pomodoro_home.dart';
 import 'package:notifoo/src/pages/SignIn.dart';
 import 'package:notifoo/src/pages/habit_tracker.dart';
+import 'package:notifoo/src/pages/habit_hub_page.dart';
 import 'package:notifoo/src/pages/task_page.dart';
 import 'package:notifoo/src/widgets/CustomBottomBar/BottomNavigation.dart';
 import 'package:notifoo/src/widgets/navigation/nav_drawer_widget.dart';
@@ -43,21 +45,27 @@ class AppState extends State<App> {
         tabName: "Habits",
         icon: Icons.track_changes_outlined,
         activeIcon: Icons.track_changes,
-        page: HabitTracker(),
+        page: HabitHubPage(
+          title: 'Habits',
+          openNavigationDrawer: () => scaffoldKey.currentState!.openDrawer(),
+        ),
       ),
       TabItem(
         tabName: "Pomodoro",
         icon: Icons.timer_outlined,
         activeIcon: Icons.timer,
-        page: Pomodoro(
+        page: PomodoroHome(
           title: 'Pomodoro',
+          openNavigationDrawer: () => scaffoldKey.currentState!.openDrawer(),
         ),
       ),
       TabItem(
         tabName: "Tasks",
         icon: Icons.task_outlined,
         activeIcon: Icons.task,
-        page: TaskPage(),
+        page: TaskPage(
+          openNavigationDrawer: () => scaffoldKey.currentState!.openDrawer(),
+        ),
       ),
     ];
 
