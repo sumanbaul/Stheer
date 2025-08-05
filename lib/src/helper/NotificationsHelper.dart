@@ -308,14 +308,11 @@ class NotificationsHelper {
             (event.packageName!.contains("gallery"))) {
           // print(event.packageName); // Removed excessive logging
         } else {
-          final Map<String, dynamic> jsonresponse =
-              json.decode(event.toString());
           final createatday = event.createAt!.day;
           final today = DateTime.now().day;
           // print("Create AT Day: $createatday"); // Removed excessive logging
 
-          if (!jsonresponse.containsKey('summaryText') &&
-              event.createAt!.day >= today) {
+          if (event.createAt!.day >= today) {
             if (event.text != null) {
               final currentNotification = Notifications(
                 title: _event.title,

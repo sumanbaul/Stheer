@@ -9,6 +9,7 @@ import '../../helper/notificationCatHelper.dart';
 import '../../../src/model/Notifications.dart';
 import 'notification_card.dart';
 import 'dart:async';
+import '../../services/notification_permission_service.dart';
 
 class NotificationsListWidget extends StatefulWidget {
   final Function(Future<int>)? onCountChange;
@@ -33,6 +34,7 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
   bool isToday = true;
   ReceivePort port = ReceivePort();
   Timer? _mockNotificationTimer;
+  List<NotificationCategory>? _cachedNotifications;
 
   @override
   void initState() {
@@ -60,10 +62,20 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Container(
-        height: 600,
-        padding: EdgeInsets.zero,
-        child: _buildContainer(context),
+      body: Column(
+        children: [
+          // Permission status widget
+          NotificationPermissionService().buildPermissionStatusWidget(context),
+          
+          // Notifications list
+          Expanded(
+            child: Container(
+              height: 600,
+              padding: EdgeInsets.zero,
+              child: _buildContainer(context),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'notification_listener_button',
@@ -89,6 +101,9 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
   Future<void> initPlatformState() async {
     // For sandbox, we'll use mock notifications
     print("Initializing sandbox notification listener");
+    
+    // Check permission status on init
+    await NotificationPermissionService().checkPermission();
     
     var isServiceRunning = false; // Mock service state
     print("Service is ${!isServiceRunning ? "not " : ""}already running");
@@ -126,6 +141,21 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
     });
 
     try {
+      // Check for notification permission first
+      final permissionService = NotificationPermissionService();
+      final hasPermission = await permissionService.checkPermission();
+      
+      if (!hasPermission) {
+        // Request permission
+        final granted = await permissionService.requestPermission(context);
+        if (!granted) {
+          setState(() {
+            _loading = false;
+          });
+          return;
+        }
+      }
+      
       // For sandbox, we'll simulate starting the service
       print("Starting sandbox notification listener");
       
@@ -288,6 +318,13 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
 
         List<NotificationCategory>? notifications = snapshot.data;
         
+        // Cache the notifications to prevent flickering
+        if (notifications != null && notifications.isNotEmpty) {
+          _cachedNotifications = notifications;
+        } else if (_cachedNotifications != null && notifications == null) {
+          notifications = _cachedNotifications;
+        }
+        
         if (notifications == null || notifications.isEmpty) {
           return Center(
             child: Column(
@@ -328,12 +365,13 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
 
         return ListView.builder(
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          itemCount: notifications.length,
+          itemCount: notifications!.length,
           itemBuilder: (context, index) {
+            final notification = notifications![index];
             return NotificationsCard(
-              key: ValueKey('notification_${notifications[index].packageName}_$index'),
+              key: ValueKey('notification_${notification.packageName}_${notification.timestamp}_$index'),
               index: index,
-              notificationsCategory: notifications[index],
+              notificationsCategory: notification,
             );
           },
         );

@@ -80,7 +80,7 @@ class NotificationListerPageLogic {
       _model.packageName = event.packageName;
       // print("Success Package Found: " + app.packageName);
       //var jsondata2 = json.decode(event.toString());
-      Map<String, dynamic> jsonresponse = json.decode(event.toString());
+      // Map<String, dynamic> jsonresponse = json.decode(event.toString());
 
       //var jsonData = json.decoder.convert(event.toString());
       _model.log.add(event);
@@ -89,8 +89,7 @@ class NotificationListerPageLogic {
       var today = new DateTime.now().day;
       print('today: $today');
       //var xx = jsonresponse.containsKey('summaryText');
-      if (!jsonresponse.containsKey('summaryText') &&
-          event.createAt!.day >= today) {
+      if (event.createAt!.day >= today) {
         //check
         bool redundancy;
         // redundantNotificationCheck(event).then((bool value) {
@@ -110,7 +109,7 @@ class NotificationListerPageLogic {
               packageName: event.packageName,
               timestamp: event.timestamp,
               createAt: event.createAt!.millisecondsSinceEpoch.toString(),
-              eventJson: event.toString(),
+              eventJson: "{}",
               createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
               isDeleted: 0,
             ),
@@ -130,7 +129,7 @@ class NotificationListerPageLogic {
               packageName: event.packageName,
               timestamp: event.timestamp,
               createAt: event.createAt.toString(),
-              eventJson: event.toString()),
+              eventJson: "{}"),
         );
       }
     }
