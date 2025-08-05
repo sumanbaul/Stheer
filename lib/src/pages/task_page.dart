@@ -5,8 +5,13 @@ import 'package:notifoo/src/model/tasks.dart';
 import 'package:notifoo/src/pages/add_task.dart';
 
 class TaskPage extends StatefulWidget {
-  const TaskPage({Key? key, this.openNavigationDrawer}) : super(key: key);
+  const TaskPage({
+    Key? key, 
+    this.openNavigationDrawer,
+    this.showAppBar = true,
+  }) : super(key: key);
   final VoidCallback? openNavigationDrawer;
+  final bool showAppBar;
 
   @override
   _TaskPageState createState() => _TaskPageState();
@@ -61,7 +66,7 @@ class _TaskPageState extends State<TaskPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
+      appBar: widget.showAppBar ? AppBar(
         title: Text('Tasks'),
         leading: IconButton(
           icon: Icon(Icons.menu),
@@ -79,7 +84,7 @@ class _TaskPageState extends State<TaskPage> {
             tooltip: 'Add New Task',
           ),
         ],
-      ),
+      ) : null,
       body: Column(
         children: [
           // Header Section

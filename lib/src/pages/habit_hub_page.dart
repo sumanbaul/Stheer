@@ -11,9 +11,15 @@ import '../widgets/habits/habit_card_menu_item.dart';
 import '../widgets/navigation/nav_drawer_widget.dart';
 
 class HabitHubPage extends StatefulWidget {
-  HabitHubPage({Key? key, this.title, this.openNavigationDrawer}) : super(key: key);
+  HabitHubPage({
+    Key? key, 
+    this.title, 
+    this.openNavigationDrawer,
+    this.showAppBar = true,
+  }) : super(key: key);
   final String? title;
   final VoidCallback? openNavigationDrawer;
+  final bool showAppBar;
 
   @override
   State<HabitHubPage> createState() => _HabitHubPage();
@@ -51,7 +57,7 @@ class _HabitHubPage extends State<HabitHubPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
+      appBar: widget.showAppBar ? AppBar(
         title: Text('Habits'),
         leading: IconButton(
           icon: Icon(Icons.menu),
@@ -64,7 +70,7 @@ class _HabitHubPage extends State<HabitHubPage> {
             tooltip: 'Add New Habit',
           ),
         ],
-      ),
+      ) : null,
       body: Column(
         children: [
           // Header Section

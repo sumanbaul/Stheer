@@ -19,19 +19,209 @@ class NotificationsCard extends StatelessWidget {
 
   Future<void> _launchApp(BuildContext context, String packageName) async {
     try {
-      // For sandbox, just show a dialog
-      print('Sandbox: Would launch app $packageName');
+      // Check if app is installed
+      bool isInstalled = await DeviceApps.isAppInstalled(packageName);
       
-      // In a real app, this would launch the actual app
-      // For now, we'll just show a success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Sandbox: Would launch $packageName'),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-        ),
-      );
+      if (isInstalled) {
+        // Launch the app
+        bool launched = await DeviceApps.openApp(packageName);
+        
+        if (launched) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Opening $packageName...'),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to open $packageName'),
+              backgroundColor: Theme.of(context).colorScheme.error,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      } else {
+        // For sandbox/testing, show a dialog
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('App Not Installed'),
+              content: Text('$packageName is not installed on this device.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
     } catch (e) {
       print('Error launching app: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error launching app: $e'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  String _formatTimestamp(String? timestamp) {
+    if (timestamp == null) return 'Just now';
+    
+    try {
+      // Try to parse the timestamp
+      DateTime dateTime = DateTime.parse(timestamp);
+      DateTime now = DateTime.now();
+      Duration difference = now.difference(dateTime);
+      
+      if (difference.inMinutes < 1) {
+        return 'Just now';
+      } else if (difference.inMinutes < 60) {
+        return '${difference.inMinutes} minutes ago';
+      } else if (difference.inHours < 24) {
+        return '${difference.inHours} hours ago';
+      } else {
+        return '${difference.inDays} days ago';
+      }
+    } catch (e) {
+      // If parsing fails, return the original timestamp
+      return timestamp;
+    }
+  }
+
+  IconData _getAppIcon(String? packageName) {
+    if (packageName == null) return Icons.apps;
+    
+    if (packageName.contains("whatsapp")) {
+      return Icons.chat;
+    } else if (packageName.contains("gmail") || packageName.contains("google.android.gm")) {
+      return Icons.mail;
+    } else if (packageName.contains("instagram")) {
+      return Icons.camera_alt;
+    } else if (packageName.contains("facebook")) {
+      return Icons.facebook;
+    } else if (packageName.contains("twitter") || packageName.contains("x")) {
+      return Icons.flutter_dash;
+    } else if (packageName.contains("youtube")) {
+      return Icons.play_circle;
+    } else if (packageName.contains("telegram")) {
+      return Icons.send;
+    } else if (packageName.contains("discord")) {
+      return Icons.games;
+    } else if (packageName.contains("slack")) {
+      return Icons.work;
+    } else if (packageName.contains("linkedin")) {
+      return Icons.business;
+    } else if (packageName.contains("reddit")) {
+      return Icons.forum;
+    } else if (packageName.contains("spotify")) {
+      return Icons.music_note;
+    } else if (packageName.contains("netflix")) {
+      return Icons.movie;
+    } else if (packageName.contains("uber")) {
+      return Icons.local_taxi;
+    } else if (packageName.contains("doordash")) {
+      return Icons.delivery_dining;
+    } else if (packageName.contains("amazon")) {
+      return Icons.shopping_cart;
+    } else if (packageName.contains("ebay")) {
+      return Icons.store;
+    } else if (packageName.contains("paypal")) {
+      return Icons.payment;
+    } else if (packageName.contains("venmo")) {
+      return Icons.account_balance_wallet;
+    } else if (packageName.contains("bank") || packageName.contains("chase")) {
+      return Icons.account_balance;
+    } else if (packageName.contains("weather")) {
+      return Icons.cloud;
+    } else if (packageName.contains("calendar")) {
+      return Icons.calendar_today;
+    } else if (packageName.contains("clock") || packageName.contains("alarm")) {
+      return Icons.access_time;
+    } else if (packageName.contains("camera")) {
+      return Icons.camera_alt;
+    } else if (packageName.contains("gallery") || packageName.contains("photos")) {
+      return Icons.photo_library;
+    } else if (packageName.contains("maps") || packageName.contains("google.maps")) {
+      return Icons.map;
+    } else if (packageName.contains("drive") || packageName.contains("google.drive")) {
+      return Icons.folder;
+    } else if (packageName.contains("dropbox")) {
+      return Icons.cloud_queue;
+    } else if (packageName.contains("zoom")) {
+      return Icons.video_call;
+    } else if (packageName.contains("teams")) {
+      return Icons.groups;
+    } else if (packageName.contains("skype")) {
+      return Icons.video_camera_front;
+    } else if (packageName.contains("chrome") || packageName.contains("browser")) {
+      return Icons.language;
+    } else if (packageName.contains("settings")) {
+      return Icons.settings;
+    } else if (packageName.contains("phone") || packageName.contains("dialer")) {
+      return Icons.phone;
+    } else if (packageName.contains("messages") || packageName.contains("sms")) {
+      return Icons.sms;
+    } else if (packageName.contains("contacts")) {
+      return Icons.contacts;
+    } else if (packageName.contains("calculator")) {
+      return Icons.calculate;
+    } else if (packageName.contains("notes") || packageName.contains("memo")) {
+      return Icons.note;
+    } else if (packageName.contains("reminder") || packageName.contains("todo")) {
+      return Icons.checklist;
+    } else if (packageName.contains("health") || packageName.contains("fitness")) {
+      return Icons.favorite;
+    } else if (packageName.contains("game") || packageName.contains("play")) {
+      return Icons.games;
+    } else if (packageName.contains("news")) {
+      return Icons.article;
+    } else if (packageName.contains("shopping") || packageName.contains("store")) {
+      return Icons.shopping_bag;
+    } else if (packageName.contains("food") || packageName.contains("restaurant")) {
+      return Icons.restaurant;
+    } else if (packageName.contains("travel") || packageName.contains("booking")) {
+      return Icons.flight;
+    } else if (packageName.contains("education") || packageName.contains("learning")) {
+      return Icons.school;
+    } else if (packageName.contains("finance") || packageName.contains("money")) {
+      return Icons.account_balance_wallet;
+    } else if (packageName.contains("productivity") || packageName.contains("office")) {
+      return Icons.work;
+    } else if (packageName.contains("entertainment") || packageName.contains("media")) {
+      return Icons.movie;
+    } else if (packageName.contains("social") || packageName.contains("chat")) {
+      return Icons.people;
+    } else if (packageName.contains("utility") || packageName.contains("tool")) {
+      return Icons.build;
+    } else if (packageName.contains("lifestyle") || packageName.contains("wellness")) {
+      return Icons.spa;
+    } else if (packageName.contains("sports") || packageName.contains("fitness")) {
+      return Icons.sports_soccer;
+    } else if (packageName.contains("music") || packageName.contains("audio")) {
+      return Icons.music_note;
+    } else if (packageName.contains("video") || packageName.contains("streaming")) {
+      return Icons.video_library;
+    } else if (packageName.contains("photo") || packageName.contains("image")) {
+      return Icons.photo;
+    } else if (packageName.contains("document") || packageName.contains("file")) {
+      return Icons.description;
+    } else if (packageName.contains("security") || packageName.contains("vpn")) {
+      return Icons.security;
+    } else if (packageName.contains("backup") || packageName.contains("cloud")) {
+      return Icons.backup;
+    } else if (packageName.contains("system") || packageName.contains("android")) {
+      return Icons.android;
+    } else {
+      return Icons.apps;
     }
   }
 
@@ -69,11 +259,15 @@ class NotificationsCard extends StatelessWidget {
                       height: 48,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        color: Theme.of(context).colorScheme.surface,
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: notificationsCategory!.appIcon,
+                        child: Icon(
+                          _getAppIcon(notificationsCategory!.packageName),
+                          size: 24,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                       ),
                     ),
                     SizedBox(width: 12),
@@ -92,7 +286,7 @@ class NotificationsCard extends StatelessWidget {
                           ),
                           SizedBox(height: 4),
                           Text(
-                            notificationsCategory!.timestamp.toString(),
+                            _formatTimestamp(notificationsCategory!.timestamp),
                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                             ),

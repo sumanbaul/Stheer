@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:notifoo/src/widgets/sync_status_widget.dart';
+import 'package:notifoo/src/services/firebase_service.dart';
+import 'package:notifoo/src/helper/DatabaseHelper.dart';
+import 'package:notifoo/src/model/tasks.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -60,6 +64,66 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
             SizedBox(height: 32),
+
+            // Sync Status Section
+            _buildSectionTitle('Data & Sync'),
+            SyncStatusWidget(showDetails: true),
+            SizedBox(height: 16),
+            
+            // Test Firebase Sync Section
+            _buildSectionTitle('Firebase Test'),
+            Card(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Test Firebase Integration',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    Text(
+                      'Test the offline-first sync functionality',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: _testFirebaseSync,
+                            icon: Icon(Icons.cloud_sync, size: 18),
+                            label: Text('Test Sync'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).colorScheme.secondary,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: _testOfflineMode,
+                            icon: Icon(Icons.cloud_off, size: 18),
+                            label: Text('Test Offline'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).colorScheme.tertiary,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 24),
 
             // Notifications Section
             _buildSectionTitle('Notifications'),
@@ -492,5 +556,64 @@ class _SettingsPageState extends State<SettingsPage> {
         ],
       ),
     );
+  }
+
+  // Test Firebase sync functionality
+  void _testFirebaseSync() async {
+    try {
+      final service = FirebaseService();
+      
+      // Test manual sync
+      await service.manualSync();
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Firebase sync test completed successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Firebase sync test failed: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  // Test offline mode functionality
+  void _testOfflineMode() async {
+    try {
+      final helper = DatabaseHelper.instance;
+      
+      // Test creating a task locally
+      final task = Tasks(
+        id: 999,
+        title: "Test Task - Offline Mode",
+        isCompleted: 0,
+        taskType: "test",
+        color: "#FF6B6B",
+        createdDate: DateTime.now(),
+        modifiedDate: DateTime.now(),
+        repeatitions: 1,
+      );
+      
+      await helper.insertTask(task);
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Offline mode test completed - task saved locally'),
+          backgroundColor: Colors.blue,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Offline mode test failed: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 } 

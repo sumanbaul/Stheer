@@ -20,11 +20,14 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
 
-
   # Google Sign in
   firebase_core: ^2.8.0
   firebase_auth: ^4.2.6
   google_sign_in: ^5.2.4
+
+  # Firebase Firestore
+  cloud_firestore: ^4.8.4
+  firebase_storage: ^11.2.6
 
   #Notifications
   flutter_notification_listener: ^1.0.7
@@ -55,7 +58,8 @@ dependencies:
   # URL Launcher
   url_launcher: ^6.1.14
 
- 
+  # Shared Preferences
+  shared_preferences: ^2.2.2
 
 
 

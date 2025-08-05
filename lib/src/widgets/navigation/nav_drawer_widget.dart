@@ -46,37 +46,37 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
                   const SizedBox(height: 24),
                   
                   // Main Navigation Section
-                  _buildSectionTitle('Main'),
-                  const SizedBox(height: 8),
-                  buildMenuItem(
-                    text: 'Alerts',
-                    icon: Icons.notifications_outlined,
-                    onClicked: () => _navigateToPage(context, 0),
-                  ),
-                  buildMenuItem(
-                    text: 'Habits',
-                    icon: Icons.track_changes_outlined,
-                    onClicked: () => _navigateToPage(context, 1),
-                  ),
-                  buildMenuItem(
-                    text: 'Timer',
-                    icon: Icons.timer_outlined,
-                    onClicked: () => _navigateToPage(context, 2),
-                  ),
-                  buildMenuItem(
-                    text: 'Tasks',
-                    icon: Icons.task_outlined,
-                    onClicked: () => _navigateToPage(context, 3),
-                  ),
-                  buildMenuItem(
-                    text: 'Stats',
-                    icon: Icons.analytics_outlined,
-                    onClicked: () => _navigateToPage(context, 4),
-                  ),
+                  // _buildSectionTitle('Main'),
+                  // const SizedBox(height: 8),
+                  // buildMenuItem(
+                  //   text: 'Alerts',
+                  //   icon: Icons.notifications_outlined,
+                  //   onClicked: () => _navigateToPage(context, 0),
+                  // ),
+                  // buildMenuItem(
+                  //   text: 'Habits',
+                  //   icon: Icons.track_changes_outlined,
+                  //   onClicked: () => _navigateToPage(context, 1),
+                  // ),
+                  // buildMenuItem(
+                  //   text: 'Timer',
+                  //   icon: Icons.timer_outlined,
+                  //   onClicked: () => _navigateToPage(context, 2),
+                  // ),
+                  // buildMenuItem(
+                  //   text: 'Tasks',
+                  //   icon: Icons.task_outlined,
+                  //   onClicked: () => _navigateToPage(context, 3),
+                  // ),
+                  // buildMenuItem(
+                  //   text: 'Stats',
+                  //   icon: Icons.analytics_outlined,
+                  //   onClicked: () => _navigateToPage(context, 4),
+                  // ),
                   
-                  const SizedBox(height: 24),
-                  Divider(color: Theme.of(context).colorScheme.outline.withOpacity(0.2)),
-                  const SizedBox(height: 16),
+                  // const SizedBox(height: 24),
+                  // Divider(color: Theme.of(context).colorScheme.outline.withOpacity(0.2)),
+                  // const SizedBox(height: 16),
                   
                   // Account Section
                   _buildSectionTitle('Account'),

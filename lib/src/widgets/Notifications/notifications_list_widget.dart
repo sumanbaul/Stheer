@@ -126,58 +126,29 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
     });
 
     try {
-      // Mock service start for sandbox
+      // For sandbox, we'll simulate starting the service
       print("Starting sandbox notification listener");
+      
+      // Simulate service start delay
+      await Future.delayed(Duration(seconds: 1));
       
       // Start mock notification timer
       _mockNotificationTimer = Timer.periodic(Duration(seconds: 5), (timer) {
-        if (started) {
-          _addMockNotification();
-        }
+        _addMockNotification();
       });
-      
+
       setState(() {
         started = true;
         _loading = false;
       });
+
+      // Add initial mock notifications
+      _addMockNotification();
+      
     } catch (e) {
+      print("Error starting notification listener: $e");
       setState(() {
         _loading = false;
-      });
-      print('Error starting listener: $e');
-    }
-  }
-
-  void _addMockNotification() {
-    final mockNotifications = [
-      Notifications(
-        title: "Mock Message",
-        appTitle: "WhatsApp",
-        text: "New message received at ${DateTime.now().toString()}",
-        message: "New message",
-        packageName: "com.whatsapp",
-        timestamp: DateTime.now().millisecondsSinceEpoch,
-        createAt: DateTime.now().toString(),
-      ),
-      Notifications(
-        title: "Mock Email",
-        appTitle: "Gmail",
-        text: "New email in your inbox",
-        message: "New email",
-        packageName: "com.google.android.gm",
-        timestamp: DateTime.now().millisecondsSinceEpoch,
-        createAt: DateTime.now().toString(),
-      ),
-    ];
-
-    final randomNotification = mockNotifications[DateTime.now().millisecond % mockNotifications.length];
-    
-    if (notificationsOfTheDay != null) {
-      final _notifications = appendElements(notificationsOfTheDay!, randomNotification);
-      var _notificationsByCat = _notifications.then((value) =>
-          NotificationCatHelper.getNotificationsByCat(value, isToday));
-      setState(() {
-        notificationsByCatFuture = _notificationsByCat;
       });
     }
   }
@@ -188,20 +159,71 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
     });
 
     try {
-      // Mock service stop for sandbox
+      // For sandbox, we'll simulate stopping the service
       print("Stopping sandbox notification listener");
+      
       _mockNotificationTimer?.cancel();
+      
+      await Future.delayed(Duration(seconds: 1));
       
       setState(() {
         started = false;
         _loading = false;
       });
+      
     } catch (e) {
+      print("Error stopping notification listener: $e");
       setState(() {
         _loading = false;
       });
-      print('Error stopping listener: $e');
     }
+  }
+
+  void _addMockNotification() {
+    // Add mock notifications for testing
+    final mockNotifications = [
+      {
+        'packageName': 'com.whatsapp',
+        'title': 'WhatsApp',
+        'text': 'New message from John',
+        'message': 'You have 7 Unread notifications',
+      },
+      {
+        'packageName': 'com.instagram.android',
+        'title': 'Instagram',
+        'text': 'New story from Sarah',
+        'message': 'You have 3 Unread notifications',
+      },
+      {
+        'packageName': 'com.google.android.gm',
+        'title': 'Gmail',
+        'text': 'New email received',
+        'message': 'You have 2 Unread notifications',
+      },
+    ];
+
+    final randomNotification = mockNotifications[DateTime.now().millisecond % mockNotifications.length];
+    
+    // Create mock notification event
+    final mockEvent = NotificationEvent(
+      title: randomNotification['title']!,
+      text: randomNotification['text']!,
+      packageName: randomNotification['packageName']!,
+      timestamp: DateTime.now().millisecondsSinceEpoch,
+      createAt: DateTime.now(),
+    );
+
+    // Process the notification
+    NotificationsHelper.onData(mockEvent).then((notification) {
+      if (notification != null) {
+        // Refresh the data
+        setState(() {
+          notificationsOfTheDay = NotificationsHelper.initializeDbGetNotificationsToday(0);
+          notificationsByCatFuture = notificationsOfTheDay!.then((value) =>
+              NotificationCatHelper.getNotificationsByCat(value, isToday));
+        });
+      }
+    });
   }
 
   Widget _buildContainer(BuildContext context) {
@@ -213,9 +235,14 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    Theme.of(context).colorScheme.primary,
+                SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                 ),
                 SizedBox(height: 16),
@@ -304,6 +331,7 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
           itemCount: notifications.length,
           itemBuilder: (context, index) {
             return NotificationsCard(
+              key: ValueKey('notification_${notifications[index].packageName}_$index'),
               index: index,
               notificationsCategory: notifications[index],
             );

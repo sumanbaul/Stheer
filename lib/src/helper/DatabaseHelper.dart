@@ -552,4 +552,90 @@ class DatabaseHelper {
 
     return list;
   }
+
+  // Get task by ID
+  Future<Tasks?> getTaskById(int? id) async {
+    if (id == null) return null;
+    
+    final db = await database;
+    
+    // For web platform, return mock data
+    if (db == null) {
+      if (id == 1) {
+        return Tasks(
+          id: 1,
+          title: "Mock Task 1",
+          isCompleted: 0,
+          taskType: "personal",
+          color: "#FF6B6B",
+          createdDate: DateTime.now(),
+          modifiedDate: DateTime.now(),
+          repeatitions: 1,
+        );
+      } else if (id == 2) {
+        return Tasks(
+          id: 2,
+          title: "Mock Task 2",
+          isCompleted: 1,
+          taskType: "work",
+          color: "#4ECDC4",
+          createdDate: DateTime.now(),
+          modifiedDate: DateTime.now(),
+          repeatitions: 2,
+        );
+      }
+      return null;
+    }
+    
+    final res = await db.rawQuery("SELECT * FROM Tasks WHERE id = ?", [id]);
+    
+    if (res.isNotEmpty) {
+      return Tasks.fromJson(res.first);
+    }
+    
+    return null;
+  }
+
+  // Get habit by ID
+  Future<HabitsModel?> getHabitById(int? id) async {
+    if (id == null) return null;
+    
+    final db = await database;
+    
+    // For web platform, return mock data
+    if (db == null) {
+      if (id == 1) {
+        return HabitsModel(
+          id: 1,
+          habitTitle: "Mock Habit 1",
+          color: "#FF6B6B",
+          habitType: "daily",
+          isCompleted: 0,
+        );
+      } else if (id == 2) {
+        return HabitsModel(
+          id: 2,
+          habitTitle: "Mock Habit 2",
+          color: "#4ECDC4",
+          habitType: "weekly",
+          isCompleted: 1,
+        );
+      }
+      return null;
+    }
+    
+    final res = await db.rawQuery("SELECT * FROM ${HabitsModel.TABLENAME} WHERE id = ?", [id]);
+    
+    if (res.isNotEmpty) {
+      return HabitsModel(
+        id: res.first['id'] as int?,
+        habitTitle: res.first['habitTitle'] as String?,
+        color: res.first['color'] as String?,
+        habitType: res.first['habitType'] as String?,
+        isCompleted: res.first['isCompleted'] as int?,
+      );
+    }
+    
+    return null;
+  }
 }
