@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:notifoo/src/model/tasks.dart';
+import 'package:notifoo/src/services/push_notification_service.dart';
 
 var _taskType = ["Growth", "Daily", "Projects", "Shopping", "Timer", "Work", "Personal", "Health"];
 
@@ -425,7 +426,7 @@ class _AddTaskState extends State<AddTask> {
       });
 
       // Simulate API call
-      Future.delayed(Duration(milliseconds: 500), () {
+      Future.delayed(Duration(milliseconds: 500), () async {
         var _randomColor = rnd.nextInt(0xffffffff);
 
         _task['id'] = int.parse(DateTime.now().day.toString() +
@@ -442,6 +443,19 @@ class _AddTaskState extends State<AddTask> {
         Map<String, dynamic> taskMap = Map<String, dynamic>.from(_task);
 
         List<Tasks> tasks = [Tasks.fromMap(taskMap)];
+        
+        // Schedule push notification for the new task
+        try {
+          DateTime deadline = DateTime.now().add(Duration(days: 1)); // Default deadline: tomorrow
+          await PushNotificationService().scheduleTaskReminder(
+            _task['id'].toString(),
+            _task['title'],
+            deadline,
+          );
+          print('Task reminder scheduled successfully');
+        } catch (e) {
+          print('Failed to schedule task reminder: $e');
+        }
         
         setState(() {
           _isLoading = false;
