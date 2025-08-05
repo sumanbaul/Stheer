@@ -86,7 +86,11 @@ class _SplashScreenState extends State<SplashScreen>
     } else {
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => Homepage(),
+          pageBuilder: (context, animation, secondaryAnimation) => Homepage(
+            openNavigationDrawer: () {
+              // This will be handled by the Homepage widget itself
+            },
+          ),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },

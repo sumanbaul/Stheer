@@ -116,7 +116,8 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
 
   void initData() {
     notificationsOfTheDay = NotificationsHelper.initializeDbGetNotificationsToday(0);
-    notificationsByCatFuture = NotificationCatHelper.getNotificationsByCat(notificationsOfTheDay!, isToday);
+    notificationsByCatFuture = notificationsOfTheDay!.then((value) =>
+        NotificationCatHelper.getNotificationsByCat(value, isToday));
   }
 
   Future<void> startListening() async {
@@ -218,7 +219,8 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
         // Refresh the data
         setState(() {
           notificationsOfTheDay = NotificationsHelper.initializeDbGetNotificationsToday(0);
-          notificationsByCatFuture = NotificationCatHelper.getNotificationsByCat(notificationsOfTheDay!, isToday);
+          notificationsByCatFuture = notificationsOfTheDay!.then((value) =>
+              NotificationCatHelper.getNotificationsByCat(value, isToday));
         });
       }
     });
