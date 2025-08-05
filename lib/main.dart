@@ -3,9 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:notifoo/src/helper/provider/google_sign_in.dart';
+import 'package:notifoo/src/helper/provider/firebase_provider.dart';
 import 'package:notifoo/src/helper/routes/routes.dart';
 import 'src/helper/DatabaseHelper.dart';
 import 'package:provider/provider.dart';
+import 'package:notifoo/src/services/firebase_service.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 
@@ -33,6 +35,15 @@ Future main() async {
   
   await DatabaseHelper.instance.initializeDatabase();
 
+  // Initialize Firebase service
+  try {
+    await FirebaseService().initialize();
+    print('Firebase service initialized successfully');
+  } catch (e) {
+    print('Firebase service initialization failed: $e');
+    // Continue without Firebase service for sandbox mode
+  }
+
   //Initialize Hive
   await Hive.initFlutter();
   //open a box
@@ -53,8 +64,11 @@ class _MyAppState extends State<MyApp> {
   }
 
   @override
-  Widget build(BuildContext context) => ChangeNotifierProvider(
-        create: (context) => GoogleSignInProvider(),
+  Widget build(BuildContext context) => MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => GoogleSignInProvider()),
+          ChangeNotifierProvider(create: (context) => FirebaseProvider()),
+        ],
         child: AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle(
             statusBarColor: Colors.transparent,
