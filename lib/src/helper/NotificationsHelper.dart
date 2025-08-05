@@ -85,11 +85,203 @@ class NotificationsHelper {
   }
 
   static Future<MockApplication?> getCurrentAppWithIcon(String packageName) async {
-    // Mock app data for sandbox
+    // Improved mock app detection for sandbox
+    String appName = "Unknown App";
+    IconData appIcon = Icons.apps;
+    
+    if (packageName.contains("whatsapp")) {
+      appName = "WhatsApp";
+      appIcon = Icons.chat;
+    } else if (packageName.contains("gmail") || packageName.contains("google.android.gm")) {
+      appName = "Gmail";
+      appIcon = Icons.mail;
+    } else if (packageName.contains("instagram")) {
+      appName = "Instagram";
+      appIcon = Icons.camera_alt;
+    } else if (packageName.contains("facebook")) {
+      appName = "Facebook";
+      appIcon = Icons.facebook;
+    } else if (packageName.contains("twitter") || packageName.contains("x")) {
+      appName = "Twitter";
+      appIcon = Icons.flutter_dash;
+    } else if (packageName.contains("youtube")) {
+      appName = "YouTube";
+      appIcon = Icons.play_circle;
+    } else if (packageName.contains("telegram")) {
+      appName = "Telegram";
+      appIcon = Icons.send;
+    } else if (packageName.contains("discord")) {
+      appName = "Discord";
+      appIcon = Icons.games;
+    } else if (packageName.contains("slack")) {
+      appName = "Slack";
+      appIcon = Icons.work;
+    } else if (packageName.contains("linkedin")) {
+      appName = "LinkedIn";
+      appIcon = Icons.business;
+    } else if (packageName.contains("reddit")) {
+      appName = "Reddit";
+      appIcon = Icons.forum;
+    } else if (packageName.contains("spotify")) {
+      appName = "Spotify";
+      appIcon = Icons.music_note;
+    } else if (packageName.contains("netflix")) {
+      appName = "Netflix";
+      appIcon = Icons.movie;
+    } else if (packageName.contains("uber")) {
+      appName = "Uber";
+      appIcon = Icons.local_taxi;
+    } else if (packageName.contains("doordash")) {
+      appName = "DoorDash";
+      appIcon = Icons.delivery_dining;
+    } else if (packageName.contains("amazon")) {
+      appName = "Amazon";
+      appIcon = Icons.shopping_cart;
+    } else if (packageName.contains("ebay")) {
+      appName = "eBay";
+      appIcon = Icons.store;
+    } else if (packageName.contains("paypal")) {
+      appName = "PayPal";
+      appIcon = Icons.payment;
+    } else if (packageName.contains("venmo")) {
+      appName = "Venmo";
+      appIcon = Icons.account_balance_wallet;
+    } else if (packageName.contains("bank") || packageName.contains("chase")) {
+      appName = "Bank App";
+      appIcon = Icons.account_balance;
+    } else if (packageName.contains("weather")) {
+      appName = "Weather";
+      appIcon = Icons.cloud;
+    } else if (packageName.contains("calendar")) {
+      appName = "Calendar";
+      appIcon = Icons.calendar_today;
+    } else if (packageName.contains("clock") || packageName.contains("alarm")) {
+      appName = "Clock";
+      appIcon = Icons.access_time;
+    } else if (packageName.contains("camera")) {
+      appName = "Camera";
+      appIcon = Icons.camera_alt;
+    } else if (packageName.contains("gallery") || packageName.contains("photos")) {
+      appName = "Gallery";
+      appIcon = Icons.photo_library;
+    } else if (packageName.contains("maps") || packageName.contains("google.maps")) {
+      appName = "Maps";
+      appIcon = Icons.map;
+    } else if (packageName.contains("drive") || packageName.contains("google.drive")) {
+      appName = "Google Drive";
+      appIcon = Icons.folder;
+    } else if (packageName.contains("dropbox")) {
+      appName = "Dropbox";
+      appIcon = Icons.cloud_queue;
+    } else if (packageName.contains("zoom")) {
+      appName = "Zoom";
+      appIcon = Icons.video_call;
+    } else if (packageName.contains("teams")) {
+      appName = "Microsoft Teams";
+      appIcon = Icons.groups;
+    } else if (packageName.contains("skype")) {
+      appName = "Skype";
+      appIcon = Icons.video_camera_front;
+    } else if (packageName.contains("chrome") || packageName.contains("browser")) {
+      appName = "Browser";
+      appIcon = Icons.language;
+    } else if (packageName.contains("settings")) {
+      appName = "Settings";
+      appIcon = Icons.settings;
+    } else if (packageName.contains("phone") || packageName.contains("dialer")) {
+      appName = "Phone";
+      appIcon = Icons.phone;
+    } else if (packageName.contains("messages") || packageName.contains("sms")) {
+      appName = "Messages";
+      appIcon = Icons.sms;
+    } else if (packageName.contains("contacts")) {
+      appName = "Contacts";
+      appIcon = Icons.contacts;
+    } else if (packageName.contains("calculator")) {
+      appName = "Calculator";
+      appIcon = Icons.calculate;
+    } else if (packageName.contains("notes") || packageName.contains("memo")) {
+      appName = "Notes";
+      appIcon = Icons.note;
+    } else if (packageName.contains("reminder") || packageName.contains("todo")) {
+      appName = "Reminders";
+      appIcon = Icons.checklist;
+    } else if (packageName.contains("health") || packageName.contains("fitness")) {
+      appName = "Health & Fitness";
+      appIcon = Icons.favorite;
+    } else if (packageName.contains("game") || packageName.contains("play")) {
+      appName = "Games";
+      appIcon = Icons.games;
+    } else if (packageName.contains("news")) {
+      appName = "News";
+      appIcon = Icons.article;
+    } else if (packageName.contains("shopping") || packageName.contains("store")) {
+      appName = "Shopping";
+      appIcon = Icons.shopping_bag;
+    } else if (packageName.contains("food") || packageName.contains("restaurant")) {
+      appName = "Food & Dining";
+      appIcon = Icons.restaurant;
+    } else if (packageName.contains("travel") || packageName.contains("booking")) {
+      appName = "Travel";
+      appIcon = Icons.flight;
+    } else if (packageName.contains("education") || packageName.contains("learning")) {
+      appName = "Education";
+      appIcon = Icons.school;
+    } else if (packageName.contains("finance") || packageName.contains("money")) {
+      appName = "Finance";
+      appIcon = Icons.account_balance_wallet;
+    } else if (packageName.contains("productivity") || packageName.contains("office")) {
+      appName = "Productivity";
+      appIcon = Icons.work;
+    } else if (packageName.contains("entertainment") || packageName.contains("media")) {
+      appName = "Entertainment";
+      appIcon = Icons.movie;
+    } else if (packageName.contains("social") || packageName.contains("chat")) {
+      appName = "Social Media";
+      appIcon = Icons.people;
+    } else if (packageName.contains("utility") || packageName.contains("tool")) {
+      appName = "Utilities";
+      appIcon = Icons.build;
+    } else if (packageName.contains("lifestyle") || packageName.contains("wellness")) {
+      appName = "Lifestyle";
+      appIcon = Icons.spa;
+    } else if (packageName.contains("sports") || packageName.contains("fitness")) {
+      appName = "Sports";
+      appIcon = Icons.sports_soccer;
+    } else if (packageName.contains("music") || packageName.contains("audio")) {
+      appName = "Music";
+      appIcon = Icons.music_note;
+    } else if (packageName.contains("video") || packageName.contains("streaming")) {
+      appName = "Video";
+      appIcon = Icons.video_library;
+    } else if (packageName.contains("photo") || packageName.contains("image")) {
+      appName = "Photos";
+      appIcon = Icons.photo;
+    } else if (packageName.contains("document") || packageName.contains("file")) {
+      appName = "Documents";
+      appIcon = Icons.description;
+    } else if (packageName.contains("security") || packageName.contains("vpn")) {
+      appName = "Security";
+      appIcon = Icons.security;
+    } else if (packageName.contains("backup") || packageName.contains("cloud")) {
+      appName = "Backup & Sync";
+      appIcon = Icons.backup;
+    } else if (packageName.contains("system") || packageName.contains("android")) {
+      appName = "System App";
+      appIcon = Icons.android;
+    } else {
+      // Try to extract app name from package name
+      final parts = packageName.split('.');
+      if (parts.length > 1) {
+        appName = parts.last.split('_').map((part) => 
+          part.substring(0, 1).toUpperCase() + part.substring(1)
+        ).join(' ');
+        appIcon = Icons.apps;
+      }
+    }
+    
     return MockApplication(
-      appName: packageName.contains("whatsapp") ? "WhatsApp" : 
-               packageName.contains("gmail") ? "Gmail" : 
-               packageName.contains("instagram") ? "Instagram" : "Unknown App",
+      appName: appName,
       packageName: packageName,
       versionName: "1.0.0",
       versionCode: 1,
@@ -104,7 +296,6 @@ class NotificationsHelper {
   static Future<Notifications> onData(NotificationEvent event) async {
     final _event = event;
     final eventAppWithIcon = await (getCurrentAppWithIcon(event.packageName!));
-    print(event);
     
     if (eventAppWithIcon != null) {
       if (!eventAppWithIcon.systemApp) {
@@ -116,13 +307,13 @@ class NotificationsHelper {
             (event.packageName!.contains("wellbeing")) ||
             (event.packageName!.contains("weather2")) ||
             (event.packageName!.contains("gallery"))) {
-          print(event.packageName);
+          // print(event.packageName); // Removed excessive logging
         } else {
           final Map<String, dynamic> jsonresponse =
               json.decode(event.toString());
           final createatday = event.createAt!.day;
           final today = DateTime.now().day;
-          print("Create AT Day: $createatday");
+          // print("Create AT Day: $createatday"); // Removed excessive logging
 
           if (!jsonresponse.containsKey('summaryText') &&
               event.createAt!.day >= today) {
@@ -169,47 +360,35 @@ class NotificationsHelper {
       });
 
       if (listByPackageName.length > 0) {
-        listByPackageName.forEach((key, value) async {
-          // print(value[value.length - 1].createdDate);
-          // if (value != null) {
-          final MockApplication? _app =
-              await (getCurrentAppWithIcon(value[0].packageName));
-          //final _length = value.length;
-          var dt =
-              DateTime.fromMicrosecondsSinceEpoch(value[0].timestamp * 1000);
-          NotificationCategory nc = NotificationCategory(
-              packageName: _app?.packageName,
-              appTitle: _app?.appName,
-              appIcon: null, // Remove icon for sandbox
-              //tempIcon: Image.memory(_currentApp.icon),
-              timestamp: timeago.format(dt),
-              message: "You have " +
-                  value.length.toString() +
-                  " Unread notifications",
-              notificationCount: value.length);
+        for (var entry in listByPackageName.entries) {
+          final key = entry.key;
+          final value = entry.value;
+          
+          if (value.isNotEmpty) {
+            final MockApplication? _app =
+                await (getCurrentAppWithIcon(value[0].packageName));
+            
+            var dt =
+                DateTime.fromMicrosecondsSinceEpoch(value[0].timestamp * 1000);
+            
+            NotificationCategory nc = NotificationCategory(
+                packageName: _app?.packageName,
+                appTitle: _app?.appName,
+                appIcon: null, // Remove icon for sandbox
+                timestamp: timeago.format(dt),
+                message: "You have " +
+                    value.length.toString() +
+                    " Unread notifications",
+                notificationCount: value.length);
 
-          //  NotificationCategory nc2 = NotificationCategory(
-          // packageName: value[index].packageName,
-          // appTitle: value.,
-          // appIcon:
-          //     _app is ApplicationWithIcon ? Image.memory(_app.icon) : null,
-          // //tempIcon: Image.memory(_currentApp.icon),
-          // timestamp: value[0].timestamp,
-          // message: "You have " +
-          //     value.length.toString() +
-          //     " Unread notifications",
-          // notificationCount: value.length);
-
-          notificationsByCategory.add(nc);
-          // }
-        });
+            notificationsByCategory.add(nc);
+          }
+        }
       }
       notificationsByCategory
           .sort((a, b) => b.timestamp!.compareTo(a.timestamp!));
     }
-    print(
-        "NotificationsHelper -> NotificationsCategory${notificationsByCategory.length}");
-    return notificationsByCategory; // as Future<List<NotificationCategory>>;
+    return notificationsByCategory;
   }
 
   static Future<List<Notifications>> initPopulateData(
