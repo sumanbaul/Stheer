@@ -7,9 +7,15 @@ import 'package:notifoo/src/widgets/headline.dart';
 import 'package:notifoo/src/widgets/home/home_banner_widget.dart';
 
 class PomodoroHome extends StatefulWidget {
-  PomodoroHome({Key? key, this.title, this.openNavigationDrawer}) : super(key: key);
+  PomodoroHome({
+    Key? key, 
+    this.title, 
+    this.openNavigationDrawer,
+    this.showAppBar = true,
+  }) : super(key: key);
   final String? title;
   final VoidCallback? openNavigationDrawer;
+  final bool showAppBar;
 
   @override
   _PomodoroHomeState createState() => _PomodoroHomeState();
@@ -132,7 +138,7 @@ class _PomodoroHomeState extends State<PomodoroHome> with TickerProviderStateMix
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
+      appBar: widget.showAppBar ? AppBar(
         title: Text('Pomodoro'),
         leading: IconButton(
           icon: Icon(Icons.menu),
@@ -145,7 +151,7 @@ class _PomodoroHomeState extends State<PomodoroHome> with TickerProviderStateMix
             tooltip: 'Timer Settings',
           ),
         ],
-      ),
+      ) : null,
       body: SingleChildScrollView(
         child: Column(
           children: [

@@ -85,7 +85,6 @@ class NotificationsHelper {
   }
 
   static Future<MockApplication?> getCurrentAppWithIcon(String packageName) async {
-    // Improved mock app detection for sandbox
     String appName = "Unknown App";
     IconData appIcon = Icons.apps;
     
@@ -207,7 +206,7 @@ class NotificationsHelper {
       appName = "Reminders";
       appIcon = Icons.checklist;
     } else if (packageName.contains("health") || packageName.contains("fitness")) {
-      appName = "Health & Fitness";
+      appName = "Health";
       appIcon = Icons.favorite;
     } else if (packageName.contains("game") || packageName.contains("play")) {
       appName = "Games";
@@ -219,7 +218,7 @@ class NotificationsHelper {
       appName = "Shopping";
       appIcon = Icons.shopping_bag;
     } else if (packageName.contains("food") || packageName.contains("restaurant")) {
-      appName = "Food & Dining";
+      appName = "Food";
       appIcon = Icons.restaurant;
     } else if (packageName.contains("travel") || packageName.contains("booking")) {
       appName = "Travel";
@@ -237,10 +236,10 @@ class NotificationsHelper {
       appName = "Entertainment";
       appIcon = Icons.movie;
     } else if (packageName.contains("social") || packageName.contains("chat")) {
-      appName = "Social Media";
+      appName = "Social";
       appIcon = Icons.people;
     } else if (packageName.contains("utility") || packageName.contains("tool")) {
-      appName = "Utilities";
+      appName = "Utility";
       appIcon = Icons.build;
     } else if (packageName.contains("lifestyle") || packageName.contains("wellness")) {
       appName = "Lifestyle";
@@ -264,13 +263,13 @@ class NotificationsHelper {
       appName = "Security";
       appIcon = Icons.security;
     } else if (packageName.contains("backup") || packageName.contains("cloud")) {
-      appName = "Backup & Sync";
+      appName = "Backup";
       appIcon = Icons.backup;
     } else if (packageName.contains("system") || packageName.contains("android")) {
-      appName = "System App";
+      appName = "System";
       appIcon = Icons.android;
     } else {
-      // Try to extract app name from package name
+      // Try to derive app name from package name
       final parts = packageName.split('.');
       if (parts.length > 1) {
         appName = parts.last.split('_').map((part) => 
@@ -281,15 +280,15 @@ class NotificationsHelper {
     }
     
     return MockApplication(
-      appName: appName,
-      packageName: packageName,
+      appName: appName, 
+      packageName: packageName, 
       versionName: "1.0.0",
       versionCode: 1,
       dataDir: "/mock/data",
       systemApp: false,
       apkFilePath: "/mock/app.apk",
       size: 1000000,
-      icon: null, // Mock icon
+      icon: null
     );
   }
 

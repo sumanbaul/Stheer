@@ -4,8 +4,13 @@ import 'package:notifoo/src/model/tasks.dart';
 import 'package:notifoo/src/model/habits_model.dart';
 
 class InsightsPage extends StatefulWidget {
-  const InsightsPage({Key? key, this.openNavigationDrawer}) : super(key: key);
+  const InsightsPage({
+    Key? key, 
+    this.openNavigationDrawer,
+    this.showAppBar = true,
+  }) : super(key: key);
   final VoidCallback? openNavigationDrawer;
+  final bool showAppBar;
 
   @override
   _InsightsPageState createState() => _InsightsPageState();
@@ -109,7 +114,7 @@ class _InsightsPageState extends State<InsightsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
+      appBar: widget.showAppBar ? AppBar(
         title: Text('Insights'),
         leading: IconButton(
           icon: Icon(Icons.menu),
@@ -122,7 +127,7 @@ class _InsightsPageState extends State<InsightsPage> {
             tooltip: 'Refresh Data',
           ),
         ],
-      ),
+      ) : null,
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : SingleChildScrollView(

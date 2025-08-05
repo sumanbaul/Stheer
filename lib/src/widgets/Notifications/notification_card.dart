@@ -19,19 +19,81 @@ class NotificationsCard extends StatelessWidget {
 
   Future<void> _launchApp(BuildContext context, String packageName) async {
     try {
-      // For sandbox, just show a dialog
-      print('Sandbox: Would launch app $packageName');
+      // Check if app is installed
+      bool isInstalled = await DeviceApps.isAppInstalled(packageName);
       
-      // In a real app, this would launch the actual app
-      // For now, we'll just show a success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Sandbox: Would launch $packageName'),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-        ),
-      );
+      if (isInstalled) {
+        // Launch the app
+        bool launched = await DeviceApps.openApp(packageName);
+        
+        if (launched) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Opening $packageName...'),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to open $packageName'),
+              backgroundColor: Theme.of(context).colorScheme.error,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      } else {
+        // For sandbox/testing, show a dialog
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('App Not Installed'),
+              content: Text('$packageName is not installed on this device.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
     } catch (e) {
       print('Error launching app: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error launching app: $e'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  String _formatTimestamp(String? timestamp) {
+    if (timestamp == null) return 'Just now';
+    
+    try {
+      // Try to parse the timestamp
+      DateTime dateTime = DateTime.parse(timestamp);
+      DateTime now = DateTime.now();
+      Duration difference = now.difference(dateTime);
+      
+      if (difference.inMinutes < 1) {
+        return 'Just now';
+      } else if (difference.inMinutes < 60) {
+        return '${difference.inMinutes} minutes ago';
+      } else if (difference.inHours < 24) {
+        return '${difference.inHours} hours ago';
+      } else {
+        return '${difference.inDays} days ago';
+      }
+    } catch (e) {
+      // If parsing fails, return the original timestamp
+      return timestamp;
     }
   }
 
@@ -224,7 +286,7 @@ class NotificationsCard extends StatelessWidget {
                           ),
                           SizedBox(height: 4),
                           Text(
-                            notificationsCategory!.timestamp.toString(),
+                            _formatTimestamp(notificationsCategory!.timestamp),
                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                             ),
