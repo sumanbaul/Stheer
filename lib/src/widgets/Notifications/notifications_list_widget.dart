@@ -55,6 +55,13 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _mockNotificationTimer?.cancel();
+    
+    // Clean up notification listener
+    if (started) {
+      // Note: The plugin doesn't have a stopListening method
+      IsolateNameServer.removePortNameMapping("_notifoolistener_");
+    }
+    
     super.dispose();
   }
 
@@ -99,13 +106,20 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
   }
 
   Future<void> initPlatformState() async {
-    // For sandbox, we'll use mock notifications
-    print("Initializing sandbox notification listener");
+    print("Initializing real notification listener");
     
     // Check permission status on init
     await NotificationPermissionService().checkPermission();
     
-    var isServiceRunning = false; // Mock service state
+    // Check if service is already running
+    var isServiceRunning = false;
+    try {
+      // For now, we'll assume service is not running
+      isServiceRunning = false;
+    } catch (e) {
+      print("Error checking service status: $e");
+    }
+    
     print("Service is ${!isServiceRunning ? "not " : ""}already running");
     if (!isServiceRunning) {
       startListening();
@@ -156,24 +170,31 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
         }
       }
       
-      // For sandbox, we'll simulate starting the service
-      print("Starting sandbox notification listener");
+      // Start real notification listener
+      print("Starting real notification listener");
       
-      // Simulate service start delay
-      await Future.delayed(Duration(seconds: 1));
+      // Initialize the notification listener
+      await NotificationsListener.initialize(
+        callbackHandle: _callback,
+      );
       
-      // Start mock notification timer
-      _mockNotificationTimer = Timer.periodic(Duration(seconds: 5), (timer) {
-        _addMockNotification();
+      // Start listening for notifications
+      // The plugin automatically starts listening after initialization
+      
+      // Set up port for receiving notifications
+      IsolateNameServer.registerPortWithName(port.sendPort, "_notifoolistener_");
+      port.listen((dynamic message) {
+        if (message is NotificationEvent) {
+          _handleRealNotification(message);
+        }
       });
 
       setState(() {
         started = true;
         _loading = false;
       });
-
-      // Add initial mock notifications
-      _addMockNotification();
+      
+      print("Real notification listener started successfully");
       
     } catch (e) {
       print("Error starting notification listener: $e");
@@ -189,17 +210,22 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
     });
 
     try {
-      // For sandbox, we'll simulate stopping the service
-      print("Stopping sandbox notification listener");
+      // Stop real notification listener
+      print("Stopping real notification listener");
       
-      _mockNotificationTimer?.cancel();
+      // Stop listening for notifications
+      // Note: The plugin doesn't have a stopListening method
+      // The service will continue running in the background
       
-      await Future.delayed(Duration(seconds: 1));
+      // Unregister port
+      IsolateNameServer.removePortNameMapping("_notifoolistener_");
       
       setState(() {
         started = false;
         _loading = false;
       });
+      
+      print("Real notification listener stopped successfully");
       
     } catch (e) {
       print("Error stopping notification listener: $e");
@@ -209,42 +235,11 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
     }
   }
 
-  void _addMockNotification() {
-    // Add mock notifications for testing
-    final mockNotifications = [
-      {
-        'packageName': 'com.whatsapp',
-        'title': 'WhatsApp',
-        'text': 'New message from John',
-        'message': 'You have 7 Unread notifications',
-      },
-      {
-        'packageName': 'com.instagram.android',
-        'title': 'Instagram',
-        'text': 'New story from Sarah',
-        'message': 'You have 3 Unread notifications',
-      },
-      {
-        'packageName': 'com.google.android.gm',
-        'title': 'Gmail',
-        'text': 'New email received',
-        'message': 'You have 2 Unread notifications',
-      },
-    ];
-
-    final randomNotification = mockNotifications[DateTime.now().millisecond % mockNotifications.length];
+  void _handleRealNotification(NotificationEvent event) {
+    print("Received real notification: ${event.title} from ${event.packageName}");
     
-    // Create mock notification event
-    final mockEvent = NotificationEvent(
-      title: randomNotification['title']!,
-      text: randomNotification['text']!,
-      packageName: randomNotification['packageName']!,
-      timestamp: DateTime.now().millisecondsSinceEpoch,
-      createAt: DateTime.now(),
-    );
-
-    // Process the notification
-    NotificationsHelper.onData(mockEvent).then((notification) {
+    // Process the real notification
+    NotificationsHelper.onData(event).then((notification) {
       if (notification != null) {
         // Refresh the data
         setState(() {
@@ -252,6 +247,13 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
           notificationsByCatFuture = notificationsOfTheDay!.then((value) =>
               NotificationCatHelper.getNotificationsByCat(value, isToday));
         });
+        
+        // Update notification count if callback is provided
+        if (widget.onCountAdded != null) {
+          widget.onCountAdded!();
+        }
+        
+        print("Real notification processed and UI updated");
       }
     });
   }

@@ -292,7 +292,7 @@ class NotificationsHelper {
     );
   }
 
-  static Future<Notifications> onData(NotificationEvent event) async {
+  static Future<Notifications?> onData(NotificationEvent event) async {
     final _event = event;
     final eventAppWithIcon = await (getCurrentAppWithIcon(event.packageName!));
     
@@ -333,16 +333,8 @@ class NotificationsHelper {
       }
     }
 
-    // Return mock notification if no real data
-    return Notifications(
-      title: "Sandbox Notification",
-      appTitle: "Sandbox App",
-      text: "This is a sandbox notification for testing",
-      message: "Test message",
-      packageName: "com.sandbox.app",
-      timestamp: DateTime.now().millisecondsSinceEpoch,
-      createAt: DateTime.now().toString(),
-    );
+    // Return null if no real notification was processed
+    return null;
   }
 
   static Future<List<NotificationCategory>> getCategoryListFuture(
@@ -370,7 +362,7 @@ class NotificationsHelper {
             NotificationCategory nc = NotificationCategory(
                 packageName: _app?.packageName,
                 appTitle: _app?.appName,
-                appIcon: null, // Remove icon for sandbox
+                appIcon: _app?.icon, // Use real app icon
                 timestamp: timeago.format(dt),
                 message: "You have " +
                     value.length.toString() +
