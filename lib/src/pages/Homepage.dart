@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_notification_listener/flutter_notification_listener.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:notifoo/src/components/notifications/notifications_banner.dart';
 import 'package:notifoo/src/widgets/Notifications/notifications_list_widget.dart';
@@ -44,6 +44,8 @@ class _HomepageState extends State<Homepage> {
   bool isToday = true;
   ReceivePort port = ReceivePort();
   Timer? _mockNotificationTimer;
+  static const EventChannel _eventChannel = EventChannel('com.mindflo.stheer/notifications/events');
+  static StreamSubscription? _eventSub;
   int _currentIndex = 0;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final PageController _pageController = PageController();
@@ -64,23 +66,14 @@ class _HomepageState extends State<Homepage> {
 
   Future<void> initPlatformState() async {
     print("Initializing notification listener");
-    
-    var isServiceRunning = false;
-    print("Service is ${!isServiceRunning ? "not " : ""}already running");
-    if (!isServiceRunning) {
-      startListening();
-    }
-
-    setState(() {
-      started = isServiceRunning;
-    });
+    startListening();
   }
 
-  static void _callback(NotificationEvent evt) {
-    final SendPort? send = IsolateNameServer.lookupPortByName("_notifoolistener_");
-    if (send == null) print("can't find the sender");
-    send?.send(evt);
-  }
+  // static void _callback(NotificationEvent evt) {
+  //   final SendPort? send = IsolateNameServer.lookupPortByName("_notifoolistener_");
+  //   if (send == null) print("can't find the sender");
+  //   send?.send(evt);
+  // }
 
   Future<List<Notifications>> appendElements(
       Future<List<Notifications>>? notifications, Notifications notification) async {
@@ -102,28 +95,20 @@ class _HomepageState extends State<Homepage> {
 
     try {
       print("Starting notification listener");
-      
-      // For now, we'll use mock notifications since real notification access requires special permissions
-      // In a production app, you would use:
-      // await FlutterNotificationListener.initialize(
-      //   callback: _callback,
-      //   sendPort: port.sendPort,
-      // );
-      
-      // Start mock notification timer for testing
-      _mockNotificationTimer = Timer.periodic(Duration(seconds: 10), (timer) {
-        if (started) {
-          _addMockNotification();
+
+      _eventSub?.cancel();
+      _eventSub = _eventChannel.receiveBroadcastStream().listen((evt) async {
+        final n = await NotificationsHelper.onData(evt);
+        if (n != null) {
+          setState(() {
+            notificationsOfTheDay = NotificationsHelper.initializeDbGetNotificationsToday(0);
+            notificationsByCatFuture = notificationsOfTheDay!.then((value) =>
+                NotificationCatHelper.getNotificationsByCat(value, isToday));
+          });
         }
       });
-      
-      setState(() {
-        started = true;
-        _loading = false;
-      });
-      
-      // Add initial mock notifications
-      _addMockNotification();
+
+      setState(() { started = true; _loading = false; });
       
     } catch (e) {
       print("Error starting notification listener: $e");
@@ -156,60 +141,7 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
-  void _addMockNotification() {
-    final mockNotifications = [
-      {
-        'packageName': 'com.whatsapp',
-        'title': 'WhatsApp',
-        'text': 'New message from John',
-        'message': 'You have 7 Unread notifications',
-      },
-      {
-        'packageName': 'com.instagram.android',
-        'title': 'Instagram',
-        'text': 'New story from Sarah',
-        'message': 'You have 3 Unread notifications',
-      },
-      {
-        'packageName': 'com.google.android.gm',
-        'title': 'Gmail',
-        'text': 'New email received',
-        'message': 'You have 2 Unread notifications',
-      },
-      {
-        'packageName': 'com.twitter.android',
-        'title': 'Twitter',
-        'text': 'New tweet from TechNews',
-        'message': 'You have 5 Unread notifications',
-      },
-      {
-        'packageName': 'com.facebook.katana',
-        'title': 'Facebook',
-        'text': 'New post from your friend',
-        'message': 'You have 1 Unread notification',
-      },
-    ];
-
-    final randomNotification = mockNotifications[DateTime.now().millisecond % mockNotifications.length];
-    
-    final mockEvent = NotificationEvent(
-      title: randomNotification['title']!,
-      text: randomNotification['text']!,
-      packageName: randomNotification['packageName']!,
-      timestamp: DateTime.now().millisecondsSinceEpoch,
-      createAt: DateTime.now(),
-    );
-
-    NotificationsHelper.onData(mockEvent).then((notification) {
-      if (notification != null) {
-        setState(() {
-          notificationsOfTheDay = NotificationsHelper.initializeDbGetNotificationsToday(0);
-          notificationsByCatFuture = notificationsOfTheDay!.then((value) =>
-              NotificationCatHelper.getNotificationsByCat(value, isToday));
-        });
-      }
-    });
-  }
+  void _addMockNotification() {}
 
   void _onBottomNavTapped(int index) {
     setState(() {

@@ -24,4 +24,14 @@ class HabitsModel {
       'color': color,
     };
   }
+
+  factory HabitsModel.fromMap(Map<String, dynamic> map) {
+    return HabitsModel(
+      id: map['id'],
+      habitTitle: map['habitTitle'],
+      isCompleted: map['isCompleted'],
+      habitType: map['habitType'],
+      color: map['color'],
+    );
+  }
 }

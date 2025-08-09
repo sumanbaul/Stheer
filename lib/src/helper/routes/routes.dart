@@ -5,6 +5,7 @@ import 'package:notifoo/src/pages/habit_tracker.dart';
 import 'package:notifoo/src/pages/habit_hub_page.dart';
 import 'package:notifoo/src/pages/task_page.dart';
 import 'package:notifoo/src/pages/insights_page.dart';
+import 'package:notifoo/src/pages/advanced_analytics_dashboard.dart';
 import 'package:notifoo/src/pages/pomodoro_home.dart';
 import 'package:notifoo/src/pages/SplashScreen.dart';
 import 'package:notifoo/src/pages/Homepage.dart';
@@ -24,6 +25,7 @@ class Routes {
       '/habits': (context) => HabitHubPage(title: "Habits"),
       '/tasks': (context) => TaskPage(),
       '/insights': (context) => InsightsPage(),
+      '/advanced-analytics': (context) => AdvancedAnalyticsDashboard(),
       '/alerts': (context) => Homepage(
         title: "Alerts",
         openNavigationDrawer: () {},

@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.mindflo" "\0"
-            VALUE "FileDescription", "notifoo" "\0"
+            VALUE "FileDescription", "focusfluke" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "notifoo" "\0"
+            VALUE "InternalName", "focusfluke" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2025 com.mindflo. All rights reserved." "\0"
-            VALUE "OriginalFilename", "notifoo.exe" "\0"
-            VALUE "ProductName", "notifoo" "\0"
+            VALUE "OriginalFilename", "focusfluke.exe" "\0"
+            VALUE "ProductName", "focusfluke" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

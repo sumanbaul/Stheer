@@ -326,6 +326,44 @@ class DatabaseHelper {
     });
   }
 
+  Future<List<PomodoroTimer>> getAllPomodoroTimers() async {
+    final db = await (database);
+
+    // For web platform, return mock data
+    if (db == null) {
+      return [
+        PomodoroTimer(
+          taskName: "Mock Pomodoro Task 1",
+          duration: "25:00",
+          isCompleted: 1,
+          createdDate: DateTime.now().toString(),
+          isDeleted: 0,
+        ),
+        PomodoroTimer(
+          taskName: "Mock Pomodoro Task 2",
+          duration: "15:00",
+          isCompleted: 0,
+          createdDate: DateTime.now().subtract(Duration(days: 1)).toString(),
+          isDeleted: 0,
+        ),
+      ];
+    }
+
+    final List<Map<String, dynamic>> maps = await db.query(
+        PomodoroTimer.TABLENAME,
+        orderBy: 'createdDate DESC');
+
+    return List.generate(maps.length, (i) {
+      return PomodoroTimer(
+        taskName: maps[i]['taskName'],
+        duration: maps[i]['duration'],
+        isCompleted: maps[i]['isCompleted'],
+        createdDate: maps[i]['createdDate'],
+        isDeleted: maps[i]['isDeleted'],
+      );
+    });
+  }
+
 // Device Apps
   insertDeviceApps(Apps application) async {
     final db = await (database);

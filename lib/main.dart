@@ -8,6 +8,7 @@ import 'package:notifoo/src/helper/routes/routes.dart';
 import 'src/helper/DatabaseHelper.dart';
 import 'package:provider/provider.dart';
 import 'package:notifoo/src/services/firebase_service.dart';
+import 'package:notifoo/src/services/push_notification_service.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 
@@ -42,6 +43,15 @@ Future main() async {
   } catch (e) {
     print('Firebase service initialization failed: $e');
     // Continue without Firebase service for sandbox mode
+  }
+
+  // Initialize Push Notification service
+  try {
+    await PushNotificationService().initialize();
+    print('Push notification service initialized successfully');
+  } catch (e) {
+    print('Push notification service initialization failed: $e');
+    // Continue without push notifications for sandbox mode
   }
 
   //Initialize Hive
@@ -80,7 +90,7 @@ class _MyAppState extends State<MyApp> {
           ),
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
-            title: 'Notifoo',
+            title: 'FocusFluke',
             theme: ThemeData(
               useMaterial3: true,
               colorScheme: ColorScheme.fromSeed(

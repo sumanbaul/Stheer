@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:notifoo/src/widgets/sync_status_widget.dart';
 import 'package:notifoo/src/services/firebase_service.dart';
+import 'package:notifoo/src/services/data_export_service.dart';
+import 'package:notifoo/src/services/widget_service.dart';
+import 'package:notifoo/src/services/voice_command_service.dart';
+import 'package:notifoo/src/services/calendar_service.dart';
 import 'package:notifoo/src/helper/DatabaseHelper.dart';
 import 'package:notifoo/src/model/tasks.dart';
 
@@ -17,6 +21,9 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _darkModeEnabled = false;
   bool _soundEnabled = true;
   bool _vibrationEnabled = true;
+  bool _voiceCommandsEnabled = false;
+  bool _calendarSyncEnabled = false;
+  bool _widgetsEnabled = false;
   String _selectedLanguage = 'English';
   String _selectedTheme = 'System';
   double _timerDuration = 25.0;
@@ -192,6 +199,49 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             SizedBox(height: 24),
 
+            // Integration Features Section
+            _buildSectionTitle('Integration Features'),
+            _buildSwitchTile(
+              'Voice Commands',
+              'Control app with voice commands',
+              Icons.mic_outlined,
+              _voiceCommandsEnabled,
+              (value) => _toggleVoiceCommands(value),
+            ),
+            _buildActionTile(
+              'Test Voice Commands',
+              'Try voice command functionality',
+              Icons.record_voice_over_outlined,
+              () => _testVoiceCommands(),
+            ),
+            _buildSwitchTile(
+              'Calendar Sync',
+              'Sync tasks and habits to calendar',
+              Icons.calendar_today_outlined,
+              _calendarSyncEnabled,
+              (value) => _toggleCalendarSync(value),
+            ),
+            _buildActionTile(
+              'Sync to Calendar',
+              'Manually sync data to calendar',
+              Icons.sync_outlined,
+              () => _syncToCalendar(),
+            ),
+            _buildSwitchTile(
+              'Home Screen Widgets',
+              'Enable home screen widgets',
+              Icons.widgets_outlined,
+              _widgetsEnabled,
+              (value) => _toggleWidgets(value),
+            ),
+            _buildActionTile(
+              'Update Widgets',
+              'Refresh home screen widget data',
+              Icons.refresh_outlined,
+              () => _updateWidgets(),
+            ),
+            SizedBox(height: 24),
+
             // Account Section
             _buildSectionTitle('Account'),
             _buildAccountTile(),
@@ -201,9 +251,15 @@ class _SettingsPageState extends State<SettingsPage> {
             _buildSectionTitle('Data & Privacy'),
             _buildActionTile(
               'Export Data',
-              'Download your data',
+              'Download your data as JSON or CSV',
               Icons.download_outlined,
-              () => _exportData(),
+              () => _showExportDialog(),
+            ),
+            _buildActionTile(
+              'Import Data',
+              'Restore data from backup',
+              Icons.upload_outlined,
+              () => _importData(),
             ),
             _buildActionTile(
               'Clear Cache',
@@ -442,13 +498,136 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void _exportData() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Data export started'),
-        backgroundColor: Colors.blue,
+  void _showExportDialog() async {
+    final summary = await DataExportService().getDataSummary();
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Export Data'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Export your FocusFluke data to backup or share.'),
+            SizedBox(height: 16),
+            Text('Data Summary:', style: TextStyle(fontWeight: FontWeight.bold)),
+            SizedBox(height: 8),
+            Text('Tasks: ${summary['tasks']['total']} (${summary['tasks']['completed']} completed)'),
+            Text('Habits: ${summary['habits']['total']} (${summary['habits']['completed']} completed)'),
+            Text('Pomodoros: ${summary['pomodoros']['total']} sessions'),
+            SizedBox(height: 16),
+            Text('Choose export format:'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _performExport('json');
+            },
+            child: Text('JSON'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _performExport('csv');
+            },
+            child: Text('CSV'),
+          ),
+        ],
       ),
     );
+  }
+
+  void _performExport(String format) async {
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Preparing ${format.toUpperCase()} export...'),
+          backgroundColor: Colors.blue,
+        ),
+      );
+
+      await DataExportService().exportToFile(format: format);
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Export completed! Check your sharing options.'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Export failed: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _importData() async {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Import Data'),
+        content: Text('This will import data from a JSON backup file. Existing data will be preserved.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await _performImport();
+            },
+            child: Text('Import'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _performImport() async {
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Starting import...'),
+          backgroundColor: Colors.blue,
+        ),
+      );
+
+      final success = await DataExportService().importFromFile();
+      
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Data imported successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Import cancelled'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Import failed: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void _clearCache() {
@@ -539,6 +718,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 _darkModeEnabled = false;
                 _soundEnabled = true;
                 _vibrationEnabled = true;
+                _voiceCommandsEnabled = false;
+                _calendarSyncEnabled = false;
+                _widgetsEnabled = false;
                 _selectedLanguage = 'English';
                 _selectedTheme = 'System';
                 _timerDuration = 25.0;
@@ -611,6 +793,195 @@ class _SettingsPageState extends State<SettingsPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Offline mode test failed: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  // New feature implementations
+  void _toggleVoiceCommands(bool enabled) async {
+    if (enabled) {
+      final voiceService = VoiceCommandService();
+      final initialized = await voiceService.initialize();
+      
+      if (initialized) {
+        setState(() {
+          _voiceCommandsEnabled = true;
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Voice commands enabled successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to enable voice commands'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } else {
+      setState(() {
+        _voiceCommandsEnabled = false;
+      });
+    }
+  }
+
+  void _testVoiceCommands() async {
+    final voiceService = VoiceCommandService();
+    
+    if (!voiceService.isAvailable) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Voice commands not available. Please enable first.'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    // Set up callbacks for testing
+    voiceService.onCommandRecognized = (command) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Command recognized: $command'),
+          backgroundColor: Colors.blue,
+        ),
+      );
+    };
+
+    voiceService.onError = (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Voice error: $error'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    };
+
+    await voiceService.startListening();
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Listening for voice commands... Try saying "Add task test"'),
+        backgroundColor: Colors.blue,
+        duration: Duration(seconds: 5),
+      ),
+    );
+  }
+
+  void _toggleCalendarSync(bool enabled) async {
+    if (enabled) {
+      final calendarService = CalendarService();
+      final initialized = await calendarService.initialize();
+      
+      if (initialized) {
+        setState(() {
+          _calendarSyncEnabled = true;
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Calendar sync enabled successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to enable calendar sync. Check permissions.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } else {
+      setState(() {
+        _calendarSyncEnabled = false;
+      });
+    }
+  }
+
+  void _syncToCalendar() async {
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Syncing data to calendar...'),
+          backgroundColor: Colors.blue,
+        ),
+      );
+
+      final calendarService = CalendarService();
+      await calendarService.syncTasksToCalendar();
+      await calendarService.syncHabitsToCalendar();
+      
+      final summary = await calendarService.getIntegrationSummary();
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Calendar sync completed! Events today: ${summary['events_today']}'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Calendar sync failed: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _toggleWidgets(bool enabled) async {
+    if (enabled) {
+      final widgetService = WidgetService();
+      await widgetService.initialize();
+      
+      setState(() {
+        _widgetsEnabled = true;
+      });
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Widgets enabled successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      setState(() {
+        _widgetsEnabled = false;
+      });
+    }
+  }
+
+  void _updateWidgets() async {
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Updating widgets...'),
+          backgroundColor: Colors.blue,
+        ),
+      );
+
+      final widgetService = WidgetService();
+      await widgetService.updateAllWidgets();
+      
+      final summary = await widgetService.getWidgetSummary();
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Widgets updated! Available: ${summary['widgets_available'].length}'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Widget update failed: $e'),
           backgroundColor: Colors.red,
         ),
       );

@@ -27,4 +27,15 @@ class PomodoroTimer {
       'isDeleted': isDeleted
     };
   }
+
+  factory PomodoroTimer.fromMap(Map<String, dynamic> map) {
+    return PomodoroTimer(
+      id: map['id'],
+      taskName: map['taskName'],
+      duration: map['duration'],
+      isCompleted: map['isCompleted'],
+      createdDate: map['createdDate'],
+      isDeleted: map['isDeleted'],
+    );
+  }
 }

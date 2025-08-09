@@ -174,7 +174,7 @@ class _SplashScreenState extends State<SplashScreen>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Notifoo',
+                          'FocusFluke',
                           style: GoogleFonts.inter(
                             fontSize: 36,
                             fontWeight: FontWeight.bold,
