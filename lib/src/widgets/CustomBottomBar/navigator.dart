@@ -7,13 +7,13 @@ import 'package:notifoo/src/pages/habit_tracker.dart';
 import 'package:notifoo/src/pages/habit_hub_page.dart';
 import 'package:notifoo/src/pages/task_page.dart';
 import 'package:notifoo/src/pages/insights_page.dart';
-import 'package:notifoo/src/widgets/CustomBottomBar/BottomNavigation.dart';
+import 'package:notifoo/src/widgets/CustomBottomBar/bottomNavigation.dart';
 import 'package:notifoo/src/widgets/CustomBottomBar/responsive_helper.dart';
 import 'package:notifoo/src/widgets/navigation/nav_drawer_widget.dart';
 
 import '../../../src/model/Notifications.dart';
 import '../../pages/Profile.dart';
-import 'TabItem.dart';
+import 'tabItem.dart';
 
 class App extends StatefulWidget {
   App({

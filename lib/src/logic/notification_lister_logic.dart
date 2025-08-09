@@ -117,19 +117,18 @@ class NotificationListerPageLogic {
         }
         flagEntry = event.text;
       } else {
-        // # TODO fix here
-
-        // var titleLength = jsonresponse["textLines"].length;
-
         DatabaseHelper.instance.insertNotification(
           Notifications(
-              title: jsonresponse["textLines"] as String?,
-              text: event.text,
-              message: event.message,
-              packageName: event.packageName,
-              timestamp: event.timestamp,
-              createAt: event.createAt.toString(),
-              eventJson: "{}"),
+            title: event.title,
+            text: event.text,
+            message: event.message,
+            packageName: event.packageName,
+            timestamp: event.timestamp,
+            createAt: event.createAt!.millisecondsSinceEpoch.toString(),
+            eventJson: "{}",
+            createdDate: DateTime.now().millisecondsSinceEpoch.toString(),
+            isDeleted: 0,
+          ),
         );
       }
     }
