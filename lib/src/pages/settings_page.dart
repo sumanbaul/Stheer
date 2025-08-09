@@ -67,19 +67,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Load persisted settings
-    final settings = SettingsService();
-    _notificationsEnabled = settings.getBool(SettingsService.kNotificationsEnabled, defaultValue: _notificationsEnabled);
-    _soundEnabled = settings.getBool(SettingsService.kSoundEnabled, defaultValue: _soundEnabled);
-    _vibrationEnabled = settings.getBool(SettingsService.kVibrationEnabled, defaultValue: _vibrationEnabled);
-    _voiceCommandsEnabled = settings.getBool(SettingsService.kVoiceEnabled, defaultValue: _voiceCommandsEnabled);
-    _calendarSyncEnabled = settings.getBool(SettingsService.kCalendarEnabled, defaultValue: _calendarSyncEnabled);
-    _widgetsEnabled = settings.getBool(SettingsService.kWidgetsEnabled, defaultValue: _widgetsEnabled);
-    _autoRouteRecord = settings.getBool(SettingsService.kAutoRouteRecord, defaultValue: _autoRouteRecord);
-    _selectedLanguage = settings.getString(SettingsService.kLanguage, defaultValue: _selectedLanguage);
-    _selectedTheme = settings.getString(SettingsService.kTheme, defaultValue: _selectedTheme);
-    _timerDuration = settings.getDouble(SettingsService.kTimerDuration, defaultValue: _timerDuration);
-    _breakDuration = settings.getDouble(SettingsService.kBreakDuration, defaultValue: _breakDuration);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(

@@ -64,10 +64,10 @@ A modern productivity companion app that helps you manage notifications, track h
 - **Smart Recognition**: Intelligent command parsing and execution
 
 ### 📱 **Home Screen Widgets**
-- **Task Widget**: Quick view of pending tasks with completion
-- **Habit Widget**: Track daily habit progress
-- **Focus Widget**: Pomodoro timer and session statistics
-- **Quick Actions**: Add tasks and toggle habits from home screen
+- **Task Control**: Quick view of pending/completed counts; tap to open tasks
+- **Habit Control**: Today’s completion summary; tap to open habits
+- **Insights Snapshot**: Focus minutes and streak summary at a glance
+- **Quick Actions**: Background click handling to trigger app actions
 
 ### 📅 **Calendar Integration**
 - **Automatic Sync**: Tasks and habits sync to device calendar
@@ -268,7 +268,7 @@ share_plus: ^7.2.1
 file_picker: ^6.1.1
 
 # Widget Support
-home_widget: ^0.4.0
+home_widget: ^0.8.0
 
 # Voice Commands
 speech_to_text: ^6.6.0
@@ -303,7 +303,7 @@ device_calendar: ^4.3.1
 
 ### **✅ Recently Added Features**
 - [x] **Export/Import Functionality**: JSON and CSV export with backup/restore
-- [x] **Home Screen Widgets**: Task, habit, and focus timer widgets
+- [x] **Home Screen Widgets**: Task Control, Habit Control, Insights Snapshot with click handling
 - [x] **Voice Commands**: Control app with natural language
 - [x] **Calendar Integration**: Sync tasks and habits to device calendar
 - [x] **Enhanced Push Notifications**: Smart reminders with multiple channels
