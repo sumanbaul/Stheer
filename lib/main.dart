@@ -10,6 +10,8 @@ import 'package:provider/provider.dart';
 import 'package:notifoo/src/services/firebase_service.dart';
 import 'package:notifoo/src/services/push_notification_service.dart';
 import 'src/helper/provider/theme_provider.dart';
+import 'package:notifoo/src/services/steps_service.dart';
+import 'package:notifoo/src/services/location_service.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 
@@ -80,6 +82,8 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (context) => GoogleSignInProvider()),
           ChangeNotifierProvider(create: (context) => FirebaseProvider()),
           ChangeNotifierProvider(create: (context) => ThemeProvider()..load()),
+          ChangeNotifierProvider(create: (context) => StepsService()),
+          ChangeNotifierProvider(create: (context) => LocationService()),
         ],
         child: AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle(

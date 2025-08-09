@@ -100,6 +100,16 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
                   // Other Section
                   _buildSectionTitle('Other'),
                   const SizedBox(height: 8),
+  buildMenuItem(
+    text: 'Activity',
+    icon: Icons.directions_walk,
+    onClicked: () => _navigateToPage(context, 10),
+  ),
+  buildMenuItem(
+    text: 'Usage',
+    icon: Icons.insights,
+    onClicked: () => _navigateToPage(context, 11),
+  ),
                   buildMenuItem(
                     text: 'Advanced Analytics',
                     icon: Icons.analytics,
@@ -392,6 +402,12 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
         break;
       case 9: // About
         _showAboutDialog(context);
+        break;
+      case 10: // Activity
+        Navigator.pushNamed(context, '/activity');
+        break;
+      case 11: // Usage
+        Navigator.pushNamed(context, '/usage');
         break;
     }
   }

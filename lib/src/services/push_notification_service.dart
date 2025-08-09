@@ -227,6 +227,35 @@ class PushNotificationService {
     }
   }
 
+  // Public helper: show a simple local notification immediately
+  Future<void> showLocalNotification({
+    required int id,
+    required String title,
+    required String body,
+    Map<String, dynamic>? payload,
+    AndroidNotificationChannel? channel,
+    Importance importance = Importance.high,
+    Priority priority = Priority.high,
+  }) async {
+    await _flutterLocalNotificationsPlugin.show(
+      id,
+      title,
+      body,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          (channel ?? _channel).id,
+          (channel ?? _channel).name,
+          channelDescription: (channel ?? _channel).description,
+          icon: '@mipmap/ic_launcher',
+          importance: importance,
+          priority: priority,
+        ),
+        iOS: const DarwinNotificationDetails(),
+      ),
+      payload: payload != null ? json.encode(payload) : null,
+    );
+  }
+
   // Schedule local notifications
   Future<void> scheduleHabitReminder(String habitId, String habitName, int hour, int minute) async {
     await _flutterLocalNotificationsPlugin.zonedSchedule(

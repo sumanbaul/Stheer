@@ -13,6 +13,8 @@ import android.text.TextUtils
 class MainActivity: FlutterActivity() {
     private val METHOD_CHANNEL = "com.mindflo.stheer/notifications/methods"
     private val EVENT_CHANNEL = "com.mindflo.stheer/notifications/events"
+    private val USAGE_CHANNEL = "com.mindflo.stheer/usage"
+    private val FITNESS_CHANNEL = "com.mindflo.stheer/fitness"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -41,6 +43,43 @@ class MainActivity: FlutterActivity() {
         }
         // EventChannel stream is published from the service
         EventChannel(flutterEngine.dartExecutor.binaryMessenger, EVENT_CHANNEL).setStreamHandler(NotificationStreamHandler)
+
+        // App usage channel (Android only)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, USAGE_CHANNEL).setMethodCallHandler { call: MethodCall, result: MethodChannel.Result ->
+            try {
+                when (call.method) {
+                    "hasUsageAccess" -> result.success(UsageBridge.hasUsageAccess(applicationContext))
+                    "openUsageAccessSettings" -> {
+                        UsageBridge.openUsageAccessSettings(applicationContext)
+                        result.success(true)
+                    }
+                    "getDailySummary" -> result.success(UsageBridge.getDailySummary(applicationContext))
+                    "getMostUsedApps" -> {
+                        val limit = (call.argument<Int>("limit") ?: 10)
+                        result.success(UsageBridge.getMostUsedApps(applicationContext, limit))
+                    }
+                    else -> result.notImplemented()
+                }
+            } catch (e: Exception) {
+                result.error("ERR", e.message, null)
+            }
+        }
+
+        // Fitness / Google Fit bridge (Android only)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, FITNESS_CHANNEL).setMethodCallHandler { call: MethodCall, result: MethodChannel.Result ->
+            try {
+                when (call.method) {
+                    "connect" -> result.success(FitnessBridge.connect(this))
+                    "hasPermissions" -> result.success(FitnessBridge.hasPermissions(this))
+                    "isConnected" -> result.success(FitnessBridge.isConnected())
+                    "getTodaySteps" -> result.success(FitnessBridge.getTodaySteps(this))
+                    "getWeeklySteps" -> result.success(FitnessBridge.getWeeklySteps(this))
+                    else -> result.notImplemented()
+                }
+            } catch (e: Exception) {
+                result.error("ERR", e.message, null)
+            }
+        }
     }
 
     private fun isNotificationServiceEnabled(): Boolean {
