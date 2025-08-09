@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:confetti/confetti.dart';
+import 'package:notifoo/src/util/glow.dart';
 import 'package:notifoo/src/helper/DatabaseHelper.dart';
 import 'package:notifoo/src/helper/provider/task_api_provider.dart';
 import 'package:notifoo/src/model/tasks.dart';
@@ -30,6 +33,8 @@ class _TaskPageState extends State<TaskPage> {
 
   var isLoading = false;
   Tasks fieldValues = Tasks();
+  final ConfettiController _confettiController =
+      ConfettiController(duration: const Duration(seconds: 2));
   
   // Task statistics
   int _totalTasks = 0;
@@ -91,12 +96,15 @@ class _TaskPageState extends State<TaskPage> {
           ),
         ],
       ) : null,
-      body: Column(
+      body: Stack(
         children: [
-          // Header Section
-          Container(
+          // Header + content
+          Padding(
             padding: EdgeInsets.all(20),
             child: Column(
+              children: [
+              // Header Section
+              Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
@@ -163,13 +171,27 @@ class _TaskPageState extends State<TaskPage> {
                 ),
               ],
             ),
-          ),
           
-          // Tasks List
-          Expanded(
-            child: isLoading
-                ? Center(child: CircularProgressIndicator())
-                : _buildTasksListView(),
+              // Tasks List
+                Expanded(
+                  child: isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : _buildTasksListView(),
+                ),
+              ],
+            ),
+          ),
+          // Confetti overlay
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirectionality: BlastDirectionality.explosive,
+              emissionFrequency: 0.05,
+              numberOfParticles: 20,
+              gravity: 0.4,
+              shouldLoop: false,
+            ),
           ),
         ],
       ),
@@ -184,7 +206,10 @@ class _TaskPageState extends State<TaskPage> {
   }
 
   Widget _buildStatCard(String title, String value, IconData icon, Color color) {
-    return Container(
+    return Glows.wrapGlow(
+      color: color,
+      blur: 28,
+      child: Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
@@ -212,6 +237,7 @@ class _TaskPageState extends State<TaskPage> {
           ),
         ],
       ),
+    ),
     );
   }
 
@@ -239,14 +265,24 @@ class _TaskPageState extends State<TaskPage> {
         }
 
         List<Tasks> filteredTasks = _filterTasks(snapshot.data!);
-        
-        return ListView.builder(
+        return AnimationLimiter(
+          child: ListView.builder(
           padding: EdgeInsets.symmetric(horizontal: 20),
           itemCount: filteredTasks.length,
           itemBuilder: (BuildContext context, int index) {
             final task = filteredTasks[index];
-            return _buildTaskCard(task, index);
+            return AnimationConfiguration.staggeredList(
+              position: index,
+              duration: const Duration(milliseconds: 350),
+              child: SlideAnimation(
+                verticalOffset: 24.0,
+                child: FadeInAnimation(
+                  child: _buildTaskCard(task, index),
+                ),
+              ),
+            );
           },
+          ),
         );
       },
     );
@@ -267,7 +303,10 @@ class _TaskPageState extends State<TaskPage> {
     final isCompleted = task.isCompleted == 1;
     final taskColor = _parseTaskColor(task.color);
     
-    return Card(
+    return Glows.wrapGlow(
+      color: isCompleted ? Colors.green : taskColor,
+      blur: 22,
+      child: Card(
       margin: EdgeInsets.only(bottom: 12),
       child: ListTile(
         leading: Container(
@@ -361,7 +400,7 @@ class _TaskPageState extends State<TaskPage> {
         ),
         onTap: () => _toggleTaskCompletion(task),
       ),
-    );
+    ));
   }
 
   Widget _buildEmptyState() {
@@ -468,6 +507,10 @@ class _TaskPageState extends State<TaskPage> {
     await DatabaseHelper.instance.insertTask(updatedTask);
     if (mounted) {
       await _loadTasks();
+      // Fire confetti on completing a task
+      if (updatedTask.isCompleted == 1) {
+        _confettiController.play();
+      }
     }
   }
 

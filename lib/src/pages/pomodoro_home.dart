@@ -6,6 +6,7 @@ import 'package:notifoo/src/widgets/Topbar.dart';
 import 'package:notifoo/src/widgets/headline.dart';
 import 'package:notifoo/src/widgets/home/home_banner_widget.dart';
 import 'package:notifoo/src/services/push_notification_service.dart';
+import 'package:notifoo/src/util/glow.dart';
 
 class PomodoroHome extends StatefulWidget {
   PomodoroHome({
@@ -189,14 +190,17 @@ class _PomodoroHomeState extends State<PomodoroHome> with TickerProviderStateMix
                   ),
                   SizedBox(height: 16),
                   
-                  // Stats Card
-                  Container(
+                  // Stats Card with glow
+                  Glows.wrapGlow(
+                    color: Theme.of(context).colorScheme.primary,
+                    blur: 14,
+                    child: Container(
                     padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                        color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
                       ),
                     ),
                     child: Row(
@@ -204,7 +208,7 @@ class _PomodoroHomeState extends State<PomodoroHome> with TickerProviderStateMix
                         Container(
                           padding: EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary,
+                           color: Theme.of(context).colorScheme.primary,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Icon(
@@ -221,21 +225,22 @@ class _PomodoroHomeState extends State<PomodoroHome> with TickerProviderStateMix
                               Text(
                                 'Today\'s Progress',
                                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.w700,
+                                  color: Theme.of(context).colorScheme.onSurface,
                                 ),
                               ),
                               SizedBox(height: 4),
                               Text(
                                 '$_completedPomodoros pomodoros • $_totalFocusTime min focused',
                                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                                 ),
                               ),
                             ],
                           ),
                         ),
                       ],
+                    ),
                     ),
                   ),
                 ],

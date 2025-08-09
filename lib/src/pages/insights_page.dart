@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:notifoo/src/helper/DatabaseHelper.dart';
 import 'package:notifoo/src/model/tasks.dart';
 import 'package:notifoo/src/model/habits_model.dart';
+import 'package:notifoo/src/util/glow.dart';
 
 class InsightsPage extends StatefulWidget {
   const InsightsPage({
@@ -227,13 +228,16 @@ class _InsightsPageState extends State<InsightsPage> {
   }
 
   Widget _buildStatCard(String title, String value, IconData icon, Color color, double progress) {
-    return Container(
+    return Glows.wrapGlow(
+      color: color,
+      blur: 14,
+      child: Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: color.withOpacity(0.2),
+          color: color.withOpacity(0.15),
         ),
       ),
       child: Column(
@@ -258,7 +262,7 @@ class _InsightsPageState extends State<InsightsPage> {
                 value,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: color,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
@@ -281,6 +285,7 @@ class _InsightsPageState extends State<InsightsPage> {
           ],
         ],
       ),
+    ),
     );
   }
 

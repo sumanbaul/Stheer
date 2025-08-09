@@ -11,6 +11,7 @@ import '../model/habits_model.dart';
 import '../widgets/habits/data/habit_card_menu_items.dart';
 import '../widgets/habits/habit_card_menu_item.dart';
 import '../widgets/navigation/nav_drawer_widget.dart';
+import 'package:notifoo/src/util/glow.dart';
 
 class HabitHubPage extends StatefulWidget {
   HabitHubPage({
@@ -97,14 +98,17 @@ class _HabitHubPage extends State<HabitHubPage> {
                 ),
                 SizedBox(height: 16),
                 
-                // Progress Card
-                Container(
+                // Progress Card with glow
+                Glows.wrapGlow(
+                  color: Theme.of(context).colorScheme.primary,
+                  blur: 14,
+                  child: Container(
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                      color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
                     ),
                   ),
                   child: Row(
@@ -129,15 +133,15 @@ class _HabitHubPage extends State<HabitHubPage> {
                             Text(
                               'Today\'s Progress',
                               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.w700,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                             SizedBox(height: 4),
                             Text(
                               '$_completedHabits of $_totalHabits habits completed',
                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                               ),
                             ),
                             SizedBox(height: 8),
@@ -152,6 +156,7 @@ class _HabitHubPage extends State<HabitHubPage> {
                         ),
                       ),
                     ],
+                  ),
                   ),
                 ),
               ],
@@ -224,7 +229,12 @@ class _HabitHubPage extends State<HabitHubPage> {
       itemCount: _habits.length,
       itemBuilder: (context, index) {
         final habit = _habits[index];
-        return Card(
+        return Glows.wrapGlow(
+          color: habit.isCompleted == 1 
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.outline.withOpacity(0.6),
+          blur: 22,
+          child: Card(
           margin: EdgeInsets.only(bottom: 12),
           child: ListTile(
             leading: Container(
@@ -303,6 +313,7 @@ class _HabitHubPage extends State<HabitHubPage> {
             ),
             onTap: () => _toggleHabitCompletion(habit),
           ),
+        ),
         );
       },
     );
