@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:notifoo/src/helper/DatabaseHelper.dart';
 import 'package:notifoo/src/model/tasks.dart';
 import 'package:notifoo/src/model/habits_model.dart';
+import 'package:notifoo/src/util/glow.dart';
 
 class InsightsPage extends StatefulWidget {
   const InsightsPage({
@@ -52,12 +53,23 @@ class _InsightsPageState extends State<InsightsPage> {
       _completedHabits = habits.where((habit) => habit.isCompleted == 1).length;
       _habitCompletionRate = _totalHabits > 0 ? _completedHabits / _totalHabits : 0.0;
 
-      // Mock pomodoro data
-      _totalPomodoros = 12;
-      _totalFocusTime = 300; // 5 hours
+      // Compute pomodoro/focus from db if available
+      try {
+        final poms = await DatabaseHelper.instance.getAllPomodoroTimers();
+        _totalPomodoros = poms.length;
+        // naive parse of duration mm:ss → minutes
+        _totalFocusTime = poms.fold<int>(0, (sum, p) {
+          final parts = (p.duration ?? '0:00').split(':');
+          final m = int.tryParse(parts.first) ?? 0;
+          return sum + m;
+        });
+      } catch (_) {
+        _totalPomodoros = 0;
+        _totalFocusTime = 0;
+      }
 
-      // Generate weekly data for heatmap
-      _generateWeeklyData();
+      // Generate weekly data by bucketing completions
+      await _generateWeeklyDataFromDb();
 
       setState(() {
         _isLoading = false;
@@ -69,22 +81,27 @@ class _InsightsPageState extends State<InsightsPage> {
     }
   }
 
-  void _generateWeeklyData() {
+  Future<void> _generateWeeklyDataFromDb() async {
     _weeklyData = [];
     final now = DateTime.now();
-    
+    // For each day in past 7, compute completed tasks/habits
+    final tasks = await DatabaseHelper.instance.getAllTasks();
+    final habits = await DatabaseHelper.instance.getHabits();
     for (int i = 6; i >= 0; i--) {
-      final date = now.subtract(Duration(days: i));
+      final date = DateTime(now.year, now.month, now.day).subtract(Duration(days: i));
       final dayName = _getDayName(date.weekday);
-      final completionRate = 0.3 + (0.7 * (i / 6)); // Mock data
-      
+      int tCount = tasks.where((t) => t.modifiedDate != null && DateTime(t.modifiedDate!.year, t.modifiedDate!.month, t.modifiedDate!.day) == date && t.isCompleted == 1).length;
+      int hCount = habits.where((h) => h.isCompleted == 1).length; // no per-day timestamp available; show total completed as proxy
+      final total = (_totalTasks + _totalHabits).clamp(1, 999999);
+      final done = (_completedTasks + _completedHabits).clamp(0, 999999);
+      final completionRate = total > 0 ? (done / total) : 0.0;
       _weeklyData.add({
         'day': dayName,
         'date': date,
         'completionRate': completionRate,
-        'tasks': 3 + (i * 2),
-        'habits': 2 + i,
-        'pomodoros': 1 + i,
+        'tasks': tCount,
+        'habits': hCount,
+        'pomodoros': _totalPomodoros,
       });
     }
   }
@@ -227,13 +244,16 @@ class _InsightsPageState extends State<InsightsPage> {
   }
 
   Widget _buildStatCard(String title, String value, IconData icon, Color color, double progress) {
-    return Container(
+    return Glows.wrapGlow(
+      color: color,
+      blur: 14,
+      child: Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: color.withOpacity(0.2),
+          color: color.withOpacity(0.15),
         ),
       ),
       child: Column(
@@ -258,7 +278,7 @@ class _InsightsPageState extends State<InsightsPage> {
                 value,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: color,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
@@ -281,6 +301,7 @@ class _InsightsPageState extends State<InsightsPage> {
           ],
         ],
       ),
+    ),
     );
   }
 

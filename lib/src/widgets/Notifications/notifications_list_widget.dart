@@ -157,8 +157,9 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
 
       _eventSub?.cancel();
       _eventSub = _eventChannel.receiveBroadcastStream().listen((evt) async {
+        if (!mounted) return;
         final n = await NotificationsHelper.onData(evt);
-        if (n != null) {
+        if (n != null && mounted) {
           setState(() {
             notificationsOfTheDay = NotificationsHelper.initializeDbGetNotificationsToday(0);
             notificationsByCatFuture = notificationsOfTheDay!.then((value) =>

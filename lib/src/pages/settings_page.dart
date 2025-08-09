@@ -8,6 +8,10 @@ import 'package:notifoo/src/services/voice_command_service.dart';
 import 'package:notifoo/src/services/calendar_service.dart';
 import 'package:notifoo/src/helper/DatabaseHelper.dart';
 import 'package:notifoo/src/model/tasks.dart';
+import 'package:notifoo/src/services/settings_service.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
+import 'package:notifoo/src/helper/provider/theme_provider.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -24,6 +28,8 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _voiceCommandsEnabled = false;
   bool _calendarSyncEnabled = false;
   bool _widgetsEnabled = false;
+  bool _autoRouteRecord = false;
+  bool _canExactAlarms = false;
   String _selectedLanguage = 'English';
   String _selectedTheme = 'System';
   double _timerDuration = 25.0;
@@ -31,6 +37,33 @@ class _SettingsPageState extends State<SettingsPage> {
 
   final List<String> _languages = ['English', 'Spanish', 'French', 'German'];
   final List<String> _themes = ['System', 'Light', 'Dark'];
+
+  @override
+  void initState() {
+    super.initState();
+    // Load persisted settings once
+    final s = SettingsService();
+    _notificationsEnabled = s.getBool(SettingsService.kNotificationsEnabled, defaultValue: _notificationsEnabled);
+    _soundEnabled = s.getBool(SettingsService.kSoundEnabled, defaultValue: _soundEnabled);
+    _vibrationEnabled = s.getBool(SettingsService.kVibrationEnabled, defaultValue: _vibrationEnabled);
+    _voiceCommandsEnabled = s.getBool(SettingsService.kVoiceEnabled, defaultValue: _voiceCommandsEnabled);
+    _calendarSyncEnabled = s.getBool(SettingsService.kCalendarEnabled, defaultValue: _calendarSyncEnabled);
+    _widgetsEnabled = s.getBool(SettingsService.kWidgetsEnabled, defaultValue: _widgetsEnabled);
+    _autoRouteRecord = s.getBool(SettingsService.kAutoRouteRecord, defaultValue: _autoRouteRecord);
+    _selectedLanguage = s.getString(SettingsService.kLanguage, defaultValue: _selectedLanguage);
+    _selectedTheme = s.getString(SettingsService.kTheme, defaultValue: _selectedTheme);
+    _timerDuration = s.getDouble(SettingsService.kTimerDuration, defaultValue: _timerDuration);
+    _breakDuration = s.getDouble(SettingsService.kBreakDuration, defaultValue: _breakDuration);
+    _checkExactAlarmCapability();
+  }
+
+  static final MethodChannel _alarmChannel = const MethodChannel('com.mindflo.stheer/alarms');
+  Future<void> _checkExactAlarmCapability() async {
+    try {
+      final can = await _alarmChannel.invokeMethod('canScheduleExactAlarms');
+      setState(() { _canExactAlarms = can == true; });
+    } catch (_) {}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -139,21 +172,30 @@ class _SettingsPageState extends State<SettingsPage> {
               'Receive alerts for tasks and habits',
               Icons.notifications_outlined,
               _notificationsEnabled,
-              (value) => setState(() => _notificationsEnabled = value),
+              (value) {
+                setState(() => _notificationsEnabled = value);
+                SettingsService().setBool(SettingsService.kNotificationsEnabled, value);
+              },
             ),
             _buildSwitchTile(
               'Sound Alerts',
               'Play sound for notifications',
               Icons.volume_up_outlined,
               _soundEnabled,
-              (value) => setState(() => _soundEnabled = value),
+              (value) {
+                setState(() => _soundEnabled = value);
+                SettingsService().setBool(SettingsService.kSoundEnabled, value);
+              },
             ),
             _buildSwitchTile(
               'Vibration',
               'Vibrate for notifications',
               Icons.vibration_outlined,
               _vibrationEnabled,
-              (value) => setState(() => _vibrationEnabled = value),
+              (value) {
+                setState(() => _vibrationEnabled = value);
+                SettingsService().setBool(SettingsService.kVibrationEnabled, value);
+              },
             ),
             SizedBox(height: 24),
 
@@ -165,7 +207,21 @@ class _SettingsPageState extends State<SettingsPage> {
               Icons.palette_outlined,
               _selectedTheme,
               _themes,
-              (value) => setState(() => _selectedTheme = value!),
+              (value) {
+                setState(() => _selectedTheme = value!);
+                final themeProvider = context.read<ThemeProvider>();
+                switch (_selectedTheme) {
+                  case 'Light':
+                    themeProvider.setThemeMode(ThemeMode.light);
+                    break;
+                  case 'Dark':
+                    themeProvider.setThemeMode(ThemeMode.dark);
+                    break;
+                  default:
+                    themeProvider.setThemeMode(ThemeMode.system);
+                }
+                SettingsService().setString(SettingsService.kTheme, _selectedTheme);
+              },
             ),
             _buildDropdownTile(
               'Language',
@@ -173,7 +229,10 @@ class _SettingsPageState extends State<SettingsPage> {
               Icons.language_outlined,
               _selectedLanguage,
               _languages,
-              (value) => setState(() => _selectedLanguage = value!),
+              (value) {
+                setState(() => _selectedLanguage = value!);
+                SettingsService().setString(SettingsService.kLanguage, _selectedLanguage);
+              },
             ),
             SizedBox(height: 24),
 
@@ -186,7 +245,10 @@ class _SettingsPageState extends State<SettingsPage> {
               _timerDuration,
               5.0,
               60.0,
-              (value) => setState(() => _timerDuration = value),
+              (value) {
+                setState(() => _timerDuration = value);
+                SettingsService().setDouble(SettingsService.kTimerDuration, _timerDuration);
+              },
             ),
             _buildSliderTile(
               'Break Duration',
@@ -195,7 +257,10 @@ class _SettingsPageState extends State<SettingsPage> {
               _breakDuration,
               1.0,
               30.0,
-              (value) => setState(() => _breakDuration = value),
+              (value) {
+                setState(() => _breakDuration = value);
+                SettingsService().setDouble(SettingsService.kBreakDuration, _breakDuration);
+              },
             ),
             SizedBox(height: 24),
 
@@ -206,7 +271,10 @@ class _SettingsPageState extends State<SettingsPage> {
               'Control app with voice commands',
               Icons.mic_outlined,
               _voiceCommandsEnabled,
-              (value) => _toggleVoiceCommands(value),
+              (value) {
+                _toggleVoiceCommands(value);
+                SettingsService().setBool(SettingsService.kVoiceEnabled, value);
+              },
             ),
             _buildActionTile(
               'Test Voice Commands',
@@ -219,7 +287,10 @@ class _SettingsPageState extends State<SettingsPage> {
               'Sync tasks and habits to calendar',
               Icons.calendar_today_outlined,
               _calendarSyncEnabled,
-              (value) => _toggleCalendarSync(value),
+              (value) {
+                _toggleCalendarSync(value);
+                SettingsService().setBool(SettingsService.kCalendarEnabled, value);
+              },
             ),
             _buildActionTile(
               'Sync to Calendar',
@@ -228,11 +299,40 @@ class _SettingsPageState extends State<SettingsPage> {
               () => _syncToCalendar(),
             ),
             _buildSwitchTile(
+              'Auto Record Routes',
+              'Automatically record walking routes when Activity is open',
+              Icons.route,
+              _autoRouteRecord,
+              (value) {
+                setState(() => _autoRouteRecord = value);
+                SettingsService().setBool(SettingsService.kAutoRouteRecord, value);
+              },
+            ),
+            Card(
+              margin: EdgeInsets.only(bottom: 8),
+              child: ListTile(
+                leading: Icon(Icons.alarm_on, color: Theme.of(context).colorScheme.primary),
+                title: Text('Allow Exact Alarms'),
+                subtitle: Text(_canExactAlarms ? 'Enabled on this device' : 'Tap to open settings and allow'),
+                trailing: Icon(Icons.open_in_new),
+                onTap: () async {
+                  try {
+                    await _alarmChannel.invokeMethod('openExactAlarmSettings');
+                    await Future.delayed(const Duration(seconds: 1));
+                    await _checkExactAlarmCapability();
+                  } catch (_) {}
+                },
+              ),
+            ),
+            _buildSwitchTile(
               'Home Screen Widgets',
               'Enable home screen widgets',
               Icons.widgets_outlined,
               _widgetsEnabled,
-              (value) => _toggleWidgets(value),
+              (value) {
+                _toggleWidgets(value);
+                SettingsService().setBool(SettingsService.kWidgetsEnabled, value);
+              },
             ),
             _buildActionTile(
               'Update Widgets',
@@ -457,13 +557,27 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _saveSettings() {
-    // Here you would typically save settings to local storage or backend
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Settings saved successfully'),
-        backgroundColor: Colors.green,
-      ),
-    );
+    SettingsService()
+        .saveAll(
+          notificationsEnabled: _notificationsEnabled,
+          soundEnabled: _soundEnabled,
+          vibrationEnabled: _vibrationEnabled,
+          voiceEnabled: _voiceCommandsEnabled,
+          calendarEnabled: _calendarSyncEnabled,
+          widgetsEnabled: _widgetsEnabled,
+          language: _selectedLanguage,
+          theme: _selectedTheme,
+          timerDuration: _timerDuration,
+          breakDuration: _breakDuration,
+        )
+        .then((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Settings saved successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    });
   }
 
   void _showAccountDialog() {

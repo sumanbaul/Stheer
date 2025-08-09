@@ -9,19 +9,28 @@ class WidgetService {
   factory WidgetService() => _instance;
   WidgetService._internal();
 
-  static const String _widgetName = 'FocusFlukeWidget';
-  static const String _taskWidgetName = 'TaskWidget';
-  static const String _habitWidgetName = 'HabitWidget';
-  static const String _focusWidgetName = 'FocusWidget';
+  // Android provider class registered in AndroidManifest.xml
+  static const String _androidProviderClass = 'es.antonborri.home_widget.HomeWidgetProvider';
 
   /// Initialize widget service
   Future<void> initialize() async {
     try {
       await HomeWidget.setAppGroupId('group.focusfluke.widgets');
+      // Register basic click actions mapping
+      await HomeWidget.registerBackgroundCallback(WidgetService._backgroundCallback);
       print('Widget service initialized successfully');
     } catch (e) {
       print('Failed to initialize widget service: $e');
     }
+  }
+
+  // Background callback entrypoint for widget clicks
+  @pragma('vm:entry-point')
+  static Future<void> _backgroundCallback(Uri? uri) async {
+    if (uri == null) return;
+    final action = uri.host; // e.g., focusfluke://quick_add_task
+    final data = uri.queryParameters['data'];
+    await handleWidgetClick(action, data);
   }
 
   /// Update all widgets with latest data
@@ -31,13 +40,12 @@ class WidgetService {
         updateTaskWidget(),
         updateHabitWidget(),
         updateFocusWidget(),
+        updateInsightsWidget(),
       ]);
       
       // Trigger widget update
       await HomeWidget.updateWidget(
-        name: _widgetName,
-        androidName: _widgetName,
-        iOSName: _widgetName,
+        androidName: _androidProviderClass,
       );
       
       print('All widgets updated successfully');
@@ -70,7 +78,7 @@ class WidgetService {
       };
       
       await HomeWidget.saveWidgetData('task_data', json.encode(taskData));
-      await HomeWidget.updateWidget(name: _taskWidgetName);
+      await HomeWidget.updateWidget(androidName: _androidProviderClass);
     } catch (e) {
       print('Failed to update task widget: $e');
     }
@@ -96,7 +104,7 @@ class WidgetService {
       };
       
       await HomeWidget.saveWidgetData('habit_data', json.encode(habitData));
-      await HomeWidget.updateWidget(name: _habitWidgetName);
+      await HomeWidget.updateWidget(androidName: _androidProviderClass);
     } catch (e) {
       print('Failed to update habit widget: $e');
     }
@@ -123,9 +131,34 @@ class WidgetService {
       };
       
       await HomeWidget.saveWidgetData('focus_data', json.encode(focusData));
-      await HomeWidget.updateWidget(name: _focusWidgetName);
+      await HomeWidget.updateWidget(androidName: _androidProviderClass);
     } catch (e) {
       print('Failed to update focus widget: $e');
+    }
+  }
+
+  /// Update insights summary for widget
+  Future<void> updateInsightsWidget() async {
+    try {
+      final tasks = await DatabaseHelper.instance.getAllTasks();
+      final habits = await DatabaseHelper.instance.getHabits();
+      final pomodoros = await DatabaseHelper.instance.getAllPomodoroTimers();
+
+      final completedTasksToday = tasks.where((t) => t.isCompleted == 1 && t.modifiedDate != null && _isToday(t.modifiedDate!)).length;
+      final completedHabitsToday = habits.where((h) => h.isCompleted == 1).length;
+      final pomodorosToday = pomodoros.where((p) => p.isCompleted == 1 && p.createdDate != null && _isToday(DateTime.parse(p.createdDate!))).length;
+
+      final insights = {
+        'completed_tasks_today': completedTasksToday,
+        'completed_habits_today': completedHabitsToday,
+        'focus_minutes_today': pomodorosToday * 25,
+        'streak_days': 0,
+      };
+
+      await HomeWidget.saveWidgetData('insights_data', json.encode(insights));
+      await HomeWidget.updateWidget(androidName: _androidProviderClass);
+    } catch (e) {
+      print('Failed to update insights widget: $e');
     }
   }
 

@@ -9,6 +9,9 @@ import 'src/helper/DatabaseHelper.dart';
 import 'package:provider/provider.dart';
 import 'package:notifoo/src/services/firebase_service.dart';
 import 'package:notifoo/src/services/push_notification_service.dart';
+import 'src/helper/provider/theme_provider.dart';
+import 'package:notifoo/src/services/steps_service.dart';
+import 'package:notifoo/src/services/location_service.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 
@@ -78,6 +81,9 @@ class _MyAppState extends State<MyApp> {
         providers: [
           ChangeNotifierProvider(create: (context) => GoogleSignInProvider()),
           ChangeNotifierProvider(create: (context) => FirebaseProvider()),
+          ChangeNotifierProvider(create: (context) => ThemeProvider()..load()),
+          ChangeNotifierProvider(create: (context) => StepsService()),
+          ChangeNotifierProvider(create: (context) => LocationService()),
         ],
         child: AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle(
@@ -88,66 +94,115 @@ class _MyAppState extends State<MyApp> {
             systemNavigationBarIconBrightness: Brightness.light,
             systemNavigationBarDividerColor: Colors.transparent,
           ),
-          child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'FocusFluke',
-            theme: ThemeData(
-              useMaterial3: true,
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: Color(0xFF6366F1),
-                brightness: Brightness.dark,
-                surface: Color(0xFF1A1A1A),
-                primary: Color(0xFF6366F1),
-                secondary: Color(0xFF8B5CF6),
-                tertiary: Color(0xFF06B6D4),
-                error: Color(0xFFEF4444),
-                onPrimary: Colors.white,
-                onSecondary: Colors.white,
-                onSurface: Colors.white,
-              ),
-              textTheme: GoogleFonts.interTextTheme(
-                ThemeData.dark().textTheme,
-              ),
-              cardTheme: CardTheme(
-                color: Color(0xFF1F1F1F),
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              elevatedButtonTheme: ElevatedButtonThemeData(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF6366F1),
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-              floatingActionButtonTheme: FloatingActionButtonThemeData(
-                backgroundColor: Color(0xFF6366F1),
-                foregroundColor: Colors.white,
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              appBarTheme: AppBarTheme(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                centerTitle: true,
-                titleTextStyle: GoogleFonts.inter(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
+          child: Consumer<ThemeProvider>(
+            builder: (context, theme, _) => MaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: 'FocusFluke',
+              themeMode: theme.themeMode,
+              theme: _buildLightTheme(),
+              darkTheme: _buildDarkTheme(),
+              initialRoute: '/',
+              routes: Routes().getRoute(),
             ),
-            initialRoute: '/',
-            routes: Routes().getRoute(),
           ),
         ),
       );
+}
+
+ThemeData _buildDarkTheme() {
+  return ThemeData(
+    useMaterial3: true,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: const Color(0xFF6366F1),
+      brightness: Brightness.dark,
+      surface: const Color(0xFF0F1115),
+      primary: const Color(0xFF7C83FF),
+      secondary: const Color(0xFF8B5CF6),
+      tertiary: const Color(0xFF06B6D4),
+      error: const Color(0xFFEF4444),
+      onPrimary: Colors.white,
+      onSecondary: Colors.white,
+      onSurface: Colors.white,
+    ),
+    textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
+    cardTheme: CardTheme(
+      color: const Color(0xFF151922),
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF7C83FF),
+        foregroundColor: Colors.white,
+        elevation: 0,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: const Color(0xFF7C83FF),
+      foregroundColor: Colors.white,
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    ),
+    appBarTheme: AppBarTheme(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      centerTitle: true,
+      titleTextStyle: GoogleFonts.inter(
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+        color: Colors.white,
+      ),
+    ),
+  );
+}
+
+ThemeData _buildLightTheme() {
+  return ThemeData(
+    useMaterial3: true,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: const Color(0xFF6366F1),
+      brightness: Brightness.light,
+      surface: const Color(0xFFF7F8FA),
+      primary: const Color(0xFF4F46E5),
+      secondary: const Color(0xFF7C3AED),
+      tertiary: const Color(0xFF0891B2),
+      error: const Color(0xFFDC2626),
+      onPrimary: Colors.white,
+      onSecondary: Colors.white,
+      onSurface: const Color(0xFF0F172A),
+    ),
+    textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme),
+    cardTheme: CardTheme(
+      color: Colors.white,
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF4F46E5),
+        foregroundColor: Colors.white,
+        elevation: 0,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: const Color(0xFF4F46E5),
+      foregroundColor: Colors.white,
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    ),
+    appBarTheme: AppBarTheme(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      centerTitle: true,
+      titleTextStyle: GoogleFonts.inter(
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+        color: const Color(0xFF0F172A),
+      ),
+    ),
+  );
 }

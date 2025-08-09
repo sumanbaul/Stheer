@@ -42,7 +42,10 @@ class DatabaseHelper {
         habitTitle TEXT, 
         isCompleted INTEGER, 
         habitType TEXT, 
-        color TEXT, 
+        color TEXT,
+        category TEXT,
+        repetitionsPerDay INTEGER,
+        times TEXT,
         createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
         )''';
 
@@ -70,8 +73,13 @@ class DatabaseHelper {
     try {
       return await openDatabase(
         join(await getDatabasesPath(), databaseName),
-        version: 8,
+        version: 9,
         onCreate: _onCreate,
+        onOpen: (db) async {
+          // Ensure habits table and required columns exist
+          await db.execute(_habitsTable);
+          await _ensureHabitColumns(db);
+        },
         onUpgrade: (db, oldVersion, newVersion) => {
           //BELOW CODE IS CURRENTLY NOT IN USE
           if (oldVersion == 2)
@@ -88,13 +96,39 @@ class DatabaseHelper {
             {
               db.execute(_deviceAppsAlterTableV3),
               db.execute(_createTasksTable),
+              db.execute(_habitsTable),
               db.close(),
+            }
+          else if (oldVersion < 9)
+            {
+              // Add new habit metadata columns if missing
+              db.execute('ALTER TABLE tblhabits ADD COLUMN category TEXT'),
+              db.execute('ALTER TABLE tblhabits ADD COLUMN repetitionsPerDay INTEGER'),
+              db.execute('ALTER TABLE tblhabits ADD COLUMN times TEXT'),
             }
         },
       );
     } catch (e) {
       print('Database initialization failed: $e');
       return null;
+    }
+  }
+
+  Future<void> _ensureHabitColumns(Database db) async {
+    try {
+      final info = await db.rawQuery('PRAGMA table_info(tblhabits)');
+      final cols = info.map((m) => (m['name'] as String?) ?? '').toSet();
+      if (!cols.contains('category')) {
+        await db.execute('ALTER TABLE tblhabits ADD COLUMN category TEXT');
+      }
+      if (!cols.contains('repetitionsPerDay')) {
+        await db.execute('ALTER TABLE tblhabits ADD COLUMN repetitionsPerDay INTEGER');
+      }
+      if (!cols.contains('times')) {
+        await db.execute('ALTER TABLE tblhabits ADD COLUMN times TEXT');
+      }
+    } catch (e) {
+      debugPrint('ensureHabitColumns error: $e');
     }
   }
 
@@ -434,7 +468,16 @@ class DatabaseHelper {
       print('Web platform: Would create habit: ${habitsItem.habitTitle}');
       return 1;
     }
-    final id = await db.insert(HabitsModel.TABLENAME, habitsItem.toMap(),
+    final data = {
+      'habitTitle': habitsItem.habitTitle,
+      'isCompleted': habitsItem.isCompleted ?? 0,
+      'habitType': habitsItem.habitType ?? '',
+      'color': habitsItem.color ?? '#FF6366F1',
+      'category': habitsItem.category,
+      'repetitionsPerDay': habitsItem.repetitionsPerDay,
+      'times': habitsItem.times,
+    };
+    final id = await db.insert(HabitsModel.TABLENAME, data,
         conflictAlgorithm: ConflictAlgorithm.ignore);
     return id;
   }
@@ -497,9 +540,9 @@ class DatabaseHelper {
     }
 
     final data = {
-      'title': title,
-      'description': descrption,
-      'createdAt': DateTime.now().toString()
+      'habitTitle': title,
+      'habitType': descrption,
+      'createdAt': DateTime.now().toString(),
     };
 
     final result =
@@ -515,10 +558,23 @@ class DatabaseHelper {
       return;
     }
     try {
-      await db.delete("items", where: "id = ?", whereArgs: [id]);
+      await db.delete("tblhabits", where: "id = ?", whereArgs: [id]);
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
     }
+  }
+
+  Future<int> updateHabitCompletion(int id, int isCompleted) async {
+    final db = await (database);
+    if (db == null) {
+      print('Web platform: Would update habit completion with id: $id');
+      return 1;
+    }
+    final data = {
+      'isCompleted': isCompleted,
+      'createdAt': DateTime.now().toString(),
+    };
+    return await db.update('tblhabits', data, where: 'id = ?', whereArgs: [id]);
   }
 
   // Insert tasks on database
@@ -529,7 +585,7 @@ class DatabaseHelper {
       print('Web platform: Would create task: ${newTask.title}');
       return 1;
     }
-    final res = await db.insert('Tasks', newTask.toJson());
+    final res = await db.insert('Tasks', newTask.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
     return res;
   }
 
@@ -539,8 +595,20 @@ class DatabaseHelper {
       print('Web platform: Would insert task: ${newTask.title}');
       return 1;
     }
-    final res = await db.insert('Tasks', newTask.toJson());
+    final res = await db.insert('Tasks', newTask.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
     return res;
+  }
+
+  Future<int> updateTask(Tasks updated) async {
+    final db = await database;
+    if (db == null) return 1;
+    return db.update('Tasks', updated.toMap(), where: 'id = ?', whereArgs: [updated.id]);
+  }
+
+  Future<int> deleteTask(int id) async {
+    final db = await database;
+    if (db == null) return 0;
+    return db.delete('Tasks', where: 'id = ?', whereArgs: [id]);
   }
 
   // Delete all employees

@@ -9,6 +9,9 @@ import 'package:notifoo/src/pages/advanced_analytics_dashboard.dart';
 import 'package:notifoo/src/pages/pomodoro_home.dart';
 import 'package:notifoo/src/pages/SplashScreen.dart';
 import 'package:notifoo/src/pages/Homepage.dart';
+import 'package:notifoo/src/pages/activity_page.dart';
+import 'package:notifoo/src/pages/activity_detail_page.dart';
+import 'package:notifoo/src/pages/app_usage_page.dart';
 import 'package:notifoo/src/widgets/CustomBottomBar/navigator.dart';
 
 class Routes {
@@ -26,6 +29,12 @@ class Routes {
       '/tasks': (context) => TaskPage(),
       '/insights': (context) => InsightsPage(),
       '/advanced-analytics': (context) => AdvancedAnalyticsDashboard(),
+      '/activity': (context) => const ActivityPage(),
+      '/activity-detail': (context) {
+        final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+        return ActivityDetailPage(entry: args);
+      },
+      '/usage': (context) => const AppUsagePage(),
       '/alerts': (context) => Homepage(
         title: "Alerts",
         openNavigationDrawer: () {},

@@ -85,6 +85,7 @@ dependencies:
   
   # Voice Commands
   speech_to_text: ^6.6.0
+  geolocator: ^9.0.2
   
   # Calendar Integration
   device_calendar: ^4.3.3
