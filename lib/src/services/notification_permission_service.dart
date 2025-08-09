@@ -178,7 +178,7 @@ class NotificationPermissionService {
                                              '1. Tap "Open Settings"\n'
                        '2. Scroll to "Special app access"\n'
                        '3. Tap "Notification access"\n'
-                       '4. Find and enable "Notifoo"\n'
+                       '4. Find and enable "FocusFluke"\n'
                        '5. Return to the app\n\n'
                        '⚠️ Note: This is different from "App notifications" permission',
                       style: Theme.of(context).textTheme.bodySmall,
@@ -387,7 +387,7 @@ class NotificationPermissionService {
                        '2. Scroll down to "Apps"\n'
                        '3. Tap "Special app access"\n'
                        '4. Tap "Notification access"\n'
-                       '5. Find "Notifoo" in the list\n'
+                       '5. Find "FocusFluke" in the list\n'
                        '6. Toggle the switch to ON\n'
                        '7. Return to this app\n\n'
                        '⚠️ IMPORTANT: This is NOT the same as "App notifications" permission. '

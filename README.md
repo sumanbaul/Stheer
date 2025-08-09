@@ -1,4 +1,4 @@
-# Notifoo 📱
+# FocusFluke 📱
 
 A modern productivity companion app that helps you manage notifications, track habits, focus with Pomodoro timers, and organize tasks efficiently. Built with Flutter and Material 3 design.
 
@@ -86,8 +86,8 @@ A modern productivity companion app that helps you manage notifications, track h
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/yourusername/notifoo.git
-cd notifoo
+git clone https://github.com/yourusername/focusfluke.git
+cd focusfluke
 ```
 
 2. **Install dependencies:**

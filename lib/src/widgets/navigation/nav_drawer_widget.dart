@@ -436,7 +436,7 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('About Notifoo'),
+        title: Text('About FocusFluke'),
         content: Text('Version 1.0.0\n\nA productivity app to help you stay focused and organized.'),
         actions: [
           TextButton(

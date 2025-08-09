@@ -1,6 +1,6 @@
 {
-    "name": "notifoo",
-    "short_name": "notifoo",
+      "name": "focusfluke",
+  "short_name": "focusfluke",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
