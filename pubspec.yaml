@@ -6,7 +6,7 @@ description: FocusFluke - A modern notification management app that helps you ba
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: '>=2.17.0 <4.0.0'
 
 dependencies:
   flutter:
@@ -88,6 +88,7 @@ dev_dependencies:
     sdk: flutter
   hive_generator: ^1.1.3
   build_runner: ^2.1.11
+  flutter_lints: ^4.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

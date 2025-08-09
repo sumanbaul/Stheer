@@ -108,7 +108,7 @@ class _MyAppState extends State<MyApp> {
               textTheme: GoogleFonts.interTextTheme(
                 ThemeData.dark().textTheme,
               ),
-              cardTheme: CardTheme(
+              cardTheme: CardThemeData(
                 color: Color(0xFF1F1F1F),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
