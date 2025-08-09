@@ -5,6 +5,7 @@ import 'package:notifoo/src/widgets/Pomodoro/pomodoroSavedListW.dart';
 import 'package:notifoo/src/widgets/Topbar.dart';
 import 'package:notifoo/src/widgets/headline.dart';
 import 'package:notifoo/src/widgets/home/home_banner_widget.dart';
+import 'package:notifoo/src/services/push_notification_service.dart';
 
 class PomodoroHome extends StatefulWidget {
   PomodoroHome({
@@ -114,6 +115,17 @@ class _PomodoroHomeState extends State<PomodoroHome> with TickerProviderStateMix
       _isWorkTime = !_isWorkTime;
     });
     _resetTimer();
+    
+    // Schedule push notification for the next session
+    try {
+      PushNotificationService().scheduleFocusSessionReminder(
+        _completedPomodoros,
+        Duration(minutes: _isWorkTime ? _workDuration : _breakDuration),
+      );
+      print('Focus session reminder scheduled successfully');
+    } catch (e) {
+      print('Failed to schedule focus session reminder: $e');
+    }
     
     // Show completion message
     ScaffoldMessenger.of(context).showSnackBar(

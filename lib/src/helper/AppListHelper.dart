@@ -1,4 +1,4 @@
-import 'package:device_apps/device_apps.dart';
+// import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
 import 'package:notifoo/src/helper/DatabaseHelper.dart';
 import 'dart:async';
@@ -19,7 +19,7 @@ import 'package:notifoo/src/model/apps.dart';
 
 abstract class AppsListBase {
   @protected
-  Future<List<Application>>? _apps;
+  // Future<List<Application>>? _apps;
 
   Future<List<Apps>>? _appsFromDB;
   List<Apps>? _appList;
@@ -42,16 +42,16 @@ class AppListHelper extends AppsListBase {
 
   AppListHelper._internal() {
     //default fallback
-    _apps = getListOfApps();
+    // _apps = getListOfApps();
     _appsFromDB = getApps();
   }
 
-  static Future<List<Application>> getListOfApps() async {
-    return await DeviceApps.getInstalledApplications(
-        onlyAppsWithLaunchIntent: true,
-        includeAppIcons: true,
-        includeSystemApps: true);
-  }
+  // static Future<List<Application>> getListOfApps() async {
+  //   return await DeviceApps.getInstalledApplications(
+  //       onlyAppsWithLaunchIntent: true,
+  //       includeAppIcons: true,
+  //       includeSystemApps: true);
+  // }
 
   static Future<List<Apps>> getApps() async {
     return DatabaseHelper.instance.getInstalledApps();

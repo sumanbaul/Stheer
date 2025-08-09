@@ -74,4 +74,18 @@ class Tasks {
       'repeatitions': repeatitions
     };
   }
+
+  // Map representation aligned with database/export needs
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'isCompleted': isCompleted,
+      'taskType': taskType,
+      'color': color,
+      'createdDate': createdDate?.toIso8601String(),
+      'modifiedDate': modifiedDate?.toIso8601String(),
+      'repeatitions': repeatitions,
+    };
+  }
 }

@@ -1,15 +1,23 @@
 buildscript {
-    ext.kotlin_version = '1.8.0'
+    ext.kotlin_version = '1.9.24'
     repositories {
         google()
         mavenCentral()  // Maven Central repository
+        gradlePluginPortal()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.1.1'
+        classpath 'com.android.tools.build:gradle:8.6.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "com.google.gms:google-services:4.3.15"
+        classpath "com.google.gms:google-services:4.4.2"
     }
+}
+
+// Provide legacy ext variables that many plugins read for SDK versions
+ext {
+    compileSdkVersion = 36
+    targetSdkVersion = 36
+    minSdkVersion = 21
 }
 
 allprojects {
@@ -19,6 +27,75 @@ allprojects {
     }
 }
 
+// Ensure AGP 8+ namespace for legacy/compliant library modules
+subprojects { project ->
+    project.plugins.withId('com.android.library') {
+        def androidExt = project.extensions.findByName('android')
+        if (androidExt != null) {
+            try {
+                // Ensure compileSdk set high enough for Java 9+ sources in plugins
+                try {
+                    if (androidExt.hasProperty('compileSdk')) {
+                        androidExt.compileSdk = 36
+                    } else {
+                        androidExt.compileSdkVersion 36
+                    }
+                } catch(Exception ignored) { }
+
+                // Also set min/target SDKs where possible for consistency
+                try {
+                    androidExt.defaultConfig {
+                        if (hasProperty('minSdkVersion') && minSdkVersion < rootProject.ext.minSdkVersion) {
+                            minSdkVersion rootProject.ext.minSdkVersion
+                        }
+                        if (hasProperty('targetSdkVersion')) {
+                            targetSdkVersion rootProject.ext.targetSdkVersion
+                        }
+                    }
+                } catch(Exception ignored) { }
+
+                def missing = true
+                try {
+                    missing = !androidExt.hasProperty('namespace') || androidExt.namespace == null
+                } catch(Exception ignored) { missing = true }
+
+                if (missing) {
+                    def manifestFile = file(project.projectDir.absolutePath + "/src/main/AndroidManifest.xml")
+                    def ns = null
+                    if (manifestFile.exists()) {
+                        def text = manifestFile.getText('UTF-8')
+                        def matcher = (text =~ /package=\"([^\"]+)\"/)
+                        if (matcher.find()) { ns = matcher.group(1) }
+                    }
+                    if (ns == null) {
+                        ns = "com.legacy." + project.name.replace('-', '_')
+                    }
+                    androidExt.namespace = ns
+                    println("[namespace] Applied '" + ns + "' to " + project.path)
+                }
+            } catch(Exception e) {
+                println("[namespace] Skipped for ${project.path}: ${e.message}")
+            }
+
+            // Align Java/Kotlin toolchains to 1.8 across library modules to avoid JVM target mismatches
+            try {
+                androidExt.compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_1_8
+                    targetCompatibility JavaVersion.VERSION_1_8
+                }
+            } catch(Exception ignored) { }
+            try {
+                // If Kotlin plugin is applied, set jvmTarget
+                project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach { task ->
+                    task.kotlinOptions { jvmTarget = '1.8' }
+                }
+            } catch(Exception ignored) { }
+        }
+    }
+
+    // No per-plugin overrides required
+}
+
 rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
@@ -26,6 +103,9 @@ subprojects {
 subprojects {
     project.evaluationDependsOn(':app')
 }
+
+// Ensure legacy plugins without a namespace (e.g., discontinued libraries) still work with AGP 8+
+// Removed dynamic namespace injection to avoid evaluation errors; ensure third-party plugins are compatible
 
 tasks.register("clean", Delete) {
     delete rootProject.buildDir

@@ -44,7 +44,7 @@ class _SignInState extends State<SignIn> {
               SizedBox(height: 32),
               
               Text(
-                'Welcome to Notifoo',
+                'Welcome to FocusFluke',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.onSurface,

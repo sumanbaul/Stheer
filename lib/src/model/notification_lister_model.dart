@@ -1,6 +1,5 @@
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 import 'package:notifoo/src/logic/notification_lister_logic.dart';
 
 class NotificationListerModel extends ChangeNotifier {
@@ -10,7 +9,7 @@ class NotificationListerModel extends ChangeNotifier {
   bool? started;
   bool? loading;
   String? packageName;
-  List<NotificationEvent> log = [];
+  List<dynamic> log = [];
   Application? app;
 
   NotificationListerModel() {

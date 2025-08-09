@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:device_apps/device_apps.dart';
+// import 'package:device_apps/device_apps.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../src/model/notificationCategory.dart';
@@ -19,48 +19,28 @@ class NotificationsCard extends StatelessWidget {
 
   Future<void> _launchApp(BuildContext context, String packageName) async {
     try {
-      // Check if app is installed
-      bool isInstalled = await DeviceApps.isAppInstalled(packageName);
-      
-      if (isInstalled) {
-        // Launch the app
-        bool launched = await DeviceApps.openApp(packageName);
-        
-        if (launched) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Opening $packageName...'),
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              duration: Duration(seconds: 2),
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Failed to open $packageName'),
-              backgroundColor: Theme.of(context).colorScheme.error,
-              duration: Duration(seconds: 2),
-            ),
-          );
-        }
-      } else {
-        // For sandbox/testing, show a dialog
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('App Not Installed'),
-              content: Text('$packageName is not installed on this device.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
+      // Fallback: attempt to open with Android intent URL if possible
+      final uri = Uri.tryParse('intent://$packageName#Intent;scheme=package;end');
+      if (uri != null && await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+        return;
       }
+      // If not possible, inform user
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Open App'),
+            content: Text('Cannot open $packageName on this device.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
     } catch (e) {
       print('Error launching app: $e');
       ScaffoldMessenger.of(context).showSnackBar(

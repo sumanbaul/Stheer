@@ -7,6 +7,7 @@ import 'package:notifoo/src/pages/SignIn.dart';
 import 'package:notifoo/src/pages/habit_hub_page.dart';
 import 'package:notifoo/src/pages/task_page.dart';
 import 'package:notifoo/src/pages/insights_page.dart';
+import 'package:notifoo/src/pages/advanced_analytics_dashboard.dart';
 import 'package:notifoo/src/pages/settings_page.dart';
 import 'package:notifoo/src/pages/pomodoro_home.dart';
 
@@ -100,14 +101,19 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
                   _buildSectionTitle('Other'),
                   const SizedBox(height: 8),
                   buildMenuItem(
+                    text: 'Advanced Analytics',
+                    icon: Icons.analytics,
+                    onClicked: () => _navigateToPage(context, 7),
+                  ),
+                  buildMenuItem(
                     text: 'Help & Support',
                     icon: Icons.help_outline,
-                    onClicked: () => _navigateToPage(context, 7),
+                    onClicked: () => _navigateToPage(context, 8),
                   ),
                   buildMenuItem(
                     text: 'About',
                     icon: Icons.info_outline,
-                    onClicked: () => _navigateToPage(context, 8),
+                    onClicked: () => _navigateToPage(context, 9),
                   ),
                   
                   const SizedBox(height: 24),
@@ -371,10 +377,20 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
           ),
         );
         break;
-      case 7: // Help & Support
+      case 7: // Advanced Analytics
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AdvancedAnalyticsDashboard(
+              openNavigationDrawer: () {},
+            ),
+          ),
+        );
+        break;
+      case 8: // Help & Support
         _showHelpDialog(context);
         break;
-      case 8: // About
+      case 9: // About
         _showAboutDialog(context);
         break;
     }
@@ -420,7 +436,7 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('About Notifoo'),
+        title: Text('About FocusFluke'),
         content: Text('Version 1.0.0\n\nA productivity app to help you stay focused and organized.'),
         actions: [
           TextButton(

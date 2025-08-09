@@ -1,4 +1,4 @@
-# Notifoo 📱
+# FocusFluke 📱
 
 A modern productivity companion app that helps you manage notifications, track habits, focus with Pomodoro timers, and organize tasks efficiently. Built with Flutter and Material 3 design.
 
@@ -12,6 +12,7 @@ A modern productivity companion app that helps you manage notifications, track h
 - **App Icons**: Proper app icons for 50+ popular applications
 - **Smart Categorization**: Automatic app detection and categorization
 - **Real-time Updates**: Live notification capture and processing
+- **Enhanced Push Notifications**: Multi-channel smart reminders
 
 ### 🎯 **Habit Tracking**
 - **Progress Visualization**: Track daily habit completion rates
@@ -36,6 +37,7 @@ A modern productivity companion app that helps you manage notifications, track h
 - **Completion Rates**: Task and habit completion statistics
 - **Focus Metrics**: Pomodoro session tracking
 - **Achievement System**: Badges and streaks
+- **Advanced Dashboard**: Comprehensive productivity analytics
 
 ### 👤 **User Profile**
 - **Comprehensive Dashboard**: User statistics and achievements
@@ -53,6 +55,32 @@ A modern productivity companion app that helps you manage notifications, track h
 - **Interactive Onboarding**: 5-page guided tour of app features
 - **Smooth Transitions**: Elegant page transitions and animations
 - **Skip Functionality**: Option to skip onboarding for experienced users
+
+### 🗣️ **Voice Commands**
+- **Natural Language**: Control app with voice commands
+- **Task Management**: "Add task buy groceries" or "Complete task"
+- **Habit Control**: "Add habit drink water" or "Complete habit"
+- **Timer Control**: "Start timer" for Pomodoro sessions
+- **Smart Recognition**: Intelligent command parsing and execution
+
+### 📱 **Home Screen Widgets**
+- **Task Widget**: Quick view of pending tasks with completion
+- **Habit Widget**: Track daily habit progress
+- **Focus Widget**: Pomodoro timer and session statistics
+- **Quick Actions**: Add tasks and toggle habits from home screen
+
+### 📅 **Calendar Integration**
+- **Automatic Sync**: Tasks and habits sync to device calendar
+- **Time Blocking**: Schedule focus sessions with break periods
+- **Smart Scheduling**: Avoid conflicts with existing events
+- **Event Creation**: Automatic reminders for tasks and habits
+- **Cross-Platform**: Works with Google Calendar, Apple Calendar, etc.
+
+### 💾 **Data Management**
+- **Export/Import**: JSON and CSV format support
+- **Backup & Restore**: Complete data backup functionality
+- **Data Summary**: Preview before export with statistics
+- **Cross-Device**: Easy migration between devices
 
 ## 🎨 **Design Features**
 
@@ -86,8 +114,8 @@ A modern productivity companion app that helps you manage notifications, track h
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/yourusername/notifoo.git
-cd notifoo
+git clone https://github.com/yourusername/focusfluke.git
+cd focusfluke
 ```
 
 2. **Install dependencies:**
@@ -142,12 +170,40 @@ flutter run
 3. Review recent activity
 4. Manage account settings
 
+### **Voice Commands**
+1. Enable voice commands in Settings → Integration Features
+2. Say "Add task [task name]" to create new tasks
+3. Use "Add habit [habit name]" for new habits
+4. Say "Start timer" to begin Pomodoro session
+5. Try "Show tasks" or "Complete task" for quick actions
+
+### **Home Screen Widgets**
+1. Enable widgets in Settings → Integration Features
+2. Long press on home screen and add FocusFluke widgets
+3. Choose from Task, Habit, or Focus Timer widgets
+4. Tap widget elements for quick interactions
+
+### **Calendar Integration**
+1. Enable calendar sync in Settings → Integration Features
+2. Grant calendar permissions when prompted
+3. Use "Sync to Calendar" for manual synchronization
+4. View tasks and habits in your device calendar
+
+### **Data Export/Import**
+1. Go to Settings → Data & Privacy
+2. Tap "Export Data" and choose JSON or CSV format
+3. Share the exported file for backup
+4. Use "Import Data" to restore from backup files
+
 ## 🔐 **Permissions**
 
 The app requires the following permissions:
 - **Notification Access**: Capture and read notifications
 - **Internet**: Google Sign-in and Firebase features
 - **Storage**: Local data persistence
+- **Microphone**: Voice command functionality
+- **Calendar**: Sync tasks and habits to calendar
+- **File Access**: Export/import data functionality
 
 ## 🏗️ **Architecture**
 
@@ -192,6 +248,9 @@ shared_preferences: ^2.2.2
 google_fonts: ^4.0.3
 font_awesome_flutter: ^10.4.0
 flutter_native_splash: ^2.1.0
+flutter_staggered_animations: ^1.1.1
+lottie: ^2.7.0
+shimmer: ^3.0.0
 ```
 
 ### **Database & Storage**
@@ -199,6 +258,23 @@ flutter_native_splash: ^2.1.0
 sqflite: ^2.0.2
 path: ^1.8.0
 hive_flutter: ^1.1.0
+```
+
+### **Integration Features**
+```yaml
+# File Operations & Sharing
+path_provider: ^2.1.1
+share_plus: ^7.2.1
+file_picker: ^6.1.1
+
+# Widget Support
+home_widget: ^0.4.0
+
+# Voice Commands
+speech_to_text: ^6.6.0
+
+# Calendar Integration
+device_calendar: ^4.3.1
 ```
 
 ## 🎯 **Key Features Implemented**
@@ -225,18 +301,25 @@ hive_flutter: ^1.1.0
 - [x] Real-time data synchronization
 - [x] Responsive design for all screen sizes
 
+### **✅ Recently Added Features**
+- [x] **Export/Import Functionality**: JSON and CSV export with backup/restore
+- [x] **Home Screen Widgets**: Task, habit, and focus timer widgets
+- [x] **Voice Commands**: Control app with natural language
+- [x] **Calendar Integration**: Sync tasks and habits to device calendar
+- [x] **Enhanced Push Notifications**: Smart reminders with multiple channels
+- [x] **Advanced Theme System**: Custom color schemes and personalization
+
 ### **🔄 In Progress**
-- [ ] Push notifications
 - [ ] Advanced analytics dashboard
-- [ ] Export/import functionality
+- [ ] Enhanced UI animations
 
 ### **📋 Planned Features**
 - [ ] Cloud backup and sync
 - [ ] Advanced habit analytics
 - [ ] Social features and sharing
-- [ ] Custom themes and personalization
-- [ ] Widget support
 - [ ] Wear OS integration
+- [ ] AI-powered suggestions
+- [ ] Multi-device synchronization
 
 ## 🐛 **Recent Fixes**
 
@@ -302,4 +385,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Made with ❤️ using Flutter**
 
-*Version 2.0.0 - Modern Productivity Companion with Enhanced UX*
+*Version 2.1.0 - Enhanced Productivity Suite with Voice Commands, Widgets, and Smart Integrations*

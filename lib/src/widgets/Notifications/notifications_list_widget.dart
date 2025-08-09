@@ -1,7 +1,7 @@
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_notification_listener/flutter_notification_listener.dart';
+import 'package:flutter/services.dart';
 import 'package:notifoo/src/model/notificationCategory.dart';
 
 import '../../helper/NotificationsHelper.dart';
@@ -9,6 +9,7 @@ import '../../helper/notificationCatHelper.dart';
 import '../../../src/model/Notifications.dart';
 import 'notification_card.dart';
 import 'dart:async';
+import '../../services/notification_permission_service.dart';
 
 class NotificationsListWidget extends StatefulWidget {
   final Function(Future<int>)? onCountChange;
@@ -33,6 +34,9 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
   bool isToday = true;
   ReceivePort port = ReceivePort();
   Timer? _mockNotificationTimer;
+  List<NotificationCategory>? _cachedNotifications;
+  static const EventChannel _eventChannel = EventChannel('com.mindflo.stheer/notifications/events');
+  static StreamSubscription? _eventSub;
 
   @override
   void initState() {
@@ -53,6 +57,13 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _mockNotificationTimer?.cancel();
+    
+    // Clean up notification listener
+    if (started) {
+      // Note: The plugin doesn't have a stopListening method
+      IsolateNameServer.removePortNameMapping("_notifoolistener_");
+    }
+    
     super.dispose();
   }
 
@@ -60,10 +71,20 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Container(
-        height: 600,
-        padding: EdgeInsets.zero,
-        child: _buildContainer(context),
+      body: Column(
+        children: [
+          // Permission status widget
+          NotificationPermissionService().buildPermissionStatusWidget(context),
+          
+          // Notifications list
+          Expanded(
+            child: Container(
+              height: 600,
+              padding: EdgeInsets.zero,
+              child: _buildContainer(context),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'notification_listener_button',
@@ -87,25 +108,21 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
   }
 
   Future<void> initPlatformState() async {
-    // For sandbox, we'll use mock notifications
-    print("Initializing sandbox notification listener");
+    print("Initializing real notification listener");
     
-    var isServiceRunning = false; // Mock service state
-    print("Service is ${!isServiceRunning ? "not " : ""}already running");
-    if (!isServiceRunning) {
-      startListening();
-    }
-
-    setState(() {
-      started = isServiceRunning;
-    });
+    // Check permission status on init
+    await NotificationPermissionService().checkPermission();
+    
+    // Check if service is already running
+    // We start listening when widget loads; service lifecycle handled by OS
+    startListening();
   }
 
-  static void _callback(NotificationEvent evt) {
-    final SendPort? send = IsolateNameServer.lookupPortByName("_notifoolistener_");
-    if (send == null) print("can't find the sender");
-    send?.send(evt);
-  }
+  // static void _callback(NotificationEvent evt) {
+    //   final SendPort? send = IsolateNameServer.lookupPortByName("_notifoolistener_");
+  //   if (send == null) print("can't find the sender");
+  //   send?.send(evt);
+  // }
 
   Future<List<Notifications>> appendElements(
       Future<List<Notifications>>? notifications, Notifications notification) async {
@@ -126,25 +143,33 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
     });
 
     try {
-      // For sandbox, we'll simulate starting the service
-      print("Starting sandbox notification listener");
+      // Check for notification permission first
+      final permissionService = NotificationPermissionService();
+      final hasPermission = await permissionService.checkPermission();
       
-      // Simulate service start delay
-      await Future.delayed(Duration(seconds: 1));
-      
-      // Start mock notification timer
-      _mockNotificationTimer = Timer.periodic(Duration(seconds: 5), (timer) {
-        _addMockNotification();
+      if (!hasPermission) {
+        final granted = await permissionService.requestPermission(context);
+        if (!granted) {
+          setState(() { _loading = false; });
+          return;
+        }
+      }
+
+      _eventSub?.cancel();
+      _eventSub = _eventChannel.receiveBroadcastStream().listen((evt) async {
+        final n = await NotificationsHelper.onData(evt);
+        if (n != null) {
+          setState(() {
+            notificationsOfTheDay = NotificationsHelper.initializeDbGetNotificationsToday(0);
+            notificationsByCatFuture = notificationsOfTheDay!.then((value) =>
+                NotificationCatHelper.getNotificationsByCat(value, isToday));
+          });
+        }
       });
 
-      setState(() {
-        started = true;
-        _loading = false;
-      });
+      setState(() { started = true; _loading = false; });
+      print("Notification listener started successfully");
 
-      // Add initial mock notifications
-      _addMockNotification();
-      
     } catch (e) {
       print("Error starting notification listener: $e");
       setState(() {
@@ -153,24 +178,18 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
     }
   }
 
+  // No-op: legacy callback removed (handled via EventChannel)
+
   Future<void> stopListening() async {
     setState(() {
       _loading = true;
     });
 
     try {
-      // For sandbox, we'll simulate stopping the service
-      print("Stopping sandbox notification listener");
-      
-      _mockNotificationTimer?.cancel();
-      
-      await Future.delayed(Duration(seconds: 1));
-      
-      setState(() {
-        started = false;
-        _loading = false;
-      });
-      
+      print("Stopping notification listener stream");
+      await _eventSub?.cancel();
+      setState(() { started = false; _loading = false; });
+      print("Real notification listener stopped successfully");
     } catch (e) {
       print("Error stopping notification listener: $e");
       setState(() {
@@ -179,52 +198,7 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
     }
   }
 
-  void _addMockNotification() {
-    // Add mock notifications for testing
-    final mockNotifications = [
-      {
-        'packageName': 'com.whatsapp',
-        'title': 'WhatsApp',
-        'text': 'New message from John',
-        'message': 'You have 7 Unread notifications',
-      },
-      {
-        'packageName': 'com.instagram.android',
-        'title': 'Instagram',
-        'text': 'New story from Sarah',
-        'message': 'You have 3 Unread notifications',
-      },
-      {
-        'packageName': 'com.google.android.gm',
-        'title': 'Gmail',
-        'text': 'New email received',
-        'message': 'You have 2 Unread notifications',
-      },
-    ];
-
-    final randomNotification = mockNotifications[DateTime.now().millisecond % mockNotifications.length];
-    
-    // Create mock notification event
-    final mockEvent = NotificationEvent(
-      title: randomNotification['title']!,
-      text: randomNotification['text']!,
-      packageName: randomNotification['packageName']!,
-      timestamp: DateTime.now().millisecondsSinceEpoch,
-      createAt: DateTime.now(),
-    );
-
-    // Process the notification
-    NotificationsHelper.onData(mockEvent).then((notification) {
-      if (notification != null) {
-        // Refresh the data
-        setState(() {
-          notificationsOfTheDay = NotificationsHelper.initializeDbGetNotificationsToday(0);
-          notificationsByCatFuture = notificationsOfTheDay!.then((value) =>
-              NotificationCatHelper.getNotificationsByCat(value, isToday));
-        });
-      }
-    });
-  }
+  // void _handleRealNotification(NotificationEvent event) { }
 
   Widget _buildContainer(BuildContext context) {
     return FutureBuilder<List<NotificationCategory>>(
@@ -288,6 +262,13 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
 
         List<NotificationCategory>? notifications = snapshot.data;
         
+        // Cache the notifications to prevent flickering
+        if (notifications != null && notifications.isNotEmpty) {
+          _cachedNotifications = notifications;
+        } else if (_cachedNotifications != null && notifications == null) {
+          notifications = _cachedNotifications;
+        }
+        
         if (notifications == null || notifications.isEmpty) {
           return Center(
             child: Column(
@@ -328,12 +309,13 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
 
         return ListView.builder(
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          itemCount: notifications.length,
+          itemCount: notifications!.length,
           itemBuilder: (context, index) {
+            final notification = notifications![index];
             return NotificationsCard(
-              key: ValueKey('notification_${notifications[index].packageName}_$index'),
+              key: ValueKey('notification_${notification.packageName}_${notification.timestamp}_$index'),
               index: index,
-              notificationsCategory: notifications[index],
+              notificationsCategory: notification,
             );
           },
         );

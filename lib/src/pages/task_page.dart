@@ -3,6 +3,7 @@ import 'package:notifoo/src/helper/DatabaseHelper.dart';
 import 'package:notifoo/src/helper/provider/task_api_provider.dart';
 import 'package:notifoo/src/model/tasks.dart';
 import 'package:notifoo/src/pages/add_task.dart';
+import 'package:notifoo/src/services/push_notification_service.dart';
 
 class TaskPage extends StatefulWidget {
   const TaskPage({
@@ -43,22 +44,27 @@ class _TaskPageState extends State<TaskPage> {
   }
 
   Future<void> _loadTasks() async {
+    if (!mounted) return;
     setState(() {
       isLoading = true;
     });
     
     try {
       final tasks = await DatabaseHelper.instance.getAllTasks();
-      setState(() {
-        _totalTasks = tasks.length;
-        _completedTasks = tasks.where((task) => task.isCompleted == 1).length;
-        _pendingTasks = _totalTasks - _completedTasks;
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _totalTasks = tasks.length;
+          _completedTasks = tasks.where((task) => task.isCompleted == 1).length;
+          _pendingTasks = _totalTasks - _completedTasks;
+          isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -460,7 +466,9 @@ class _TaskPageState extends State<TaskPage> {
     );
     
     await DatabaseHelper.instance.insertTask(updatedTask);
-    await _loadTasks();
+    if (mounted) {
+      await _loadTasks();
+    }
   }
 
   void _editTask(Tasks task) {
@@ -546,6 +554,7 @@ class _TaskPageState extends State<TaskPage> {
 
   //When loading from API
   _loadFromApi() async {
+    if (!mounted) return;
     setState(() {
       isLoading = true;
     });
@@ -556,13 +565,16 @@ class _TaskPageState extends State<TaskPage> {
     // wait for 2 seconds to simulate loading of data
     await Future.delayed(const Duration(seconds: 2));
 
-    setState(() {
-      isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   //Delete Data
   _deleteData() async {
+    if (!mounted) return;
     setState(() {
       isLoading = true;
     });
@@ -572,9 +584,11 @@ class _TaskPageState extends State<TaskPage> {
     // wait for 1 second to simulate loading of data
     await Future.delayed(const Duration(seconds: 1));
 
-    setState(() {
-      isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
 
     print('All tasks deleted');
   }

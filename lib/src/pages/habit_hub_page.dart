@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:notifoo/src/widgets/habits/habit_lister.dart';
 import 'package:notifoo/src/widgets/habits/show_form.dart';
 import 'package:notifoo/src/widgets/headers/subHeader.dart';
+import 'package:notifoo/src/services/push_notification_service.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../helper/DatabaseHelper.dart';
 import '../model/habits_model.dart';
@@ -398,6 +400,19 @@ class _HabitHubPage extends State<HabitHubPage> {
         isCompleted: 0,
         color: Colors.pink.toString());
     await DatabaseHelper.instance.createHabit(_habit);
+    
+    // Schedule push notification for the new habit
+    try {
+      await PushNotificationService().scheduleHabitReminder(
+        _habit.id.toString(),
+        _habit.habitTitle ?? 'New Habit',
+        9, 0, // Default reminder at 9 AM
+      );
+      print('Habit reminder scheduled successfully');
+    } catch (e) {
+      print('Failed to schedule habit reminder: $e');
+    }
+    
     _refreshHabits();
   }
 
