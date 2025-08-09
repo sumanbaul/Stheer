@@ -258,26 +258,88 @@ class PushNotificationService {
 
   // Schedule local notifications
   Future<void> scheduleHabitReminder(String habitId, String habitName, int hour, int minute) async {
-    await _flutterLocalNotificationsPlugin.zonedSchedule(
-      habitId.hashCode,
-      'Habit Reminder',
-      'Time to complete: $habitName',
-      _nextInstanceOfTime(hour, minute),
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          _habitChannel.id,
-          _habitChannel.name,
-          channelDescription: _habitChannel.description,
-          icon: '@mipmap/ic_launcher',
+    try {
+      await _flutterLocalNotificationsPlugin.zonedSchedule(
+        habitId.hashCode,
+        'Habit Reminder',
+        'Time to complete: $habitName',
+        _nextInstanceOfTime(hour, minute),
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            _habitChannel.id,
+            _habitChannel.name,
+            channelDescription: _habitChannel.description,
+            icon: '@mipmap/ic_launcher',
+          ),
         ),
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+        payload: json.encode({
+          'type': 'habit_reminder',
+          'habitId': habitId,
+          'habitName': habitName,
+        }),
+      );
+    } catch (e) {
+      // Fallback for devices without exact alarm permission
+      await showLocalNotification(
+        id: habitId.hashCode,
+        title: 'Reminder scheduled',
+        body: 'We will remind you about "$habitName" at ~$hour:${minute.toString().padLeft(2,'0')}',
+      );
+      // Do not rethrow to avoid crashing callers
+    }
+  }
+
+  Future<void> scheduleHabitRemindersForTimes(String habitId, String habitName, List<TimeOfDay> times, {bool preferExact = false}) async {
+    for (final t in times) {
+      final id = habitId.hashCode ^ (t.hour * 60 + t.minute);
+      if (preferExact) {
+        try {
+          await _flutterLocalNotificationsPlugin.zonedSchedule(
+            id,
+            'Habit Reminder',
+            'Time to complete: $habitName',
+            _nextInstanceOfTime(t.hour, t.minute),
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                _habitChannel.id,
+                _habitChannel.name,
+                channelDescription: _habitChannel.description,
+                icon: '@mipmap/ic_launcher',
+              ),
+            ),
+            androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+            uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+            payload: json.encode({'type': 'habit_reminder','habitId': habitId,'habitName': habitName}),
+          );
+          continue;
+        } catch (_) {}
+      }
+      await scheduleDailyInexactReminder(id, 'Habit Reminder', 'Time to complete: $habitName', hour: t.hour, minute: t.minute);
+    }
+  }
+
+  // Legacy-friendly periodic reminder (inexact)
+  Future<void> scheduleDailyInexactReminder(int id, String title, String body, {int hour = 9, int minute = 0}) async {
+    final details = NotificationDetails(
+      android: AndroidNotificationDetails(
+        _habitChannel.id,
+        _habitChannel.name,
+        channelDescription: _habitChannel.description,
+        icon: '@mipmap/ic_launcher',
       ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    );
+    // Use zonedSchedule daily with allowWhileIdle but not exact mode (system may batch)
+    await _flutterLocalNotificationsPlugin.zonedSchedule(
+      id,
+      title,
+      body,
+      _nextInstanceOfTime(hour, minute),
+      details,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.time,
       uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-      payload: json.encode({
-        'type': 'habit_reminder',
-        'habitId': habitId,
-        'habitName': habitName,
-      }),
     );
   }
 

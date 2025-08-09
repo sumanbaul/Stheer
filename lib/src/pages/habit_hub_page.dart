@@ -268,7 +268,7 @@ class _HabitHubPage extends State<HabitHubPage> {
               ),
             ),
             subtitle: Text(
-              habit.habitType ?? '',
+              _buildHabitSubtitle(habit),
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
               ),
@@ -350,19 +350,8 @@ class _HabitHubPage extends State<HabitHubPage> {
   }
 
   void _toggleHabitCompletion(HabitsModel habit) async {
-    final updatedHabit = HabitsModel(
-      id: habit.id,
-      habitTitle: habit.habitTitle,
-      habitType: habit.habitType,
-      isCompleted: habit.isCompleted == 1 ? 0 : 1,
-      color: habit.color,
-    );
-    
-    await DatabaseHelper.instance.updateHabitItem(
-      habit.id!,
-      habit.habitTitle!,
-      habit.habitType!,
-    );
+    final newCompleted = habit.isCompleted == 1 ? 0 : 1;
+    await DatabaseHelper.instance.updateHabitCompletion(habit.id!, newCompleted);
     _refreshHabits();
   }
 
@@ -405,26 +394,50 @@ class _HabitHubPage extends State<HabitHubPage> {
 
   // Insert a new habit to the database
   Future<void> _addItem() async {
-    HabitsModel _habit = new HabitsModel(
-        habitTitle: _titleController.text,
-        habitType: _descriptionController.text,
-        isCompleted: 0,
-        color: Colors.pink.toString());
-    await DatabaseHelper.instance.createHabit(_habit);
+    // Decode encoded metadata if present
+    final type = _descriptionController.text;
+    final data = _decodeHabitMeta(type);
+    final habit = HabitsModel(
+      habitTitle: _titleController.text,
+      habitType: data['base'] ?? type,
+      isCompleted: 0,
+      color: data['color'] ?? '#${Theme.of(context).colorScheme.primary.value.toRadixString(16)}',
+      repetitionsPerDay: data['rep'] as int?,
+      category: data['cat'] as String?,
+      times: data['times'] as String?,
+    );
+    await DatabaseHelper.instance.createHabit(habit);
     
     // Schedule push notification for the new habit
+    // Schedule reminder using inexact alarms to avoid exact alarm restriction
     try {
-      await PushNotificationService().scheduleHabitReminder(
-        _habit.id.toString(),
-        _habit.habitTitle ?? 'New Habit',
-        9, 0, // Default reminder at 9 AM
+      await PushNotificationService().showLocalNotification(
+        id: DateTime.now().millisecondsSinceEpoch % 100000,
+        title: 'Habit Added',
+        body: 'We will remind you about "${habit.habitTitle}" today.',
       );
-      print('Habit reminder scheduled successfully');
     } catch (e) {
-      print('Failed to schedule habit reminder: $e');
+      print('Habit reminder fallback notification failed: $e');
     }
     
     _refreshHabits();
+  }
+
+  Map<String, dynamic> _decodeHabitMeta(String type) {
+    final result = <String, dynamic>{};
+    if (!type.contains('::')) {
+      result['base'] = type;
+      return result;
+    }
+    final parts = type.split('::');
+    result['base'] = parts.first;
+    for (final p in parts.skip(1)) {
+      if (p.startsWith('rep=')) result['rep'] = int.tryParse(p.substring(4));
+      if (p.startsWith('cat=')) result['cat'] = p.substring(4);
+      if (p.startsWith('times=')) result['times'] = p.substring(6);
+      if (p.startsWith('color=')) result['color'] = p.substring(6);
+    }
+    return result;
   }
 
   // Update an existing habit
@@ -441,5 +454,28 @@ class _HabitHubPage extends State<HabitHubPage> {
       content: Text('Habit deleted successfully!'),
     ));
     _refreshHabits();
+  }
+
+  String _buildHabitSubtitle(HabitsModel habit) {
+    // Parse encoded info if present: "type::rep=3::cat=Health"
+    final type = habit.habitType ?? '';
+    int? reps;
+    String? cat;
+    if (type.contains('::')) {
+      final parts = type.split('::');
+      if (parts.isNotEmpty) {
+        for (final p in parts.skip(1)) {
+          if (p.startsWith('rep=')) {
+            reps = int.tryParse(p.substring(4));
+          } else if (p.startsWith('cat=')) {
+            cat = p.substring(4);
+          }
+        }
+      }
+      final base = parts.first;
+      final details = [if (cat != null) cat, if (reps != null) '${reps}x/day'].join(' · ');
+      return details.isEmpty ? base : '$base  •  $details';
+    }
+    return type;
   }
 }

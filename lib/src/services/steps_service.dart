@@ -155,6 +155,22 @@ class StepsService extends ChangeNotifier {
     }
   }
 
+  Future<void> refreshAfterPermission() async {
+    try {
+      final has = await _fitness.invokeMethod('hasPermissions');
+      if (has == true) {
+        _useReal = true;
+        _connected = true;
+        _mockTimer?.cancel();
+        await _loadRealToday();
+        await _loadRealWeekly();
+        _ensureHistoryToday();
+        _updateHistoryToday();
+        notifyListeners();
+      }
+    } catch (_) {}
+  }
+
   Future<void> _loadRealToday() async {
     try {
       final steps = await _fitness.invokeMethod('getTodaySteps');

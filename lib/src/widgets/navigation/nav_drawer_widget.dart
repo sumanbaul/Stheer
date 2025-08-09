@@ -42,13 +42,24 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
               padding: padding,
               child: Column(
                 children: [
-                  const SizedBox(height: 12),
-                  buildSearchField(),
+                  //commenting search, since its irrelevant for now, if not needed, remove it
+                  // const SizedBox(height: 12),
+                  // buildSearchField(),
                   const SizedBox(height: 24),
                   
                   // Main Navigation Section
-                  // _buildSectionTitle('Main'),
-                  // const SizedBox(height: 8),
+                   _buildSectionTitle('Trackers'),
+                   const SizedBox(height: 8),
+                   buildMenuItem(
+                    text: 'Activity',
+                    icon: Icons.directions_walk,
+                    onClicked: () => _navigateToPage(context, 10),
+                  ),
+                  buildMenuItem(
+                    text: 'Usage',
+                    icon: Icons.insights,
+                    onClicked: () => _navigateToPage(context, 11),
+                  ),
                   // buildMenuItem(
                   //   text: 'Alerts',
                   //   icon: Icons.notifications_outlined,
@@ -100,16 +111,7 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
                   // Other Section
                   _buildSectionTitle('Other'),
                   const SizedBox(height: 8),
-  buildMenuItem(
-    text: 'Activity',
-    icon: Icons.directions_walk,
-    onClicked: () => _navigateToPage(context, 10),
-  ),
-  buildMenuItem(
-    text: 'Usage',
-    icon: Icons.insights,
-    onClicked: () => _navigateToPage(context, 11),
-  ),
+ 
                   buildMenuItem(
                     text: 'Advanced Analytics',
                     icon: Icons.analytics,

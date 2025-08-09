@@ -9,6 +9,7 @@ class SettingsService {
   static const String kVoiceEnabled = 'voice_commands_enabled';
   static const String kCalendarEnabled = 'calendar_sync_enabled';
   static const String kWidgetsEnabled = 'widgets_enabled';
+  static const String kAutoRouteRecord = 'auto_route_record';
   static const String kLanguage = 'language';
   static const String kTheme = 'theme'; // 'System' | 'Light' | 'Dark'
   static const String kTimerDuration = 'timer_duration';

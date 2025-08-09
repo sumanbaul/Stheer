@@ -503,8 +503,8 @@ class _TaskPageState extends State<TaskPage> {
       modifiedDate: DateTime.now(),
       repeatitions: task.repeatitions,
     );
-    
-    await DatabaseHelper.instance.insertTask(updatedTask);
+    // Update instead of insert duplicate
+    await DatabaseHelper.instance.updateTask(updatedTask);
     if (mounted) {
       await _loadTasks();
       // Fire confetti on completing a task
@@ -533,13 +533,18 @@ class _TaskPageState extends State<TaskPage> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              _deleteData();
+              _deleteTaskFromDb(task);
             },
             child: Text('Delete', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _deleteTaskFromDb(Tasks task) async {
+    await DatabaseHelper.instance.deleteTask(task.id ?? -1);
+    await _loadTasks();
   }
 
   void _showFilterDialog() {

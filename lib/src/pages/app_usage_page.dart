@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'dart:io';
 import 'package:notifoo/src/util/glow.dart';
 import 'package:notifoo/src/services/app_usage_service.dart';
@@ -53,10 +54,9 @@ class _AppUsagePageState extends State<AppUsagePage> {
     setState(() { _loading = true; });
     final summary = await _usage.getDailySummary();
     final apps = await _usage.getMostUsedApps(limit: 10);
-    // naive weekly minutes using same API (fallback: mock), real impl would query per-day
-    _weekDailyMinutes = [
-      40, 52, 65, 30, 80, 70, 45
-    ];
+    // native weekly minutes via UsageStatsManager per day
+    final weekly = await _usage.getWeeklyMinutes();
+    _weekDailyMinutes = weekly.isNotEmpty ? weekly : [40, 52, 65, 30, 80, 70, 45];
     setState(() {
       _hasPermission = true;
       _screenTimeMinutes = (summary['screenTimeMinutes'] ?? 0) as int;
@@ -118,16 +118,16 @@ class _AppUsagePageState extends State<AppUsagePage> {
             ],
             // Screen time summary & focus score
             // Header KPI card cluster with gradient
+            // KPI card with glowing border
             Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [cs.primary.withOpacity(0.25), cs.secondary.withOpacity(0.25)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: [
+                  BoxShadow(color: cs.primary.withOpacity(0.25), blurRadius: 24, spreadRadius: 2),
+                ],
+                gradient: LinearGradient(colors: [cs.primary.withOpacity(0.20), cs.secondary.withOpacity(0.20)], begin: Alignment.topLeft, end: Alignment.bottomRight),
               ),
-              padding: const EdgeInsets.all(1.2),
+              padding: const EdgeInsets.all(2),
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -183,7 +183,7 @@ class _AppUsagePageState extends State<AppUsagePage> {
                     child: ListTile(
                       leading: CircleAvatar(
                         backgroundColor: (app['color'] as Color? ?? cs.primary).withOpacity(0.15),
-                        child: Icon(Icons.apps, color: (app['color'] as Color? ?? cs.primary)),
+                        child: _AppIconFromBase64(base64: app['iconBase64'] as String?),
                       ),
                       title: Row(
                         children: [
@@ -235,6 +235,23 @@ class _AppUsagePageState extends State<AppUsagePage> {
         ),
       ),
     );
+  }
+}
+
+class _AppIconFromBase64 extends StatelessWidget {
+  final String? base64;
+  const _AppIconFromBase64({this.base64});
+  @override
+  Widget build(BuildContext context) {
+    if (base64 == null || base64!.isEmpty) {
+      return const Icon(Icons.apps);
+    }
+    try {
+      final bytes = const Base64Decoder().convert(base64!);
+      return Image.memory(bytes, width: 20, height: 20, fit: BoxFit.contain);
+    } catch (_) {
+      return const Icon(Icons.apps);
+    }
   }
 }
 

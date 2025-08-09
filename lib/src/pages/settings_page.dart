@@ -10,6 +10,7 @@ import 'package:notifoo/src/helper/DatabaseHelper.dart';
 import 'package:notifoo/src/model/tasks.dart';
 import 'package:notifoo/src/services/settings_service.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 import 'package:notifoo/src/helper/provider/theme_provider.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -27,6 +28,8 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _voiceCommandsEnabled = false;
   bool _calendarSyncEnabled = false;
   bool _widgetsEnabled = false;
+  bool _autoRouteRecord = false;
+  bool _canExactAlarms = false;
   String _selectedLanguage = 'English';
   String _selectedTheme = 'System';
   double _timerDuration = 25.0;
@@ -46,10 +49,20 @@ class _SettingsPageState extends State<SettingsPage> {
     _voiceCommandsEnabled = s.getBool(SettingsService.kVoiceEnabled, defaultValue: _voiceCommandsEnabled);
     _calendarSyncEnabled = s.getBool(SettingsService.kCalendarEnabled, defaultValue: _calendarSyncEnabled);
     _widgetsEnabled = s.getBool(SettingsService.kWidgetsEnabled, defaultValue: _widgetsEnabled);
+    _autoRouteRecord = s.getBool(SettingsService.kAutoRouteRecord, defaultValue: _autoRouteRecord);
     _selectedLanguage = s.getString(SettingsService.kLanguage, defaultValue: _selectedLanguage);
     _selectedTheme = s.getString(SettingsService.kTheme, defaultValue: _selectedTheme);
     _timerDuration = s.getDouble(SettingsService.kTimerDuration, defaultValue: _timerDuration);
     _breakDuration = s.getDouble(SettingsService.kBreakDuration, defaultValue: _breakDuration);
+    _checkExactAlarmCapability();
+  }
+
+  static final MethodChannel _alarmChannel = const MethodChannel('com.mindflo.stheer/alarms');
+  Future<void> _checkExactAlarmCapability() async {
+    try {
+      final can = await _alarmChannel.invokeMethod('canScheduleExactAlarms');
+      setState(() { _canExactAlarms = can == true; });
+    } catch (_) {}
   }
 
   @override
@@ -62,6 +75,7 @@ class _SettingsPageState extends State<SettingsPage> {
     _voiceCommandsEnabled = settings.getBool(SettingsService.kVoiceEnabled, defaultValue: _voiceCommandsEnabled);
     _calendarSyncEnabled = settings.getBool(SettingsService.kCalendarEnabled, defaultValue: _calendarSyncEnabled);
     _widgetsEnabled = settings.getBool(SettingsService.kWidgetsEnabled, defaultValue: _widgetsEnabled);
+    _autoRouteRecord = settings.getBool(SettingsService.kAutoRouteRecord, defaultValue: _autoRouteRecord);
     _selectedLanguage = settings.getString(SettingsService.kLanguage, defaultValue: _selectedLanguage);
     _selectedTheme = settings.getString(SettingsService.kTheme, defaultValue: _selectedTheme);
     _timerDuration = settings.getDouble(SettingsService.kTimerDuration, defaultValue: _timerDuration);
@@ -296,6 +310,32 @@ class _SettingsPageState extends State<SettingsPage> {
               'Manually sync data to calendar',
               Icons.sync_outlined,
               () => _syncToCalendar(),
+            ),
+            _buildSwitchTile(
+              'Auto Record Routes',
+              'Automatically record walking routes when Activity is open',
+              Icons.route,
+              _autoRouteRecord,
+              (value) {
+                setState(() => _autoRouteRecord = value);
+                SettingsService().setBool(SettingsService.kAutoRouteRecord, value);
+              },
+            ),
+            Card(
+              margin: EdgeInsets.only(bottom: 8),
+              child: ListTile(
+                leading: Icon(Icons.alarm_on, color: Theme.of(context).colorScheme.primary),
+                title: Text('Allow Exact Alarms'),
+                subtitle: Text(_canExactAlarms ? 'Enabled on this device' : 'Tap to open settings and allow'),
+                trailing: Icon(Icons.open_in_new),
+                onTap: () async {
+                  try {
+                    await _alarmChannel.invokeMethod('openExactAlarmSettings');
+                    await Future.delayed(const Duration(seconds: 1));
+                    await _checkExactAlarmCapability();
+                  } catch (_) {}
+                },
+              ),
             ),
             _buildSwitchTile(
               'Home Screen Widgets',

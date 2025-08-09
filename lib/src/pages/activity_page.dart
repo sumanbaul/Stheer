@@ -3,6 +3,7 @@ import 'dart:ui' show Offset;
 import 'package:notifoo/src/services/steps_service.dart';
 import 'package:notifoo/src/util/glow.dart';
 import 'package:notifoo/src/services/location_service.dart';
+import 'package:notifoo/src/services/settings_service.dart';
 import 'package:provider/provider.dart';
 
 class ActivityPage extends StatefulWidget {
@@ -18,6 +19,11 @@ class _ActivityPageState extends State<ActivityPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<StepsService>().initialize();
+      // Auto start route if enabled
+      final auto = SettingsService().getBool(SettingsService.kAutoRouteRecord, defaultValue: false);
+      if (auto) {
+        context.read<LocationService>().startTracking();
+      }
     });
   }
 

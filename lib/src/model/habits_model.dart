@@ -4,6 +4,9 @@ class HabitsModel {
   final int? isCompleted;
   final String? habitType;
   final String? color;
+  final int? repetitionsPerDay; // new
+  final String? category; // new
+  final String? times; // comma-separated HH:MM list
 
   static const String TABLENAME = "tblhabits";
 
@@ -13,6 +16,9 @@ class HabitsModel {
     this.isCompleted,
     this.habitType,
     this.color,
+    this.repetitionsPerDay,
+    this.category,
+    this.times,
   });
 
   Map<String, dynamic> toMap() {
@@ -22,6 +28,9 @@ class HabitsModel {
       'isCompleted': isCompleted,
       'habitType': habitType,
       'color': color,
+      'repetitionsPerDay': repetitionsPerDay,
+      'category': category,
+      'times': times,
     };
   }
 
@@ -32,6 +41,9 @@ class HabitsModel {
       isCompleted: map['isCompleted'],
       habitType: map['habitType'],
       color: map['color'],
+      repetitionsPerDay: map['repetitionsPerDay'],
+      category: map['category'],
+      times: map['times'],
     );
   }
 }

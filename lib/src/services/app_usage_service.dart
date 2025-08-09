@@ -35,10 +35,20 @@ class AppUsageService {
   Future<List<Map<String, dynamic>>> getMostUsedApps({int limit = 10}) async {
     if (!Platform.isAndroid) return [];
     try {
-      final list = await _channel.invokeMethod('getMostUsedApps', {'limit': limit});
+      final list = await _channel.invokeMethod('getMostUsedAppsDetailed', {'limit': limit});
       return (list as List).map((e) => Map<String, dynamic>.from(e as Map)).toList();
     } catch (_) {
       return [];
+    }
+  }
+
+  Future<List<int>> getWeeklyMinutes() async {
+    if (!Platform.isAndroid) return List<int>.filled(7, 0);
+    try {
+      final list = await _channel.invokeMethod('getWeeklyMinutes');
+      return (list as List).map((e) => (e as int)).toList();
+    } catch (_) {
+      return List<int>.filled(7, 0);
     }
   }
 }
