@@ -3,9 +3,9 @@ import 'dart:isolate';
 import 'dart:ui';
 import 'dart:convert';
 import 'package:collection/collection.dart';
-import 'package:device_apps/device_apps.dart';
+// import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_notification_listener/flutter_notification_listener.dart';
+// import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 
 import '../../src/model/Notifications.dart';
 import '../../src/model/notificationCategory.dart';
@@ -41,14 +41,14 @@ class MockApplication {
 class NotificationsHelper {
   static bool started = false;
   static ReceivePort port = ReceivePort();
-  static List<NotificationEvent?>? notificationEvent;
+  // static List<NotificationEvent?>? notificationEvent;
 
-  static void _callback(NotificationEvent evt) {
-    print("send evt to ui: $evt");
-    final SendPort? send = IsolateNameServer.lookupPortByName("_listener_");
-    if (send == null) print("can't find the sender");
-    send?.send(evt);
-  }
+  // static void _callback(NotificationEvent evt) {
+  //   print("send evt to ui: $evt");
+  //   final SendPort? send = IsolateNameServer.lookupPortByName("_listener_");
+  //   if (send == null) print("can't find the sender");
+  //   send?.send(evt);
+  // }
 
   static Future<List<Notifications>> initializeDbGetNotificationsToday(
       int day) async {
@@ -292,49 +292,81 @@ class NotificationsHelper {
     );
   }
 
-  static Future<Notifications?> onData(NotificationEvent event) async {
-    final _event = event;
-    final eventAppWithIcon = await (getCurrentAppWithIcon(event.packageName!));
-    
-    if (eventAppWithIcon != null) {
-      if (!eventAppWithIcon.systemApp) {
-        if (event.packageName!.contains("skydrive") ||
-            (event.packageName!.contains("service")) ||
-            (event.packageName!.contains("notifoo")) ||
-            (event.packageName!.contains("screenshot")) ||
-            (event.packageName!.contains("deskclock")) ||
-            (event.packageName!.contains("wellbeing")) ||
-            (event.packageName!.contains("weather2")) ||
-            (event.packageName!.contains("gallery"))) {
-          // print(event.packageName); // Removed excessive logging
-        } else {
-          final createatday = event.createAt!.day;
-          final today = DateTime.now().day;
-          // print("Create AT Day: $createatday"); // Removed excessive logging
+  static Future<Notifications?> onData(dynamic event) async {
+    // Accepts either a plugin event object with getters or a Map<String, dynamic>
+    final dynamic source = event;
+    final String? package = _readField<String>(source, 'packageName');
+    final String? title = _readField<String>(source, 'title');
+    final String? text = _readField<String>(source, 'text');
+    final String? message = _readField<String>(source, 'message');
+    final int timestamp = _readField<int>(source, 'timestamp') ?? DateTime.now().millisecondsSinceEpoch;
+    final dynamic createAtRaw = _readField<dynamic>(source, 'createAt');
+    final DateTime createAt = createAtRaw is DateTime
+        ? createAtRaw
+        : DateTime.now();
 
-          if (event.createAt!.day >= today) {
-            if (event.text != null) {
-              final currentNotification = Notifications(
-                title: _event.title,
-                appTitle: eventAppWithIcon.appName,
-                text: _event.text,
-                message: _event.message,
-                packageName: _event.packageName,
-                timestamp: _event.timestamp,
-                createAt: _event.createAt!.toString(),
-              );
+    if (package == null) return null;
 
-              // Save to database
-              await DatabaseHelper.instance.insertNotification(currentNotification);
-              return currentNotification;
-            }
+    final eventAppWithIcon = await getCurrentAppWithIcon(package);
+    if (eventAppWithIcon == null || eventAppWithIcon.systemApp) return null;
+
+    // Filter out known noise packages by substring matching on package
+    final String pkgLower = package.toLowerCase();
+    const List<String> noise = [
+      'skydrive',
+      'service',
+      'notifoo',
+      'screenshot',
+      'deskclock',
+      'wellbeing',
+      'weather2',
+      'gallery',
+    ];
+    if (noise.any((n) => pkgLower.contains(n))) return null;
+
+    if (text == null) return null;
+
+    final Notifications currentNotification = Notifications(
+      title: title,
+      appTitle: eventAppWithIcon.appName,
+      text: text,
+      message: message,
+      packageName: package,
+      timestamp: timestamp,
+      createAt: createAt.toString(),
+    );
+
+    await DatabaseHelper.instance.insertNotification(currentNotification);
+    return currentNotification;
+  }
+
+  // Safely read a field from either an object with a getter or a Map
+  static T? _readField<T>(dynamic source, String name) {
+    try {
+      if (source is Map) {
+        final value = source[name];
+        return value is T ? value : (value is num && T == int ? value.toInt() as T : null);
+      }
+      final dynamic value = (source as dynamic).toJson?.call()[name] ?? (source as dynamic).__getattr__?.call(name) ?? (source as dynamic)[name];
+      return value is T ? value : null;
+    } catch (_) {
+      try {
+        final dynamic value = (source as dynamic).__getattribute__?.call(name);
+        return value is T ? value : null;
+      } catch (_) {
+        try {
+          final dynamic value = (source as dynamic).$name;
+          return value is T ? value : null;
+        } catch (_) {
+          try {
+            final dynamic value = (source as dynamic).toMap?.call()[name];
+            return value is T ? value : null;
+          } catch (_) {
+            return null;
           }
         }
       }
     }
-
-    // Return null if no real notification was processed
-    return null;
   }
 
   static Future<List<NotificationCategory>> getCategoryListFuture(
@@ -386,26 +418,22 @@ class NotificationsHelper {
         : await DatabaseHelper.instance.getNotifications(0);
   }
 
-  static Future<bool> redundantNotificationCheck(
-      NotificationEvent event) async {
-    var getNotificationModel = await DatabaseHelper.instance
-        .getNotificationsByPackageToday(event.packageName);
+  static Future<bool> redundantNotificationCheck(dynamic event) async {
+    final String? pkg = _readField<String>(event, 'packageName');
+    final String evTitle = _readField<String>(event, 'title') ?? '';
+    final String evText = _readField<String>(event, 'text') ?? '';
+    if (pkg == null) return false;
 
-    Future<bool>? entryFlag;
+    final List<Notifications> todaysByPkg =
+        await DatabaseHelper.instance.getNotificationsByPackageToday(pkg);
 
-    getNotificationModel.forEach((key) {
-      if (key.packageName!.contains(event.packageName!)) {
-        if (key.title!.contains(event.title!) &&
-            key.text!.contains(event.text!)) {
-          entryFlag = Future<bool>.value(true);
-          //return Future<bool>.value(true);
-        } else {
-          entryFlag = Future<bool>.value(false);
-        }
+    for (final existing in todaysByPkg) {
+      if ((existing.title ?? '').contains(evTitle) &&
+          (existing.text ?? '').contains(evText)) {
+        return true;
       }
-    });
-
-    return entryFlag!;
+    }
+    return false;
   }
 
   //this below method will be moved later to a different place

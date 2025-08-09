@@ -1,7 +1,7 @@
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_notification_listener/flutter_notification_listener.dart';
+import 'package:flutter/services.dart';
 import 'package:notifoo/src/model/notificationCategory.dart';
 
 import '../../helper/NotificationsHelper.dart';
@@ -35,6 +35,8 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
   ReceivePort port = ReceivePort();
   Timer? _mockNotificationTimer;
   List<NotificationCategory>? _cachedNotifications;
+  static const EventChannel _eventChannel = EventChannel('com.mindflo.stheer/notifications/events');
+  static StreamSubscription? _eventSub;
 
   @override
   void initState() {
@@ -112,29 +114,15 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
     await NotificationPermissionService().checkPermission();
     
     // Check if service is already running
-    var isServiceRunning = false;
-    try {
-      // For now, we'll assume service is not running
-      isServiceRunning = false;
-    } catch (e) {
-      print("Error checking service status: $e");
-    }
-    
-    print("Service is ${!isServiceRunning ? "not " : ""}already running");
-    if (!isServiceRunning) {
-      startListening();
-    }
-
-    setState(() {
-      started = isServiceRunning;
-    });
+    // We start listening when widget loads; service lifecycle handled by OS
+    startListening();
   }
 
-  static void _callback(NotificationEvent evt) {
-    final SendPort? send = IsolateNameServer.lookupPortByName("_notifoolistener_");
-    if (send == null) print("can't find the sender");
-    send?.send(evt);
-  }
+  // static void _callback(NotificationEvent evt) {
+    //   final SendPort? send = IsolateNameServer.lookupPortByName("_notifoolistener_");
+  //   if (send == null) print("can't find the sender");
+  //   send?.send(evt);
+  // }
 
   Future<List<Notifications>> appendElements(
       Future<List<Notifications>>? notifications, Notifications notification) async {
@@ -160,42 +148,28 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
       final hasPermission = await permissionService.checkPermission();
       
       if (!hasPermission) {
-        // Request permission
         final granted = await permissionService.requestPermission(context);
         if (!granted) {
-          setState(() {
-            _loading = false;
-          });
+          setState(() { _loading = false; });
           return;
         }
       }
-      
-      // Start real notification listener
-      print("Starting real notification listener");
-      
-      // Initialize the notification listener
-      await NotificationsListener.initialize(
-        callbackHandle: _callback,
-      );
-      
-      // Start listening for notifications
-      // The plugin automatically starts listening after initialization
-      
-      // Set up port for receiving notifications
-      IsolateNameServer.registerPortWithName(port.sendPort, "_notifoolistener_");
-      port.listen((dynamic message) {
-        if (message is NotificationEvent) {
-          _handleRealNotification(message);
+
+      _eventSub?.cancel();
+      _eventSub = _eventChannel.receiveBroadcastStream().listen((evt) async {
+        final n = await NotificationsHelper.onData(evt);
+        if (n != null) {
+          setState(() {
+            notificationsOfTheDay = NotificationsHelper.initializeDbGetNotificationsToday(0);
+            notificationsByCatFuture = notificationsOfTheDay!.then((value) =>
+                NotificationCatHelper.getNotificationsByCat(value, isToday));
+          });
         }
       });
 
-      setState(() {
-        started = true;
-        _loading = false;
-      });
-      
-      print("Real notification listener started successfully");
-      
+      setState(() { started = true; _loading = false; });
+      print("Notification listener started successfully");
+
     } catch (e) {
       print("Error starting notification listener: $e");
       setState(() {
@@ -204,29 +178,18 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
     }
   }
 
+  // No-op: legacy callback removed (handled via EventChannel)
+
   Future<void> stopListening() async {
     setState(() {
       _loading = true;
     });
 
     try {
-      // Stop real notification listener
-      print("Stopping real notification listener");
-      
-      // Stop listening for notifications
-      // Note: The plugin doesn't have a stopListening method
-      // The service will continue running in the background
-      
-      // Unregister port
-      IsolateNameServer.removePortNameMapping("_notifoolistener_");
-      
-      setState(() {
-        started = false;
-        _loading = false;
-      });
-      
+      print("Stopping notification listener stream");
+      await _eventSub?.cancel();
+      setState(() { started = false; _loading = false; });
       print("Real notification listener stopped successfully");
-      
     } catch (e) {
       print("Error stopping notification listener: $e");
       setState(() {
@@ -235,28 +198,7 @@ class _NotificationsListWidgetState extends State<NotificationsListWidget>
     }
   }
 
-  void _handleRealNotification(NotificationEvent event) {
-    print("Received real notification: ${event.title} from ${event.packageName}");
-    
-    // Process the real notification
-    NotificationsHelper.onData(event).then((notification) {
-      if (notification != null) {
-        // Refresh the data
-        setState(() {
-          notificationsOfTheDay = NotificationsHelper.initializeDbGetNotificationsToday(0);
-          notificationsByCatFuture = notificationsOfTheDay!.then((value) =>
-              NotificationCatHelper.getNotificationsByCat(value, isToday));
-        });
-        
-        // Update notification count if callback is provided
-        if (widget.onCountAdded != null) {
-          widget.onCountAdded!();
-        }
-        
-        print("Real notification processed and UI updated");
-      }
-    });
-  }
+  // void _handleRealNotification(NotificationEvent event) { }
 
   Widget _buildContainer(BuildContext context) {
     return FutureBuilder<List<NotificationCategory>>(

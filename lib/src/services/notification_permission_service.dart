@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_notification_listener/flutter_notification_listener.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:app_settings/app_settings.dart';
 
@@ -22,6 +22,10 @@ class NotificationPermissionService {
   bool get hasPermission => _hasPermission;
   bool get isChecking => _isChecking;
 
+  static const MethodChannel _methodChannel = MethodChannel('com.mindflo.stheer/notifications/methods');
+  static const EventChannel _eventChannel = EventChannel('com.mindflo.stheer/notifications/events');
+  static StreamSubscription? _eventSub;
+
   // Check if notification permission is granted
   Future<bool> checkPermission() async {
     if (_isChecking) return _hasPermission;
@@ -30,8 +34,15 @@ class NotificationPermissionService {
     _permissionMessageController.add('Checking notification permission...');
     
     try {
-      final hasPermission = await (NotificationsListener.hasPermission as Future<bool?>);
-      _hasPermission = hasPermission ?? false;
+      // Use real plugin permission when available
+      bool enabled = false;
+      try {
+        final res = await _methodChannel.invokeMethod('isNotificationAccessEnabled');
+        enabled = res == true;
+      } catch (e) {
+        enabled = false;
+      }
+      _hasPermission = enabled;
       _permissionStatusController.add(_hasPermission);
       
       if (_hasPermission) {
@@ -60,8 +71,8 @@ class NotificationPermissionService {
     print('Starting permission request...');
     
     try {
-      // First check current permission
-      final currentPermission = await (NotificationsListener.hasPermission as Future<bool?>);
+      // First check current permission using plugin
+      bool currentPermission = _hasPermission;
       print('Current permission status: $currentPermission');
       
       if (currentPermission == true) {
@@ -80,22 +91,17 @@ class NotificationPermissionService {
         bool settingsOpened = false;
         
         try {
-          print('Trying to open app settings...');
-          await AppSettings.openAppSettings();
+          print('Trying to open notification access settings via method channel...');
+          await _methodChannel.invokeMethod('openNotificationAccessSettings');
           settingsOpened = true;
-          print('App settings opened successfully');
+          print('Notification access settings opened successfully');
         } catch (e) {
-          print('App settings failed: $e');
-        }
-        
-        if (!settingsOpened) {
+          print('Plugin openPermissionSettings failed: $e');
           try {
-            print('Trying plugin method...');
-            await NotificationsListener.openPermissionSettings();
+            await AppSettings.openAppSettings();
             settingsOpened = true;
-            print('Plugin method succeeded');
-          } catch (e) {
-            print('Plugin method failed: $e');
+          } catch (e2) {
+            print('App settings fallback failed: $e2');
           }
         }
         
@@ -107,10 +113,14 @@ class NotificationPermissionService {
         
         // Wait a bit and check again
         await Future.delayed(Duration(seconds: 3));
-        final newPermission = await (NotificationsListener.hasPermission as Future<bool?>);
+        bool newPermission = false;
+        try {
+          final res = await _methodChannel.invokeMethod('isNotificationAccessEnabled');
+          newPermission = res == true;
+        } catch (_) { newPermission = false; }
         print('New permission status: $newPermission');
         
-        _hasPermission = newPermission ?? false;
+        _hasPermission = newPermission;
         _permissionStatusController.add(_hasPermission);
         
         if (_hasPermission) {
