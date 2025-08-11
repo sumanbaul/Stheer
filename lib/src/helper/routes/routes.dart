@@ -12,6 +12,8 @@ import 'package:notifoo/src/pages/Homepage.dart';
 import 'package:notifoo/src/pages/activity_page.dart';
 import 'package:notifoo/src/pages/activity_detail_page.dart';
 import 'package:notifoo/src/pages/app_usage_page.dart';
+import 'package:notifoo/src/pages/subscription_page.dart';
+import 'package:notifoo/src/pages/demo_features_page.dart';
 import 'package:notifoo/src/widgets/CustomBottomBar/navigator.dart';
 
 class Routes {
@@ -35,6 +37,8 @@ class Routes {
         return ActivityDetailPage(entry: args);
       },
       '/usage': (context) => const AppUsagePage(),
+      '/subscription': (context) => const SubscriptionPage(),
+      '/demo-features': (context) => const DemoFeaturesPage(),
       '/alerts': (context) => Homepage(
         title: "Alerts",
         openNavigationDrawer: () {},

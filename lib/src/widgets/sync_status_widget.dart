@@ -1,104 +1,171 @@
 import 'package:flutter/material.dart';
-import 'package:notifoo/src/services/firebase_service.dart';
+import 'package:provider/provider.dart';
+import '../services/subscription_service.dart';
+import '../model/subscription_model.dart';
 
-class SyncStatusWidget extends StatefulWidget {
+class SyncStatusWidget extends StatelessWidget {
   final bool showDetails;
-
-  const SyncStatusWidget({
-    Key? key,
-    this.showDetails = false,
-  }) : super(key: key);
-
-  @override
-  _SyncStatusWidgetState createState() => _SyncStatusWidgetState();
-}
-
-class _SyncStatusWidgetState extends State<SyncStatusWidget> {
-  bool _isSyncing = false;
-  String _lastSyncTime = 'Never';
-  String _syncStatus = 'Offline';
-
-  @override
-  void initState() {
-    super.initState();
-    _checkSyncStatus();
-  }
-
-  Future<void> _checkSyncStatus() async {
-    // This is a placeholder implementation
-    // In a real app, you would check actual sync status
-    setState(() {
-      _syncStatus = 'Online';
-      _lastSyncTime = 'Just now';
-    });
-  }
+  
+  const SyncStatusWidget({Key? key, this.showDetails = false}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Consumer<SubscriptionService>(
+      builder: (context, subscriptionService, _) {
+        return Column(
           children: [
-            Row(
-              children: [
-                Icon(
-                  _syncStatus == 'Online' ? Icons.cloud_done : Icons.cloud_off,
-                  color: _syncStatus == 'Online' 
-                      ? Colors.green 
-                      : Colors.orange,
-                  size: 20,
-                ),
-                SizedBox(width: 8),
-                Text(
-                  'Sync Status',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Spacer(),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: _syncStatus == 'Online' 
-                        ? Colors.green.withOpacity(0.1)
-                        : Colors.orange.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    _syncStatus,
-                    style: TextStyle(
-                      color: _syncStatus == 'Online' 
-                          ? Colors.green 
-                          : Colors.orange,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            if (widget.showDetails) ...[
-              SizedBox(height: 12),
-              Text(
-                'Last sync: $_lastSyncTime',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                ),
-              ),
-              SizedBox(height: 8),
-              LinearProgressIndicator(
-                value: _isSyncing ? null : 1.0,
-                backgroundColor: Colors.grey.withOpacity(0.2),
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  _syncStatus == 'Online' ? Colors.green : Colors.orange,
-                ),
-              ),
-            ],
+            // Subscription Status Banner
+            if (subscriptionService.currentSubscription != null)
+              _buildSubscriptionBanner(context, subscriptionService),
+            
+            // Existing sync status content
+            _buildSyncStatus(context),
           ],
+        );
+      },
+    );
+  }
+
+  Widget _buildSubscriptionBanner(BuildContext context, SubscriptionService subscriptionService) {
+    final subscription = subscriptionService.currentSubscription!;
+    final isTrial = subscription.status == SubscriptionStatus.trial;
+    final isExpired = subscription.status == SubscriptionStatus.expired;
+    
+    if (isExpired) return SizedBox.shrink(); // Don't show banner for expired subscriptions
+    
+    return Container(
+      margin: EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: isTrial 
+            ? [Colors.blue.withOpacity(0.1), Colors.blue.withOpacity(0.05)]
+            : [Theme.of(context).colorScheme.primary.withOpacity(0.1), Theme.of(context).colorScheme.secondary.withOpacity(0.05)],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isTrial 
+            ? Colors.blue.withOpacity(0.3)
+            : Theme.of(context).colorScheme.primary.withOpacity(0.3),
         ),
       ),
+      child: Row(
+        children: [
+          Icon(
+            isTrial ? Icons.access_time : Icons.star,
+            color: isTrial ? Colors.blue : Theme.of(context).colorScheme.primary,
+            size: 20,
+          ),
+          SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isTrial ? 'Free Trial Active' : 'Pro Subscription Active',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: isTrial ? Colors.blue : Theme.of(context).colorScheme.primary,
+                    fontSize: 14,
+                  ),
+                ),
+                if (isTrial && subscription.trialEndDate != null)
+                  Text(
+                    'Expires in ${_getTrialDaysRemaining(subscription.trialEndDate!)} days',
+                    style: TextStyle(
+                      color: Colors.blue.withOpacity(0.8),
+                      fontSize: 12,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pushNamed(context, '/subscription'),
+            child: Text(
+              isTrial ? 'Upgrade' : 'Manage',
+              style: TextStyle(
+                color: isTrial ? Colors.blue : Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
+  }
+
+  Widget _buildSyncStatus(BuildContext context) {
+    // Your existing sync status implementation here
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceVariant,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.sync,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                size: 20,
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'All data synced',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.check_circle,
+                color: Colors.green,
+                size: 20,
+              ),
+            ],
+          ),
+          if (showDetails) ...[
+            SizedBox(height: 8),
+            Text(
+              'Last sync: ${_getLastSyncTime()}',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7),
+                fontSize: 12,
+              ),
+            ),
+            SizedBox(height: 4),
+            Text(
+              'Next sync: ${_getNextSyncTime()}',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7),
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  int _getTrialDaysRemaining(DateTime trialEndDate) {
+    final now = DateTime.now();
+    final difference = trialEndDate.difference(now).inDays;
+    return difference > 0 ? difference : 0;
+  }
+
+  String _getLastSyncTime() {
+    // For now, return a placeholder. You can implement actual sync time logic
+    return '2 minutes ago';
+  }
+
+  String _getNextSyncTime() {
+    // For now, return a placeholder. You can implement actual sync time logic
+    return 'in 3 minutes';
   }
 } 

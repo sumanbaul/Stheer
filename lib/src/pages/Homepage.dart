@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:notifoo/src/components/notifications/notifications_banner.dart';
 import 'package:notifoo/src/widgets/Notifications/notifications_list_widget.dart';
 import 'package:notifoo/src/widgets/navigation/nav_drawer_widget.dart';
@@ -20,6 +21,8 @@ import '../pages/habit_hub_page.dart';
 import '../pages/task_page.dart';
 import '../pages/insights_page.dart';
 import '../pages/pomodoro_home.dart';
+import '../services/subscription_service.dart';
+import '../model/subscription_model.dart';
 
 class Homepage extends StatefulWidget {
   Homepage({
@@ -323,6 +326,67 @@ class _HomepageState extends State<Homepage> {
     switch (_currentIndex) {
       case 0: // Alerts
         return [
+          // Subscription Status Indicator
+          Consumer<SubscriptionService>(
+            builder: (context, subscriptionService, _) {
+              final subscription = subscriptionService.currentSubscription;
+              if (subscription == null) return SizedBox.shrink();
+              
+              final isTrial = subscription.status == SubscriptionStatus.trial;
+              final isPro = subscription.tier == SubscriptionTier.pro || subscription.tier == SubscriptionTier.enterprise;
+              
+              return Container(
+                margin: EdgeInsets.only(right: 8),
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isTrial 
+                    ? Colors.blue.withOpacity(0.2)
+                    : isPro 
+                      ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
+                      : Colors.grey.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isTrial 
+                      ? Colors.blue.withOpacity(0.5)
+                      : isPro 
+                        ? Theme.of(context).colorScheme.primary.withOpacity(0.5)
+                        : Colors.grey.withOpacity(0.5),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isTrial ? Icons.access_time : isPro ? Icons.star : Icons.person,
+                      color: isTrial 
+                        ? Colors.blue 
+                        : isPro 
+                          ? Theme.of(context).colorScheme.primary
+                          : Colors.grey,
+                      size: 16,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      isTrial 
+                        ? 'TRIAL'
+                        : isPro 
+                          ? 'PRO'
+                          : 'FREE',
+                      style: TextStyle(
+                        color: isTrial 
+                          ? Colors.blue 
+                          : isPro 
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.grey,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: Icon(started ? Icons.stop : Icons.play_arrow),
             onPressed: started ? stopListening : startListening,
@@ -331,6 +395,67 @@ class _HomepageState extends State<Homepage> {
         ];
       case 2: // Timer
         return [
+          // Subscription Status Indicator
+          Consumer<SubscriptionService>(
+            builder: (context, subscriptionService, _) {
+              final subscription = subscriptionService.currentSubscription;
+              if (subscription == null) return SizedBox.shrink();
+              
+              final isTrial = subscription.status == SubscriptionStatus.trial;
+              final isPro = subscription.tier == SubscriptionTier.pro || subscription.tier == SubscriptionTier.enterprise;
+              
+              return Container(
+                margin: EdgeInsets.only(right: 8),
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isTrial 
+                    ? Colors.blue.withOpacity(0.2)
+                    : isPro 
+                      ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
+                      : Colors.grey.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isTrial 
+                      ? Colors.blue.withOpacity(0.5)
+                      : isPro 
+                        ? Theme.of(context).colorScheme.primary.withOpacity(0.5)
+                        : Colors.grey.withOpacity(0.5),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isTrial ? Icons.access_time : isPro ? Icons.star : Icons.person,
+                      color: isTrial 
+                        ? Colors.blue 
+                        : isPro 
+                          ? Theme.of(context).colorScheme.primary
+                          : Colors.grey,
+                      size: 16,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      isTrial 
+                        ? 'TRIAL'
+                        : isPro 
+                          ? 'PRO'
+                          : 'FREE',
+                      style: TextStyle(
+                        color: isTrial 
+                          ? Colors.blue 
+                          : isPro 
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.grey,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: Icon(Icons.play_arrow),
             onPressed: () {
@@ -340,7 +465,69 @@ class _HomepageState extends State<Homepage> {
           ),
         ];
       default:
-        return [];
+        return [
+          // Subscription Status Indicator for other pages
+          Consumer<SubscriptionService>(
+            builder: (context, subscriptionService, _) {
+              final subscription = subscriptionService.currentSubscription;
+              if (subscription == null) return SizedBox.shrink();
+              
+              final isTrial = subscription.status == SubscriptionStatus.trial;
+              final isPro = subscription.tier == SubscriptionTier.pro || subscription.tier == SubscriptionTier.enterprise;
+              
+              return Container(
+                margin: EdgeInsets.only(right: 8),
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isTrial 
+                    ? Colors.blue.withOpacity(0.2)
+                    : isPro 
+                      ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
+                      : Colors.grey.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isTrial 
+                      ? Colors.blue.withOpacity(0.5)
+                      : isPro 
+                        ? Theme.of(context).colorScheme.primary.withOpacity(0.5)
+                        : Colors.grey.withOpacity(0.5),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isTrial ? Icons.access_time : isPro ? Icons.star : Icons.person,
+                      color: isTrial 
+                        ? Colors.blue 
+                        : isPro 
+                          ? Theme.of(context).colorScheme.primary
+                          : Colors.grey,
+                      size: 16,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      isTrial 
+                        ? 'TRIAL'
+                        : isPro 
+                          ? 'PRO'
+                          : 'FREE',
+                      style: TextStyle(
+                        color: isTrial 
+                          ? Colors.blue 
+                          : isPro 
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.grey,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ];
     }
   }
 

@@ -12,6 +12,8 @@ import 'package:notifoo/src/services/settings_service.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:notifoo/src/helper/provider/theme_provider.dart';
+import 'package:notifoo/src/services/subscription_service.dart';
+import 'package:notifoo/src/model/subscription_model.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -104,6 +106,10 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
             SizedBox(height: 32),
+            
+            // Subscription Status Section
+            _buildSubscriptionSection(context),
+            SizedBox(height: 16),
 
             // Sync Status Section
             _buildSectionTitle('Data & Sync'),
@@ -429,6 +435,131 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
       ),
     );
+  }
+
+  Widget _buildSubscriptionSection(BuildContext context) {
+    return Consumer<SubscriptionService>(
+      builder: (context, subscriptionService, _) {
+        final subscription = subscriptionService.currentSubscription;
+        
+        return Card(
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Subscription',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: _getSubscriptionColor(subscription?.tier ?? SubscriptionTier.free),
+                        borderRadius: BorderRadius.circular(12),
+                        ),
+                      child: Text(
+                        subscription?.tier.name.toUpperCase() ?? 'FREE',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12),
+                
+                if (subscription != null) ...[
+                  Text(
+                    'Status: ${subscription.status.name.toUpperCase()}',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: _getStatusColor(subscription.status),
+                    ),
+                  ),
+                  if (subscription.trialEndDate != null)
+                    Text(
+                      'Trial ends: ${_formatDate(subscription.trialEndDate!)}',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  if (subscription.endDate != null)
+                    Text(
+                      'Expires: ${_formatDate(subscription.endDate!)}',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                ] else ...[
+                  Text(
+                    'No active subscription',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                    ),
+                  ),
+                ],
+                
+                SizedBox(height: 16),
+                
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/subscription');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: Text(
+                      subscription?.isPro == true ? 'Manage Subscription' : 'Upgrade to Pro',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Color _getSubscriptionColor(SubscriptionTier tier) {
+    switch (tier) {
+      case SubscriptionTier.free:
+        return Colors.grey;
+      case SubscriptionTier.pro:
+        return Colors.blue;
+      case SubscriptionTier.enterprise:
+        return Colors.purple;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Color _getStatusColor(SubscriptionStatus status) {
+    switch (status) {
+      case SubscriptionStatus.active:
+        return Colors.green;
+      case SubscriptionStatus.trial:
+        return Colors.blue;
+      case SubscriptionStatus.expired:
+        return Colors.red;
+      case SubscriptionStatus.cancelled:
+        return Colors.orange;
+      case SubscriptionStatus.pending:
+        return Colors.yellow.shade700;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
   }
 
   Widget _buildSwitchTile(String title, String subtitle, IconData icon, bool value, ValueChanged<bool> onChanged) {
