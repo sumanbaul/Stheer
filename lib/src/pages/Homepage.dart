@@ -8,6 +8,7 @@ import 'package:notifoo/src/widgets/Notifications/notifications_list_widget.dart
 import 'package:notifoo/src/pages/habit_hub_page.dart';
 import 'package:notifoo/src/pages/pomodoro_home.dart';
 import 'package:notifoo/src/pages/task_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
 
 class Homepage extends StatefulWidget {
@@ -34,12 +35,14 @@ class _HomepageState extends State<Homepage>
   late AnimationController _slideController;
   late AnimationController _scaleController;
   late AnimationController _pulseController;
+  late AnimationController _typewriterController;
 
   // Animations
   late Animation<double> _fadeAnimation;
   late Animation<double> _slideAnimation;
   late Animation<double> _scaleAnimation;
   late Animation<double> _pulseAnimation;
+  late Animation<double> _typewriterAnimation;
 
   // Page controller for bottom navigation
   late PageController _pageController;
@@ -50,10 +53,12 @@ class _HomepageState extends State<Homepage>
 
   // State variables
   String _greeting = '';
+  String _displayedGreeting = '';
   String _currentMotivationalQuote = 'Loading motivational quote...';
   bool _isLoadingQuote = true;
   bool _hasQuoteError = false;
   Timer? _quoteRefreshTimer;
+  String? _userFirstName;
 
   // Sample data (replace with actual data from your services)
   int _todaySteps = 6500;
@@ -78,6 +83,7 @@ class _HomepageState extends State<Homepage>
     _slideController.dispose();
     _scaleController.dispose();
     _pulseController.dispose();
+    _typewriterController.dispose();
     _pageController.dispose();
     _quoteRefreshTimer?.cancel();
     super.dispose();
@@ -136,6 +142,19 @@ class _HomepageState extends State<Homepage>
       curve: Curves.easeInOut,
     ));
 
+    // Typewriter animation
+    _typewriterController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
+    _typewriterAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _typewriterController,
+      curve: Curves.easeInOut,
+    ));
+
     // Page controller
     _pageController = PageController(initialPage: 0);
 
@@ -144,9 +163,18 @@ class _HomepageState extends State<Homepage>
     _slideController.forward();
     _scaleController.forward();
     _pulseController.repeat(reverse: true);
+    _typewriterController.forward();
   }
 
   Future<void> _initializeData() async {
+    // Get user information
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null && user.displayName != null) {
+      _userFirstName = user.displayName!.split(' ').first;
+    } else {
+      _userFirstName = 'there';
+    }
+    
     // Initialize with sample data (replace with actual service calls)
     setState(() {
       _todaySteps = 6500;
@@ -156,14 +184,36 @@ class _HomepageState extends State<Homepage>
       _activeHabits = 3;
       _streakDays = 7;
       
-      // Initialize greeting based on time of day
+      // Initialize personalized greeting based on time of day
       final hour = DateTime.now().hour;
       if (hour < 12) {
-        _greeting = 'Good Morning';
+        _greeting = 'Good Morning, $_userFirstName';
       } else if (hour < 17) {
-        _greeting = 'Good Afternoon';
+        _greeting = 'Good Afternoon, $_userFirstName';
       } else {
-        _greeting = 'Good Evening';
+        _greeting = 'Good Evening, $_userFirstName';
+      }
+      
+      // Start with empty displayed greeting for typewriter effect
+      _displayedGreeting = '';
+    });
+    
+    // Start typewriter animation for greeting
+    _startTypewriterAnimation();
+  }
+
+  void _startTypewriterAnimation() {
+    _displayedGreeting = '';
+    int currentIndex = 0;
+    
+    Timer.periodic(const Duration(milliseconds: 100), (timer) {
+      if (currentIndex < _greeting.length) {
+        setState(() {
+          _displayedGreeting += _greeting[currentIndex];
+        });
+        currentIndex++;
+      } else {
+        timer.cancel();
       }
     });
   }
@@ -479,11 +529,13 @@ class _HomepageState extends State<Homepage>
           _buildTasksPage(),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showQuickActionsSheet(context),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        child: Icon(Icons.add, color: Colors.white),
-      ),
+      floatingActionButton: _currentIndex == 0 
+          ? FloatingActionButton(
+              onPressed: () => _showQuickActionsSheet(context),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              child: Icon(Icons.add, color: Colors.white),
+            )
+          : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
@@ -975,13 +1027,32 @@ class _HomepageState extends State<Homepage>
               ),
               SizedBox(width: 12),
               Expanded(
-                child: Text(
-                  _greeting,
-                  style: GoogleFonts.roboto(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
+                child: Row(
+                  children: [
+                    Text(
+                      _displayedGreeting,
+                      style: GoogleFonts.pressStart2p(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w400,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    if (_displayedGreeting.length < _greeting.length)
+                      AnimatedOpacity(
+                        opacity: _displayedGreeting.length < _greeting.length ? 1.0 : 0.0,
+                        duration: Duration(milliseconds: 500),
+                        child: Container(
+                          width: 2,
+                          height: 24,
+                          margin: EdgeInsets.only(left: 2),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary,
+                            borderRadius: BorderRadius.circular(1),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
             ],
