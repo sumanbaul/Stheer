@@ -86,13 +86,29 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
                   //   onClicked: () => _navigateToPage(context, 4),
                   // ),
                   
-                  // const SizedBox(height: 24),
-                  // Divider(color: Theme.of(context).colorScheme.outline.withOpacity(0.2)),
-                  // const SizedBox(height: 16),
+                  const SizedBox(height: 24),
+                  Divider(color: Theme.of(context).colorScheme.outline.withOpacity(0.2)),
+                  const SizedBox(height: 16),
                   
-                  // Account Section
-                  _buildSectionTitle('Account'),
+                  // Insights Section
                   const SizedBox(height: 8),
+                  _buildSectionTitle('Insights'),
+                  buildMenuItem(
+                    text: 'Stats',
+                    icon: Icons.insights,
+                    onClicked: () => _navigateToPage(context, 4),
+                  ),
+                  buildMenuItem(
+                    text: 'Advanced Analytics',
+                    icon: Icons.analytics,
+                    onClicked: () => _navigateToPage(context, 7),
+                  ),
+                  const SizedBox(height: 24),
+                  Divider(color: Theme.of(context).colorScheme.outline.withOpacity(0.2)),
+                  const SizedBox(height: 16),
+                  
+                  const SizedBox(height: 8),
+                  _buildSectionTitle('Settings & More'),
                   buildMenuItem(
                     text: 'Profile',
                     icon: Icons.person_outline,
@@ -104,19 +120,6 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
                     onClicked: () => _navigateToPage(context, 6),
                   ),
                   
-                  const SizedBox(height: 24),
-                  Divider(color: Theme.of(context).colorScheme.outline.withOpacity(0.2)),
-                  const SizedBox(height: 16),
-                  
-                  // Other Section
-                  _buildSectionTitle('Other'),
-                  const SizedBox(height: 8),
- 
-                  buildMenuItem(
-                    text: 'Advanced Analytics',
-                    icon: Icons.analytics,
-                    onClicked: () => _navigateToPage(context, 7),
-                  ),
                   buildMenuItem(
                     text: 'Help & Support',
                     icon: Icons.help_outline,

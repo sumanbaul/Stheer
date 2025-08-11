@@ -188,8 +188,8 @@ class _AdvancedAnalyticsDashboardState extends State<AdvancedAnalyticsDashboard>
       appBar: widget.showAppBar ? AppBar(
         title: Text('Advanced Analytics'),
         leading: IconButton(
-          icon: Icon(Icons.menu),
-          onPressed: widget.openNavigationDrawer,
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
           PopupMenuButton<String>(

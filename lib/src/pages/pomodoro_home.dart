@@ -154,8 +154,8 @@ class _PomodoroHomeState extends State<PomodoroHome> with TickerProviderStateMix
       appBar: widget.showAppBar ? AppBar(
         title: Text('Pomodoro'),
         leading: IconButton(
-          icon: Icon(Icons.menu),
-          onPressed: widget.openNavigationDrawer,
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
           IconButton(

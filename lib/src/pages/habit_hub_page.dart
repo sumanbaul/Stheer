@@ -63,8 +63,8 @@ class _HabitHubPage extends State<HabitHubPage> {
       appBar: widget.showAppBar ? AppBar(
         title: Text('Habits'),
         leading: IconButton(
-          icon: Icon(Icons.menu),
-          onPressed: widget.openNavigationDrawer,
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
           IconButton(
