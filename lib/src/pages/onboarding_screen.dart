@@ -80,6 +80,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => Homepage(
+          title: "Home",
           openNavigationDrawer: () {
             // This will be handled by the Homepage widget itself
           },

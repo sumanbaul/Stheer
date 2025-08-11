@@ -87,6 +87,7 @@ class _SplashScreenState extends State<SplashScreen>
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) => Homepage(
+            title: "Home",
             openNavigationDrawer: () {
               // This will be handled by the Homepage widget itself
             },

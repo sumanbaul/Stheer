@@ -15,6 +15,7 @@ import 'package:notifoo/src/pages/app_usage_page.dart';
 import 'package:notifoo/src/pages/subscription_page.dart';
 import 'package:notifoo/src/pages/demo_features_page.dart';
 import 'package:notifoo/src/widgets/CustomBottomBar/navigator.dart';
+import 'package:notifoo/src/widgets/Notifications/notifications_list_widget.dart';
 
 class Routes {
   late Map<String, Widget Function(BuildContext)> route;
@@ -23,7 +24,10 @@ class Routes {
     route = {
       '/': (context) => SplashScreen(),
       '/app': (context) => App(),
-      '/home': (context) => HabitTracker(),
+      '/home': (context) => Homepage(
+        title: "Home",
+        openNavigationDrawer: () {},
+      ),
       '/signin': (context) => Profile(),
       '/profile': (context) => Profile(title: "Profile"),
       '/pomodoro': (context) => PomodoroHome(title: "Timer"),
@@ -39,6 +43,7 @@ class Routes {
       '/usage': (context) => const AppUsagePage(),
       '/subscription': (context) => const SubscriptionPage(),
       '/demo-features': (context) => const DemoFeaturesPage(),
+      '/notifications': (context) => NotificationsListWidget(),
       '/alerts': (context) => Homepage(
         title: "Alerts",
         openNavigationDrawer: () {},

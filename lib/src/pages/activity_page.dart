@@ -453,7 +453,7 @@ class _RoutePreviewPainter extends CustomPainter {
     final line = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5
+      ..strokeWidth = 3.0
       ..strokeCap = StrokeCap.round
       ..isAntiAlias = true;
     canvas.drawPath(path, line);
