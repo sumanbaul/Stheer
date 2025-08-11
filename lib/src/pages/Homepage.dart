@@ -492,11 +492,6 @@ class _HomepageState extends State<Homepage>
       appBar: AppBar(
         title: Text(
           _getPageTitle(),
-          style: GoogleFonts.inter(
-            fontWeight: FontWeight.w400,
-            fontSize: 24,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
         ),
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
