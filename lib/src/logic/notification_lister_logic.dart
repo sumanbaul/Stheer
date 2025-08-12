@@ -1,14 +1,14 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:isolate';
-import 'dart:ui';
+// import 'dart:convert';
+// import 'dart:isolate';
+// import 'dart:ui';
 
-import 'package:device_apps/device_apps.dart';
+// Removed device_apps import - using native implementation instead
 import 'package:flutter/services.dart';
-import 'package:notifoo/src/helper/AppListHelper.dart';
+// import 'package:notifoo/src/helper/AppListHelper.dart';
 import 'package:notifoo/src/helper/DatabaseHelper.dart';
 import 'package:notifoo/src/model/Notifications.dart';
-import 'package:notifoo/src/model/apps.dart';
+// import 'package:notifoo/src/model/apps.dart';
 import 'package:notifoo/src/model/notification_lister_model.dart';
 
 class NotificationListerPageLogic {
@@ -155,44 +155,14 @@ class NotificationListerPageLogic {
 
   void startListening() async {
     print("start listening");
-
-    var hasPermission =
-        await (NotificationsListener.hasPermission as Future<bool>);
-    if (!hasPermission) {
-      print("no permission, so open settings");
-      NotificationsListener.openPermissionSettings();
-      return;
-    }
-
-    var isR = await (NotificationsListener.isRunning as Future<bool>);
-
-    if (!isR) {
-      await NotificationsListener.startService(
-        title: "Stheer listening",
-        description: "Let's scrape the notifactions...",
-        subTitle: "Service",
-        //foreground: AppButtonAction(),
-      );
-    }
-
-    // setState(() {
-    //   _model.started = true;
-    //   _loading = false;
-    // });
+    // TODO: Implement native notification listening
+    // For now, using the EventChannel approach in initPlatformState
+    print("Using EventChannel for notification listening");
   }
 
   void stopListening() async {
     print("stop listening");
-
-    // setState(() {
-    //   _loading = true;
-    // });
-
-    await NotificationsListener.stopService();
-
-    // setState(() {
-    //   started = false;
-    //   _loading = false;
-    // });
+    // TODO: Implement native notification listening stop
+    print("Stopping EventChannel notification listening");
   }
 }

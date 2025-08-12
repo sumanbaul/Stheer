@@ -98,7 +98,10 @@ dependencies {
     def multidex_version = "2.0.1"
     implementation "androidx.multidex:multidex:$multidex_version"
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
-    // Google Fit and Auth for steps integration
+    
+    // Google Play Services - Updated versions for compatibility
+    implementation 'com.google.android.gms:play-services-base:18.2.0'
     implementation 'com.google.android.gms:play-services-fitness:21.1.0'
-    implementation 'com.google.android.gms:play-services-auth:21.1.1'
+    implementation 'com.google.android.gms:play-services-auth:20.7.0'
+    implementation 'com.google.android.gms:play-services-tasks:18.0.2'
 }

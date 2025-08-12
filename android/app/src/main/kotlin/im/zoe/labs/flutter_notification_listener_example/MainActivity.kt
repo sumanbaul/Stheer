@@ -9,6 +9,9 @@ import android.content.Intent
 import android.provider.Settings
 import android.content.ComponentName
 import android.text.TextUtils
+import android.util.Log
+import android.os.Handler
+import android.os.Looper
 
 class MainActivity: FlutterActivity() {
     private val METHOD_CHANNEL = "com.mindflo.stheer/notifications/methods"
@@ -16,6 +19,7 @@ class MainActivity: FlutterActivity() {
     private val USAGE_CHANNEL = "com.mindflo.stheer/usage"
     private val FITNESS_CHANNEL = "com.mindflo.stheer/fitness"
     private val ALARM_CHANNEL = "com.mindflo.stheer/alarms"
+    private val TAG = "MainActivity"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -66,9 +70,59 @@ class MainActivity: FlutterActivity() {
                     "getWeeklyMinutes" -> {
                         result.success(UsageBridge.getWeeklyMinutes(applicationContext))
                     }
+                    "getInstalledApps" -> {
+                        result.success(AppBlockingBridge.getInstalledApps(applicationContext))
+                    }
                     else -> result.notImplemented()
                 }
             } catch (e: Exception) {
+                result.error("ERR", e.message, null)
+            }
+        }
+
+        // App blocking channel (Android only)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.mindflo.stheer/app_blocking").setMethodCallHandler { call: MethodCall, result: MethodChannel.Result ->
+            try {
+                when (call.method) {
+                    "blockApps" -> {
+                        val packageNames = call.argument<List<String>>("packageNames") ?: emptyList()
+                        val categories = call.argument<List<String>>("categories") ?: emptyList()
+                        val durationMinutes = call.argument<Int>("durationMinutes") ?: 60
+                        
+                        val success = AppBlockingBridge.blockApps(
+                            applicationContext,
+                            packageNames,
+                            categories,
+                            durationMinutes
+                        )
+                        result.success(success)
+                    }
+                    "unblockApps" -> {
+                        val packageNames = call.argument<List<String>>("packageNames") ?: emptyList()
+                        val categories = call.argument<List<String>>("categories") ?: emptyList()
+                        
+                        val success = AppBlockingBridge.unblockApps(
+                            applicationContext,
+                            packageNames,
+                            categories
+                        )
+                        result.success(success)
+                    }
+                    "isAppBlocked" -> {
+                        val packageName = call.argument<String>("packageName") ?: ""
+                        val isBlocked = AppBlockingBridge.isAppBlocked(applicationContext, packageName)
+                        result.success(isBlocked)
+                    }
+                    "getAppUsageStats" -> {
+                        val packageName = call.argument<String>("packageName") ?: ""
+                        val days = call.argument<Int>("days") ?: 7
+                        val stats = AppBlockingBridge.getAppUsageStats(applicationContext, packageName, days)
+                        result.success(stats)
+                    }
+                    else -> result.notImplemented()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error in app blocking method channel", e)
                 result.error("ERR", e.message, null)
             }
         }
@@ -77,14 +131,66 @@ class MainActivity: FlutterActivity() {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, FITNESS_CHANNEL).setMethodCallHandler { call: MethodCall, result: MethodChannel.Result ->
             try {
                 when (call.method) {
-                    "connect" -> result.success(FitnessBridge.connect(this))
-                    "hasPermissions" -> result.success(FitnessBridge.hasPermissions(this))
-                    "isConnected" -> result.success(FitnessBridge.isConnected())
-                    "getTodaySteps" -> result.success(FitnessBridge.getTodaySteps(this))
-                    "getWeeklySteps" -> result.success(FitnessBridge.getWeeklySteps(this))
+                    "connect" -> {
+                        val connectResult = FitnessBridge.connect(activity)
+                        result.success(connectResult)
+                    }
+                    "hasPermissions" -> {
+                        val hasPerms = FitnessBridge.hasPermissions(activity)
+                        result.success(hasPerms)
+                    }
+                    "isGoogleFitInstalled" -> {
+                        val isInstalled = FitnessBridge.isGoogleFitInstalled(this)
+                        result.success(isInstalled)
+                    }
+                    "isConnected" -> {
+                        val connected = FitnessBridge.isConnected()
+                        result.success(connected)
+                    }
+                    "getTodaySteps" -> {
+                        // Use async method with callback
+                        FitnessBridge.getTodaySteps(this, object : FitnessBridge.StepsCallback {
+                            override fun onSuccess(steps: Int) {
+                                // Post result back to main thread
+                                Handler(Looper.getMainLooper()).post {
+                                    result.success(steps)
+                                }
+                            }
+                            
+                            override fun onError(error: String) {
+                                Log.e(TAG, "Error getting today's steps: $error")
+                                Handler(Looper.getMainLooper()).post {
+                                    result.error("STEPS_ERROR", error, null)
+                                }
+                            }
+                        })
+                    }
+                    "getWeeklySteps" -> {
+                        // Use async method with callback
+                        FitnessBridge.getWeeklySteps(this, object : FitnessBridge.WeeklyStepsCallback {
+                            override fun onSuccess(steps: List<Int>) {
+                                // Post result back to main thread
+                                Handler(Looper.getMainLooper()).post {
+                                    result.success(steps)
+                                }
+                            }
+                            
+                            override fun onError(error: String) {
+                                Log.e(TAG, "Error getting weekly steps: $error")
+                                Handler(Looper.getMainLooper()).post {
+                                    result.error("WEEKLY_STEPS_ERROR", error, null)
+                                }
+                            }
+                        })
+                    }
+                    "disconnect" -> {
+                        FitnessBridge.disconnect()
+                        result.success(true)
+                    }
                     else -> result.notImplemented()
                 }
             } catch (e: Exception) {
+                Log.e(TAG, "Error in fitness method channel", e)
                 result.error("ERR", e.message, null)
             }
         }
@@ -118,6 +224,21 @@ class MainActivity: FlutterActivity() {
                 }
             } catch (e: Exception) {
                 result.error("ERR", e.message, null)
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        
+        // Handle Google Fit OAuth result
+        if (requestCode == FitnessBridge.REQUEST_OAUTH) {
+            Log.d(TAG, "Handling Google Fit OAuth result")
+            val success = FitnessBridge.handleActivityResult(requestCode, resultCode, data)
+            if (success) {
+                Log.d(TAG, "Google Fit OAuth successful")
+            } else {
+                Log.w(TAG, "Google Fit OAuth failed")
             }
         }
     }

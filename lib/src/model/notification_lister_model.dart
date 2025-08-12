@@ -1,4 +1,4 @@
-import 'package:device_apps/device_apps.dart';
+// Removed device_apps import - using native implementation instead
 import 'package:flutter/material.dart';
 import 'package:notifoo/src/logic/notification_lister_logic.dart';
 
@@ -10,7 +10,7 @@ class NotificationListerModel extends ChangeNotifier {
   bool? loading;
   String? packageName;
   List<dynamic> log = [];
-  Application? app;
+  // Application? app; // Removed - was from device_apps package
 
   NotificationListerModel() {
     logic = NotificationListerPageLogic(this);

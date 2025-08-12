@@ -93,6 +93,12 @@ dependencies:
   # Calendar Integration
   device_calendar: ^4.3.3
 
+  # Permission Handling
+  permission_handler: ^11.3.0
+
+  # Device Sensors for Step Tracking
+  sensors_plus: ^4.0.2
+
   # Payment & Subscription Management
   in_app_purchase: ^3.1.11
   in_app_purchase_android: ^0.3.6+1

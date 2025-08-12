@@ -1,6 +1,6 @@
 # FocusFluke 📱
 
-A modern productivity companion app that helps you manage notifications, track habits, focus with Pomodoro timers, and organize tasks efficiently. Built with Flutter and Material 3 design.
+A modern productivity companion app that helps you manage notifications, track habits, focus with Pomodoro timers, organize tasks efficiently, and monitor app usage for better digital wellbeing. Built with Flutter and Material 3 design.
 
 ## ✨ Features
 
@@ -13,6 +13,16 @@ A modern productivity companion app that helps you manage notifications, track h
 - **Smart Categorization**: Automatic app detection and categorization
 - **Real-time Updates**: Live notification capture and processing
 - **Enhanced Push Notifications**: Multi-channel smart reminders
+
+### 📱 **Advanced Usage Analytics & App Management**
+- **Comprehensive Usage Tracking**: Monitor daily, weekly, and monthly app usage
+- **Smart App Categorization**: Automatic categorization of apps (Productive, Social, Entertainment, Gaming, etc.)
+- **Focus Time Management**: Block distracting apps during focus sessions
+- **App Blocking System**: Schedule-based app blocking with customizable rules
+- **Usage Insights**: Detailed analytics with productivity scoring
+- **Pickup Detection**: Track device pickups and usage patterns
+- **Screen Time Analytics**: Hourly breakdown and trend analysis
+- **Productivity Metrics**: Focus score calculation and performance tracking
 
 ### 🎯 **Habit Tracking**
 - **Progress Visualization**: Track daily habit completion rates
@@ -38,6 +48,8 @@ A modern productivity companion app that helps you manage notifications, track h
 - **Focus Metrics**: Pomodoro session tracking
 - **Achievement System**: Badges and streaks
 - **Advanced Dashboard**: Comprehensive productivity analytics
+- **Usage Analytics**: App usage patterns and productivity insights
+- **Focus Score**: Dynamic productivity scoring system
 
 ### 👤 **User Profile**
 - **Comprehensive Dashboard**: User statistics and achievements
@@ -65,7 +77,7 @@ A modern productivity companion app that helps you manage notifications, track h
 
 ### 📱 **Home Screen Widgets**
 - **Task Control**: Quick view of pending/completed counts; tap to open tasks
-- **Habit Control**: Today’s completion summary; tap to open habits
+- **Habit Control**: Today's completion summary; tap to open habits
 - **Insights Snapshot**: Focus minutes and streak summary at a glance
 - **Quick Actions**: Background click handling to trigger app actions
 
@@ -82,15 +94,30 @@ A modern productivity companion app that helps you manage notifications, track h
 - **Data Summary**: Preview before export with statistics
 - **Cross-Device**: Easy migration between devices
 
+### 🚫 **App Blocking & Focus Management**
+- **Smart App Blocking**: Block distracting apps during focus time
+- **Scheduled Blocking**: Set up recurring focus sessions
+- **Custom Block Lists**: Create personalized app blocking rules
+- **Focus Modes**: Pre-configured blocking templates (Study, Work, Sleep)
+- **Block Now**: Quick blocking of selected apps for immediate focus
+- **Usage Statistics**: Track blocked apps and focus time effectiveness
+
 ## 🎨 **Design Features**
 
 ### **Modern UI/UX**
 - **Material 3 Design**: Latest Material Design principles
-- **Responsive Layout**: Adapts to all mobile screen sizes
+- **Responsive Layout**: Adapts to all mobile screen sizes with intelligent breakpoints
 - **Color Schemes**: Dynamic theming with primary colors
 - **Smooth Animations**: Hero animations and transitions
-- **Card-Based Design**: Clean, organized information display
+- **Card-Based Design**: Clean, organized information display with enhanced aesthetics
 - **Gradient Icons**: Beautiful app icons with gradient backgrounds
+- **Enhanced Card Design**: Modern card layouts with gradients, shadows, and circular icon containers
+
+### **Responsive Layout System**
+- **Intelligent Breakpoints**: Automatic layout switching based on screen width
+- **Side-by-Side Layouts**: Optimal space utilization for analytics and statistics
+- **Adaptive Spacing**: Dynamic spacing that adjusts to available screen real estate
+- **Creative Right-Side Elements**: Engaging productivity score cards and insights
 
 ### **Navigation**
 - **Bottom Navigation**: Quick access to main features
@@ -146,6 +173,14 @@ flutter run
 4. View detailed notification history
 5. Enjoy smooth, non-flickering notification list
 
+### **Usage Analytics & App Management**
+1. **Navigate to Usage Tab**: Access comprehensive app usage analytics
+2. **View Today's Summary**: Check daily screen time, pickups, and app launches
+3. **Explore Analytics**: Review weekly trends and productivity metrics
+4. **App Blocking**: Use "Block Now" to block distracting apps immediately
+5. **Schedule Management**: Set up recurring focus sessions with app blocking
+6. **Productivity Insights**: Monitor focus scores and usage patterns
+
 ### **Habit Tracker**
 1. Add new habits with custom categories
 2. Mark habits complete daily
@@ -199,33 +234,39 @@ flutter run
 
 The app requires the following permissions:
 - **Notification Access**: Capture and read notifications
+- **Usage Access**: Monitor app usage for analytics and blocking
 - **Internet**: Google Sign-in and Firebase features
 - **Storage**: Local data persistence
 - **Microphone**: Voice command functionality
 - **Calendar**: Sync tasks and habits to calendar
 - **File Access**: Export/import data functionality
+- **Activity Recognition**: Step counting and movement detection
 
 ## 🏗️ **Architecture**
 
 ### **Frontend**
 - **Framework**: Flutter 3.x
-- **Design**: Material 3 with custom theming
+- **Design**: Material 3 with custom theming and enhanced aesthetics
 - **State Management**: Provider pattern
 - **Navigation**: Custom bottom navigation and drawer
+- **Responsive Design**: Intelligent layout system with breakpoints
 
 ### **Backend & Storage**
 - **Local Database**: SQLite with Hive for caching
 - **Authentication**: Firebase Auth with Google Sign-in
 - **Cloud Storage**: Firebase Firestore with offline-first architecture
 - **Data Sync**: Real-time synchronization between local and cloud
+- **Native Integration**: Kotlin bridges for Android-specific features
 
 ### **Key Components**
 - **DatabaseHelper**: SQLite operations for tasks and habits
 - **FirebaseService**: Cloud synchronization and authentication
+- **AppUsageService**: Comprehensive app usage tracking and analytics
 - **ResponsiveHelper**: Dynamic sizing for different screens
 - **Navigation**: Custom bottom bar and drawer
 - **Authentication**: Google Sign-in integration
 - **NotificationHelper**: Smart notification processing and categorization
+- **StepsService**: Hybrid step counting with Google Fit and device sensors
 
 ## 📦 **Dependencies**
 
@@ -275,12 +316,16 @@ speech_to_text: ^6.6.0
 
 # Calendar Integration
 device_calendar: ^4.3.1
+
+# Sensors & Health
+sensors_plus: ^3.0.0
+google_fit: ^0.0.1
 ```
 
 ## 🎯 **Key Features Implemented**
 
 ### **✅ Completed Features**
-- [x] Modern Material 3 UI design
+- [x] Modern Material 3 UI design with enhanced aesthetics
 - [x] Beautiful splash screen with animations
 - [x] Interactive onboarding experience
 - [x] Responsive bottom navigation
@@ -308,10 +353,17 @@ device_calendar: ^4.3.1
 - [x] **Calendar Integration**: Sync tasks and habits to device calendar
 - [x] **Enhanced Push Notifications**: Smart reminders with multiple channels
 - [x] **Advanced Theme System**: Custom color schemes and personalization
+- [x] **Comprehensive Usage Analytics**: Daily, weekly, and monthly app usage tracking
+- [x] **Smart App Categorization**: Automatic categorization of installed apps
+- [x] **App Blocking System**: Schedule-based app blocking with focus modes
+- [x] **Productivity Scoring**: Dynamic focus score calculation and insights
+- [x] **Enhanced UI Layouts**: Responsive side-by-side layouts with creative elements
+- [x] **Step Counting**: Hybrid tracking with Google Fit and device sensors
+- [x] **Focus Time Management**: Block distracting apps during productivity sessions
 
 ### **🔄 In Progress**
-- [ ] Advanced analytics dashboard
-- [ ] Enhanced UI animations
+- [ ] Advanced analytics dashboard enhancements
+- [ ] Enhanced UI animations and transitions
 
 ### **📋 Planned Features**
 - [ ] Cloud backup and sync
@@ -320,6 +372,8 @@ device_calendar: ^4.3.1
 - [ ] Wear OS integration
 - [ ] AI-powered suggestions
 - [ ] Multi-device synchronization
+- [ ] Advanced app blocking rules
+- [ ] Usage pattern insights
 
 ## 🐛 **Recent Fixes**
 
@@ -331,12 +385,19 @@ device_calendar: ^4.3.1
 - [x] **Splash Screen**: Added beautiful animated splash screen
 - [x] **Onboarding Flow**: Created 5-page interactive onboarding
 - [x] **Performance Issues**: Optimized async operations and state management
+- [x] **UI Layout Issues**: Fixed pixel overflow and responsive layout problems
+- [x] **Google Fit Integration**: Resolved SecurityException and connection issues
+- [x] **Step Counting**: Fixed sensor threshold and detection logic
+- [x] **App Blocking**: Implemented native Android app blocking bridge
 
 ### **🔧 Technical Improvements**
 - [x] **Better Error Handling**: Improved error states and user feedback
 - [x] **Memory Management**: Proper disposal of controllers and timers
 - [x] **Code Organization**: Cleaner, more maintainable code structure
 - [x] **Performance Optimization**: Reduced unnecessary rebuilds and logging
+- [x] **Native Integration**: Kotlin bridges for Android-specific functionality
+- [x] **Responsive Design**: Intelligent layout system with breakpoints
+- [x] **UI Enhancements**: Modern card designs with gradients and shadows
 
 ## 🚀 **Backend Status**
 
@@ -346,6 +407,8 @@ device_calendar: ^4.3.1
 - **Real-time Sync**: Automatic data synchronization
 - **Authentication**: Google Sign-in with Firebase Auth
 - **Conflict Resolution**: Smart data conflict handling
+- **Native Android Integration**: Usage stats, app blocking, and sensor data
+- **Google Fit Integration**: Step counting and health data synchronization
 
 ## 🤝 **Contributing**
 
@@ -357,12 +420,13 @@ device_calendar: ^4.3.1
 
 ### **Development Guidelines**
 - Follow Material 3 design principles
-- Use responsive design patterns
+- Use responsive design patterns with intelligent breakpoints
 - Implement proper error handling
 - Add loading states for async operations
 - Maintain consistent color schemes
 - Test on multiple screen sizes
 - Follow Flutter best practices
+- Ensure native Android integration works properly
 
 ## 📄 **License**
 
@@ -380,9 +444,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Material Design team for design guidelines
 - Firebase team for backend services
 - Open source community for dependencies
+- Android development community for native integration support
 
 ---
 
 **Made with ❤️ using Flutter**
 
-*Version 2.1.0 - Enhanced Productivity Suite with Voice Commands, Widgets, and Smart Integrations*
+*Version 2.2.0 - Advanced Productivity Suite with Usage Analytics, App Blocking, and Enhanced UI*
